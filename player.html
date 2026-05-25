@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ListenUp</title>
 <script src="tracks.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const _supabase = supabase.createClient(
+    'https://wccuzwkswtaehcdijtcf.supabase.co',
+    'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
+  );
+  let _currentUser = null;
+  _supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session) { window.location.href = 'login.html'; return; }
+    _currentUser = session.user;
+  });
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -504,20 +516,11 @@
 
   <!-- Submit button - shown after all sentences -->
   <div id="submitWrap" style="display:block;margin-top:32px;text-align:right;">
-    <button onclick="openSaveModal()" style="padding:12px 32px;border-radius:10px;border:none;background:var(--accent);color:#0e0e0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Submit</button>
+    <button onclick="saveRecord()" style="padding:12px 32px;border-radius:10px;border:none;background:var(--accent);color:#0e0e0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Submit</button>
   </div>
 
   <!-- Save modal -->
-  <div id="saveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:340px;max-width:90vw;">
-      <div style="font-family:'DM Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:8px">기록 저장</div>
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">이름을 입력하면 학습 기록이 저장돼요</p>
-      <input type="text" id="saveName" placeholder="이름 입력..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;margin-bottom:16px;">
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button onclick="closeSaveModal()" style="padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">취소</button>
-        <button onclick="saveRecord()" style="padding:9px 22px;border-radius:8px;border:none;background:var(--accent);color:#0e0e0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">저장</button>
-      </div>
-    </div>
+  
   </div>
 
 </div>
@@ -685,14 +688,30 @@ function playSegment(i) {
 let sessionScores = [];
 let sessionDetails = {}; // stores {index: {text, userSaid, score}}
 
-function openSaveModal() {
-  document.getElementById('saveModal').style.display = 'flex';
-  document.getElementById('saveName').focus();
-}
-
-function closeSaveModal() {
-  document.getElementById('saveModal').style.display = 'none';
-  isSaving = false;
+async function saveRecord() {
+  if (isSaving) return;
+  isSaving = true;
+  const user = _currentUser;
+  const scores_arr = Object.values(sessionScores).filter(s => s != null);
+  const avg = scores_arr.length ? Math.round(scores_arr.reduce((a,b)=>a+b,0)/scores_arr.length) : null;
+  const progress = scores_arr.length + '/' + currentTrack.sentences.length + '문장';
+  try {
+    await fetch('/api/records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: user?.user_metadata?.full_name || user?.email || '익명',
+        email: user?.email || null,
+        userId: user?.id || null,
+        track: currentTrack.title,
+        mode: '쉐도잉',
+        score: avg,
+        progress,
+        details: []
+      })
+    });
+    window.location.href = 'history.html';
+  } catch(e) { alert('저장 중 오류가 발생했어요.'); isSaving = false; }
 }
 
 document.addEventListener('keydown', e => {
