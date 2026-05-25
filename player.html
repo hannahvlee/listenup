@@ -717,20 +717,21 @@ let isSaving = false;
 async function saveRecord() {
   if (isSaving) return;
   isSaving = true;
-  const user = _currentUser;
-  const name = user?.user_metadata?.full_name || user?.email || '익명';
+  const name = (_currentUser?.user_metadata?.full_name || _currentUser?.email || '익명');
+  const saveBtn = document.querySelector('.btn-save');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '저장 중...'; }
+
   const avg = sessionScores.length
     ? Math.round(sessionScores.reduce((a,b) => a+b, 0) / sessionScores.length)
     : null;
   const progress = `${sessionScores.length}/${SENTENCES.length}문장`;
+
   try {
     await fetch('/api/records', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name,
-        email: user?.email || null,
-        userId: user?.id || null,
         track: track.title,
         mode: '쉐도잉',
         score: avg,
@@ -742,7 +743,7 @@ async function saveRecord() {
     closeSaveModal();
     window.location.href = 'history.html';
   } catch(e) {
-    alert('저장 중 오류가 발생했어요.'); isSaving = false;
+    alert('저장 중 오류가 발생했어요.');
   }
 }
 

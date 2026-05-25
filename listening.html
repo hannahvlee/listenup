@@ -444,8 +444,7 @@ let isSaving = false;
 async function saveRecord() {
   if (isSaving) return;
   isSaving = true;
-  const user = _currentUser;
-  const name = user?.user_metadata?.full_name || user?.email || '익명';
+  const name = (_currentUser?.user_metadata?.full_name || _currentUser?.email || '익명');
   const validScores = scores.filter(s => s != null);
   const avg = validScores.length ? Math.round(validScores.reduce((a,b) => a+b, 0) / validScores.length) : null;
   const progress = `${validScores.length}/${currentTrack.sentences.length}문장`;
@@ -454,9 +453,7 @@ async function saveRecord() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        name,
-        email: user?.email || null,
-        userId: user?.id || null,
+        name, 
         track: currentTrack.title, 
         mode: '청취테스트', 
         score: avg, 
@@ -467,7 +464,7 @@ async function saveRecord() {
     });
     closeSaveModal();
     window.location.href = 'history.html';
-  } catch(e) { alert('저장 중 오류가 발생했어요.'); isSaving = false; }
+  } catch(e) { alert('저장 중 오류가 발생했어요.'); }
 }
 
 let showText = false;
