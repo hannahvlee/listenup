@@ -59,6 +59,9 @@
 
   .btn-logout { width: 100%; padding: 13px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--danger); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s; margin-top: 32px; }
   .btn-logout:hover { border-color: var(--danger); background: rgba(240,96,96,0.06); }
+  .btn-secondary { padding: 9px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-block; }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
@@ -93,6 +96,26 @@
   <div class="info-card">
     <div class="info-label">이메일</div>
     <div class="info-value" id="userEmail">...</div>
+  </div>
+
+  <div class="profile-card">
+    <div>
+      <div class="info-label">반</div>
+      <div class="info-value" id="userClass">-</div>
+    </div>
+    <div>
+      <div class="info-label">목표 점수</div>
+      <div class="info-value" id="userTarget">-</div>
+    </div>
+    <div>
+      <div class="info-label">목표 날짜</div>
+      <div class="info-value" id="userTargetDate">-</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:24px;">
+    <a href="profile.html" class="btn-secondary">프로필 수정</a>
+    <a href="toefl.html" class="btn-secondary">토플 점수 →</a>
   </div>
 
   <div class="filter-row">
@@ -209,9 +232,23 @@
     if (!session) { window.location.href = 'login.html'; return; }
 
     const user = session.user;
-    const name = user?.user_metadata?.full_name || user?.email || '사용자';
-    document.getElementById('userName').textContent = name;
     document.getElementById('userEmail').textContent = user.email;
+
+    // 프로필 불러오기
+    const { data: profile } = await _supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profile) {
+      document.getElementById('userName').textContent = profile.name || user?.user_metadata?.full_name || '사용자';
+      document.getElementById('userClass').textContent = profile.class || '-';
+      document.getElementById('userTarget').textContent = profile.target_score != null ? profile.target_score + '점' : '-';
+      document.getElementById('userTargetDate').textContent = profile.target_date || '-';
+    } else {
+      document.getElementById('userName').textContent = user?.user_metadata?.full_name || '사용자';
+    }
 
     try {
       const res = await fetch('/api/records?email=' + encodeURIComponent(user.email) + '&t=' + Date.now(), { cache: 'no-store' });
