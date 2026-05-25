@@ -23,18 +23,18 @@ export default async function handler(req, res) {
     return r.json();
   };
 
-  // GET - fetch all records or single record by id
+  // GET - fetch records (전체 or 특정 유저)
   if (req.method === 'GET') {
     try {
+      const { email } = req.query;
       const keysRes = await redis(['LRANGE', 'records', '0', '499']);
-      const records = (keysRes.result || []).map(r => {
+      let records = (keysRes.result || []).map(r => {
         try { return JSON.parse(r); } catch { return null; }
       }).filter(Boolean);
 
-      const id = req.query && req.query.id;
-      if (id) {
-        const record = records.find(r => String(r.id) === String(id));
-        return res.status(200).json({ record: record || null });
+      // 이메일로 필터링
+      if (email) {
+        records = records.filter(r => r.email === email);
       }
 
       return res.status(200).json({ records });
@@ -46,14 +46,16 @@ export default async function handler(req, res) {
   // POST - save a record
   if (req.method === 'POST') {
     try {
-      const { name, track, mode, score, progress, details, textVisible } = req.body;
-      if (!name || !track || !mode) {
+      const { name, email, userId, track, mode, score, details, textVisible, progress } = req.body;
+      if (!track || !mode) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
       const record = {
         id: Date.now(),
-        name,
+        name: name || '익명',
+        email: email || null,
+        userId: userId || null,
         track,
         mode,
         score,
