@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>토플 점수 - ListenUp!</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+    --accent: #c8f060; --accent2: #60c8f0; --text: #f0ede8; --text-muted: #6e6e6e;
+    --text-dim: #3e3e3e; --danger: #f06060; --success: #60f0a0; --warn: #f0c060;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(200,240,96,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,200,240,0.04) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 48px 24px 80px; position: relative; z-index: 1; flex: 1; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--accent2); text-decoration: none; letter-spacing: 0.18em; font-weight: 700; }
+  .label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+
+  /* Two column layout */
+  .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 640px) { .columns { grid-template-columns: 1fr; } }
+
+  .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title span { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); font-weight: 400; }
+
+  /* Table */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+  th { padding: 10px 12px; text-align: left; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 12px; font-size: 12px; font-family: 'DM Mono', monospace; }
+  .td-date { color: var(--text-muted); font-size: 11px; }
+  .td-score { font-weight: 500; }
+  .td-total { font-weight: 600; color: var(--accent); }
+
+  /* Add button */
+  .btn-add { width: 100%; padding: 10px; background: transparent; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 360px; }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .form-input { width: 100%; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--accent); }
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-save { width: 100%; padding: 12px; background: var(--accent); color: #0e0e0e; border: none; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.15s; }
+  .btn-save:hover { background: #d4f570; }
+  .btn-cancel { width: 100%; padding: 10px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; margin-top: 8px; }
+
+  .empty { text-align: center; padding: 32px 20px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 11px; }
+  .loading { text-align: center; padding: 24px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 11px; }
+
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <a href="index.html" class="logo">🎧 ListenUp!</a>
+    <a href="mypage.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);text-decoration:none;letter-spacing:0.05em;">← 마이페이지</a>
+  </div>
+
+  <div class="label">TOEFL</div>
+  <h1 style="font-size:28px;font-weight:600;margin-bottom:32px;">토플 점수 기록</h1>
+
+  <div class="columns">
+    <!-- 모의 토플 -->
+    <div>
+      <div class="section-title">
+        모의 토플
+        <span>0-6점</span>
+      </div>
+      <div class="table-wrap">
+        <div class="loading" id="mockLoading">불러오는 중...</div>
+        <table id="mockTable" style="display:none">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>R</th>
+              <th>L</th>
+              <th>S</th>
+              <th>W</th>
+              <th>총점</th>
+            </tr>
+          </thead>
+          <tbody id="mockBody"></tbody>
+        </table>
+        <div class="empty" id="mockEmpty" style="display:none">기록 없음</div>
+      </div>
+      <button class="btn-add" onclick="openModal('mock')">+ 점수 추가</button>
+    </div>
+
+    <!-- 실제 토플 -->
+    <div>
+      <div class="section-title">
+        실제 토플
+        <span>0-6점</span>
+      </div>
+      <div class="table-wrap">
+        <div class="loading" id="actualLoading">불러오는 중...</div>
+        <table id="actualTable" style="display:none">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>R</th>
+              <th>L</th>
+              <th>S</th>
+              <th>W</th>
+              <th>총점</th>
+            </tr>
+          </thead>
+          <tbody id="actualBody"></tbody>
+        </table>
+        <div class="empty" id="actualEmpty" style="display:none">기록 없음</div>
+      </div>
+      <button class="btn-add" onclick="openModal('actual')">+ 점수 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">점수 추가</div>
+    <div class="form-group">
+      <label class="form-label">시험 날짜</label>
+      <input type="date" class="form-input" id="inputDate">
+    </div>
+    <div class="score-grid">
+      <div class="form-group">
+        <label class="form-label">리딩 (R)</label>
+        <input type="number" class="form-input" id="inputReading" min="0" max="6" step="0.5" placeholder="0-6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">리스닝 (L)</label>
+        <input type="number" class="form-input" id="inputListening" min="0" max="6" step="0.5" placeholder="0-6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">스피킹 (S)</label>
+        <input type="number" class="form-input" id="inputSpeaking" min="0" max="6" step="0.5" placeholder="0-6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">라이팅 (W)</label>
+        <input type="number" class="form-input" id="inputWriting" min="0" max="6" step="0.5" placeholder="0-6">
+      </div>
+    </div>
+    <button class="btn-save" onclick="saveScore()">저장</button>
+    <button class="btn-cancel" onclick="closeModal()">취소</button>
+  </div>
+</div>
+
+<footer style="border-top:1px solid var(--border);padding:20px 24px;text-align:center;position:relative;z-index:1;">
+  <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">© 2026 ListenUp. All Rights Reserved.</span>
+</footer>
+
+<script>
+  const _supabase = supabase.createClient(
+    'https://wccuzwkswtaehcdijtcf.supabase.co',
+    'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
+  );
+
+  let currentType = null;
+  let currentUser = null;
+
+  async function init() {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+    await loadScores();
+  }
+
+  async function loadScores() {
+    const { data, error } = await _supabase
+      .from('toefl_scores')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('test_date', { ascending: false });
+
+    if (error) {
+      document.getElementById('mockLoading').textContent = '불러오기 실패';
+      document.getElementById('actualLoading').textContent = '불러오기 실패';
+      return;
+    }
+
+    const mock = (data || []).filter(r => r.type === 'mock');
+    const actual = (data || []).filter(r => r.type === 'actual');
+
+    renderTable('mock', mock);
+    renderTable('actual', actual);
+  }
+
+  function renderTable(type, records) {
+    const loading = document.getElementById(type + 'Loading');
+    const table = document.getElementById(type + 'Table');
+    const body = document.getElementById(type + 'Body');
+    const empty = document.getElementById(type + 'Empty');
+
+    loading.style.display = 'none';
+
+    if (records.length === 0) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    table.style.display = 'table';
+    empty.style.display = 'none';
+    body.innerHTML = '';
+
+    records.forEach(r => {
+      const tr = document.createElement('tr');
+      const total = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(1);
+      tr.innerHTML = `
+        <td class="td-date">${r.test_date}</td>
+        <td class="td-score">${r.reading}</td>
+        <td class="td-score">${r.listening}</td>
+        <td class="td-score">${r.speaking}</td>
+        <td class="td-score">${r.writing}</td>
+        <td class="td-total">${total}</td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function openModal(type) {
+    currentType = type;
+    document.getElementById('modalTitle').textContent = type === 'mock' ? '모의 토플 점수 추가' : '실제 토플 점수 추가';
+    document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('inputReading').value = '';
+    document.getElementById('inputListening').value = '';
+    document.getElementById('inputSpeaking').value = '';
+    document.getElementById('inputWriting').value = '';
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    currentType = null;
+  }
+
+  async function saveScore() {
+    const date = document.getElementById('inputDate').value;
+    const reading = parseFloat(document.getElementById('inputReading').value);
+    const listening = parseFloat(document.getElementById('inputListening').value);
+    const speaking = parseFloat(document.getElementById('inputSpeaking').value);
+    const writing = parseFloat(document.getElementById('inputWriting').value);
+
+    if (!date || isNaN(reading) || isNaN(listening) || isNaN(speaking) || isNaN(writing)) {
+      alert('모든 항목을 입력해주세요!');
+      return;
+    }
+
+    const total = (reading + listening + speaking + writing) / 4;
+
+    const { error } = await _supabase.from('toefl_scores').insert({
+      user_id: currentUser.id,
+      type: currentType,
+      reading, listening, speaking, writing,
+      total,
+      test_date: date
+    });
+
+    if (error) { alert('저장 실패: ' + error.message); return; }
+
+    closeModal();
+    await loadScores();
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  init();
+</script>
+</body>
+</html>
