@@ -731,6 +731,7 @@ async function saveRecord() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        email: _currentUser?.email,
         name,
         track: track.title,
         mode: '쉐도잉',

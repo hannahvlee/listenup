@@ -6,6 +6,18 @@
 <title>어휘 테스트</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="tracks.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const _supabase = supabase.createClient(
+    'https://wccuzwkswtaehcdijtcf.supabase.co',
+    'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
+  );
+  let _currentUser = null;
+  _supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session) window.location.href = 'login.html';
+    _currentUser = session?.user || null;
+  });
+</script>
 <style>
   :root {
     --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
@@ -452,7 +464,7 @@ async function saveRecord() {
     await fetch('/api/records', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, track: currentTrack.title, mode: '어휘테스트', score, progress, details })
+      body: JSON.stringify({ email: _currentUser?.email || '', name, track: currentTrack.title, mode: '어휘테스트', score, progress, details })
     });
     closeSaveModal();
     window.location.href = 'history.html';
