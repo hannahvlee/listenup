@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ListenUp</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="tracks.js"></script>
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #c8f060;
+    --accent2: #60c8f0;
+    --text: #f0ede8;
+    --text-muted: #6e6e6e;
+    --text-dim: #3e3e3e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(200,240,96,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,200,240,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+  }
+
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+
+  .track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .track-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .track-card:hover {
+    border-color: var(--accent);
+    background: rgba(200,240,96,0.04);
+    transform: translateX(4px);
+  }
+
+  .track-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .track-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    min-width: 24px;
+  }
+
+  .track-title {
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .track-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .track-arrow {
+    font-size: 18px;
+    color: var(--text-dim);
+    transition: color 0.2s;
+  }
+
+  .track-card:hover .track-arrow {
+    color: var(--accent);
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MDELTEL4XC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-MDELTEL4XC');
+</script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <a href="index.html" style="font-family:'DM Mono',monospace;font-size:15px;color:var(--accent2);text-decoration:none;letter-spacing:0.18em;font-weight:700;">🎧 ListenUp!</a>
+      <a href="history.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">📊 기록 보기 →</a>
+    </div>
+    <h1>어떻게 연습할까요?</h1>
+    <p class="subtitle" style="margin-bottom:32px">학습 모드를 선택하세요</p>
+  </header>
+
+  <!-- Mode selector -->
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(200px,1fr));gap:12px;margin-bottom:40px">
+    <a href="#listening" onclick="setMode('listening')" id="mode-listening"
+      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+      <span style="font-size:24px">🎧</span>
+      <div>
+        <div style="font-weight:500;margin-bottom:4px">청취 테스트</div>
+        <div style="font-size:12px;color:var(--text-muted)">듣고 한국어로 번역</div>
+      </div>
+    </a>
+    <a href="#shadowing" onclick="setMode('shadowing')" id="mode-shadowing"
+      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+      <span style="font-size:24px">🎙</span>
+      <div>
+        <div style="font-weight:500;margin-bottom:4px">쉐도잉</div>
+        <div style="font-size:12px;color:var(--text-muted)">듣고 따라 말하기</div>
+      </div>
+    </a>
+    <a href="#dictation" onclick="setMode('dictation')" id="mode-dictation"
+      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+      <span style="font-size:24px">✏️</span>
+      <div>
+        <div style="font-weight:500;margin-bottom:4px">딕테이션</div>
+        <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">듣고 영어로 받아쓰기</div>
+      </div>
+    </a>
+    <a href="#vocab" onclick="setMode('vocab')" id="mode-vocab"
+      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+      <span style="font-size:24px">📝</span>
+      <div>
+        <div style="font-weight:500;margin-bottom:4px">어휘 테스트</div>
+        <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">핵심 단어/구문 테스트</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Track list -->
+  <div class="track-list" id="trackList" style="max-width:100%"></div>
+</div>
+
+<script>
+  let currentMode = 'listening';
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-shadowing').style.borderColor = mode === 'shadowing' ? 'var(--accent)' : 'var(--border)';
+    document.getElementById('mode-listening').style.borderColor = mode === 'listening' ? 'var(--accent)' : 'var(--border)';
+    document.getElementById('mode-dictation').style.borderColor = mode === 'dictation' ? 'var(--accent)' : 'var(--border)';
+    document.getElementById('mode-vocab').style.borderColor = mode === 'vocab' ? 'var(--accent)' : 'var(--border)';
+    renderTracks();
+    return false;
+  }
+
+  function renderTracks() {
+    const trackList = document.getElementById('trackList');
+    trackList.innerHTML = '';
+    const hiddenTracks = JSON.parse(localStorage.getItem('hiddenTracks') || '[]');
+    const visibleTracks = TRACKS.filter(t => !hiddenTracks.includes(t.id) && !hiddenTracks.includes(String(t.id)));
+    visibleTracks.forEach((track, i) => {
+      const a = document.createElement('a');
+      a.className = 'track-card';
+      const href = currentMode === 'shadowing' ? `player.html?id=${track.id}` :
+                   currentMode === 'listening' ? `listening.html?id=${track.id}` :
+                   currentMode === 'dictation' ? `dictation.html?id=${track.id}` :
+                   `vocab.html?id=${track.id}`;
+      a.href = href;
+      a.innerHTML = `
+        <div class="track-left">
+          <span class="track-num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="track-title">${track.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span class="track-count">${track.sentences.length} sentences</span>
+          <span class="track-arrow">→</span>
+        </div>
+      `;
+      trackList.appendChild(a);
+    });
+  }
+
+  renderTracks();
+</script>
+
+<footer style="border-top:1px solid var(--border);background:var(--bg);padding:28px 24px;text-align:center;position:relative;z-index:1;"><div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;"><a href="terms.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">이용약관</a><span style="color:var(--border);">|</span><a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">개인정보 처리방침</a><span style="color:var(--border);">|</span>
+      <a href="feedback.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;">피드백</a>
+      <span style="color:var(--border);">|</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">© 2026 ListenUp. All Rights Reserved.</span></div></footer>
+</body>
+</html>

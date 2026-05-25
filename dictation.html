@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>딕테이션</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="tracks.js"></script>
+<style>
+  :root {
+    --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+    --accent: #c8f060; --accent2: #60c8f0; --text: #f0ede8; --text-muted: #6e6e6e;
+    --text-dim: #3e3e3e; --danger: #f06060; --success: #60f0a0; --warn: #f0c060;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(200,240,96,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,200,240,0.04) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+  .container { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; position: relative; z-index: 1; }
+  .label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: clamp(28px, 5vw, 42px); line-height: 1.1; margin-bottom: 8px; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .subtitle { font-size: 14px; color: var(--text-muted); }
+  .track-selector { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
+  .track-btn { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .track-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .track-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
+  .progress-bar { height: 0; background: var(--border); border-radius: 2px; margin-bottom: 0; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+  .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-top: 0; margin-bottom: 16px; }
+  .sentence-counter { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 0.1em; }
+  .repeat-section { margin-bottom: 20px; }
+  .repeat-dots { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .repeat-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-right: 4px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+  .dot.done { background: var(--accent2); }
+  .dot.playing { background: var(--accent); animation: pulse 0.8s infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+  .repeat-status { font-size: 13px; color: var(--text-muted); }
+  .repeat-status strong { color: var(--accent2); }
+  .controls-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .btn-listen { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; border: 1px solid var(--accent2); background: transparent; color: var(--accent2); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .btn-listen:hover { background: rgba(96,200,240,0.08); }
+  .speed-control { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .speed-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .speed-value { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); min-width: 32px; }
+  input[type="range"] { -webkit-appearance: none; width: 80px; height: 3px; background: var(--border); border-radius: 2px; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+  .input-section { margin-bottom: 20px; }
+  .input-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .dictation-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; resize: none; height: 80px; outline: none; transition: border-color 0.2s; }
+  .dictation-input:focus { border-color: var(--accent); }
+  .dictation-input::placeholder { color: var(--text-dim); }
+  .input-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .btn-submit { padding: 10px 24px; background: var(--accent); color: #0e0e0e; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
+  .btn-submit:hover { opacity: 0.85; }
+  .btn-skip { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 9px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .btn-skip:hover { border-color: var(--accent2); color: var(--accent2); }
+  .result-area { display: none; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 8px; }
+  .result-area.show { display: block; }
+  .score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .score-big { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 42px; line-height: 1; }
+  .score-big.great { color: var(--success); } .score-big.ok { color: var(--warn); } .score-big.poor { color: var(--danger); }
+  .score-badge { font-family: 'DM Mono', monospace; font-size: 12px; padding: 4px 12px; border-radius: 20px; }
+  .score-badge.pass { background: rgba(96,240,160,0.12); color: var(--success); border: 1px solid rgba(96,240,160,0.3); }
+  .score-badge.fail { background: rgba(240,96,96,0.12); color: var(--danger); border: 1px solid rgba(240,96,96,0.3); }
+  .diff-box { background: var(--surface2); border-radius: 8px; padding: 14px 16px; font-size: 14px; line-height: 1.8; margin-bottom: 12px; }
+  .word-correct { color: var(--success); } .word-wrong { color: var(--danger); text-decoration: line-through; }
+  .answer-box { background: rgba(200,240,96,0.04); border: 1px solid rgba(200,240,96,0.15); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
+  .answer-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .answer-text { font-size: 14px; line-height: 1.6; }
+  .nav-row { display: flex; gap: 8px; justify-content: flex-end; }
+  .btn-nav { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .btn-nav:hover { border-color: var(--accent2); color: var(--accent2); }
+  .btn-next { padding: 9px 22px; border-radius: 8px; border: none; background: var(--accent); color: #0e0e0e; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
+  .btn-next:hover { opacity: 0.85; }
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; text-align: center; display: none; }
+  .summary-card.show { display: block; }
+  .summary-score { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 64px; margin-bottom: 8px; }
+  .summary-score.great { color: var(--success); } .summary-score.ok { color: var(--warn); } .summary-score.poor { color: var(--danger); }
+  .summary-label { font-size: 16px; color: var(--text-muted); margin-bottom: 32px; }
+  .btn-restart { padding: 12px 28px; background: var(--accent); color: #0e0e0e; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin: 0 6px; }
+  .btn-restart:hover { opacity: 0.85; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MDELTEL4XC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-MDELTEL4XC');
+</script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)"><a href="index.html" style="font-family:'DM Mono',monospace;font-size:15px;color:var(--accent2);text-decoration:none;letter-spacing:0.18em;font-weight:700;">🎧 ListenUp!</a></div>
+    <h1 id="pageTitle2"></h1>
+    <p class="subtitle">문장을 5번 듣고 들린 내용을 영어로 받아쓰세요</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;margin-bottom:24px;" id="modeTabs"></div>
+  </header>
+  <div class="track-selector" id="trackSelector" style="display:none"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="test-card" id="testCard">
+    <div class="sentence-counter" id="sentenceCounter">문장 1 / 20</div>
+    <div class="repeat-section">
+      <div class="repeat-dots">
+        <span class="repeat-label">반복</span>
+        <div class="dot" id="dot-0"></div>
+        <div class="dot" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
+        <div class="dot" id="dot-4"></div>
+      </div>
+      <div class="repeat-status" id="repeatStatus">재생 준비 중...</div>
+    </div>
+    <div class="controls-row">
+      <button class="btn-listen" onclick="listenAgain()">🔊 다시 듣기</button>
+      <div class="speed-control">
+        <span class="speed-label">속도</span>
+        <input type="range" id="speedSlider" min="0.5" max="1.5" step="0.05" value="1.0">
+        <span class="speed-value" id="speedVal">1.0×</span>
+      </div>
+    </div>
+    <div class="input-section">
+      <div class="input-label">받아쓰기 입력</div>
+      <textarea class="dictation-input" id="dictationInput" placeholder="들린 내용을 영어로 입력하세요..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitDictation();}"></textarea>
+      <div class="input-row">
+        <div style="display:flex;gap:8px;">
+        <button class="btn-skip" onclick="skipSentence()">건너뛰기 →</button>
+      </div>
+        <button class="btn-submit" onclick="submitDictation()">채점하기</button>
+      </div>
+    </div>
+    <div class="result-area" id="resultArea">
+      <div class="score-row">
+        <div class="score-big" id="scoreBig"></div>
+        <span class="score-badge" id="scoreBadge"></span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted)" id="scoreDetail"></span>
+      </div>
+      <div class="diff-box" id="diffBox"></div>
+      <div class="answer-box">
+        <div class="answer-label">정답</div>
+        <div class="answer-text" id="answerText"></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-nav" onclick="retryThis()">↺ 다시 시도</button>
+        <button class="btn-next" onclick="nextSentence()">다음 →</button>
+        <button class="btn-skip" onclick="openSaveModal()" style="margin-left:8px;">Submit</button>
+      </div>
+    </div>
+  </div>
+  <div class="summary-card" id="summaryCard">
+    <div class="summary-score" id="summaryScore"></div>
+    <div class="summary-label" id="summaryLabel"></div>
+    <br>
+    <button class="btn-restart" onclick="restart()">다시 시작</button>
+    <button class="btn-restart" onclick="openSaveModal()" style="background:var(--accent2);color:#0e0e0e;">Submit</button>
+    <button class="btn-restart" onclick="location.href='index.html'" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">홈으로</button>
+  </div>
+
+
+
+</div>
+
+<!-- Save modal -->
+<div id="saveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:340px;max-width:90vw;">
+    <div style="font-family:'DM Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:8px">기록 저장</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">이름을 입력하면 학습 기록이 저장돼요</p>
+    <input type="text" id="saveName" placeholder="이름 입력..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;margin-bottom:16px;">
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeSaveModal()" style="padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">취소</button>
+      <button onclick="saveRecord()" style="padding:9px 22px;border-radius:8px;border:none;background:var(--accent);color:#0e0e0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">저장</button>
+    </div>
+  </div>
+</div>
+
+<audio id="mainAudio" style="display:none"></audio>
+<script>
+const MAX_REPEATS = 5;
+let currentTrack = null;
+let currentIndex = 0;
+let repeatCount = 0;
+let isPlaying = false;
+let scores = [];
+let sessionDetails = {};
+let autoRepeatTimer = null;
+
+const audio = document.getElementById('mainAudio');
+const speedSlider = document.getElementById('speedSlider');
+const speedVal = document.getElementById('speedVal');
+
+function renderTrackSelector() {
+  const el = document.getElementById('trackSelector');
+  if (TRACKS.length <= 1) { el.style.display = 'none'; }
+  const params = new URLSearchParams(window.location.search);
+  const trackId = parseInt(params.get('id')) || 1;
+  const initialIndex = TRACKS.findIndex(t => t.id === trackId) || 0;
+  TRACKS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'track-btn' + (i === initialIndex ? ' active' : '');
+    btn.textContent = t.title;
+    btn.onclick = () => selectTrack(i, btn);
+    el.appendChild(btn);
+  });
+
+  // Render mode tabs
+  const tabContainer = document.getElementById('modeTabs');
+  const tabs = [
+    { label: '🎧 청취 테스트', href: 'listening.html?id=' + trackId, active: false },
+    { label: '🎙 쉐도잉', href: 'player.html?id=' + trackId, active: false },
+    { label: '✏️ 딕테이션', href: 'dictation.html?id=' + trackId, active: true },
+    { label: '📝 어휘 테스트', href: 'vocab.html?id=' + trackId, active: false },
+  ];
+  tabs.forEach(function(t) {
+    const a = document.createElement('a');
+    a.href = t.href;
+    a.textContent = t.label;
+    a.style.cssText = 'font-family:\'DM Mono\',monospace;font-size:11px;padding:7px 16px;border-radius:20px;letter-spacing:0.06em;border:1px solid;text-decoration:none;white-space:nowrap;margin-bottom:8px;' + (t.active ? 'background:rgba(200,240,96,0.12);color:var(--accent);border-color:rgba(200,240,96,0.4);' : 'color:var(--text-muted);border-color:var(--border);');
+    tabContainer.appendChild(a);
+  });
+
+  selectTrack(initialIndex, el.children[initialIndex]);
+}
+
+function selectTrack(i, btn) {
+  document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTrack = TRACKS[i];
+  const titleEl = document.getElementById('pageTitle2');
+  if (titleEl) titleEl.textContent = currentTrack.title;
+  audio.src = currentTrack.file;
+  currentIndex = 0;
+  scores = [];
+  sessionDetails = {};
+  showSentence();
+}
+
+speedSlider.addEventListener('input', () => {
+  audio.playbackRate = parseFloat(speedSlider.value);
+  speedVal.textContent = parseFloat(speedSlider.value).toFixed(2).replace(/\.?0+$/, '') + '×';
+});
+
+function showSentence(delay = 3000) {
+  if (currentIndex >= currentTrack.sentences.length) { showSummary(); return; }
+  const s = currentTrack.sentences;
+  document.getElementById('sentenceCounter').textContent = `문장 ${currentIndex + 1} / ${s.length}`;
+  document.getElementById('progressFill').style.width = `${(currentIndex / s.length) * 100}%`;
+  document.getElementById('dictationInput').value = '';
+  document.getElementById('resultArea').classList.remove('show');
+  document.getElementById('testCard').style.display = 'block';
+  document.getElementById('summaryCard').classList.remove('show');
+  repeatCount = 0;
+  updateDots();
+  startAutoRepeat(delay);
+  setTimeout(() => document.getElementById('dictationInput').focus(), delay);
+}
+
+function updateDots() {
+  for (let i = 0; i < MAX_REPEATS; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.className = 'dot';
+    if (i < repeatCount) dot.classList.add('done');
+    else if (i === repeatCount && isPlaying) dot.classList.add('playing');
+  }
+}
+
+function playSegment() {
+  const s = currentTrack.sentences[currentIndex];
+  audio.playbackRate = parseFloat(speedSlider.value);
+  audio.currentTime = s.start;
+  audio.play();
+  isPlaying = true;
+  updateDots();
+  document.getElementById('repeatStatus').innerHTML = `<strong>${repeatCount + 1}번째</strong> 재생 중...`;
+
+  audio.ontimeupdate = () => {
+    if (audio.currentTime >= s.end) {
+      audio.pause();
+      audio.ontimeupdate = null;
+      isPlaying = false;
+      repeatCount++;
+      updateDots();
+      if (repeatCount < MAX_REPEATS) {
+        document.getElementById('repeatStatus').innerHTML = `<strong>${repeatCount}</strong>번 완료 — 잠시 후 다시 재생...`;
+        autoRepeatTimer = setTimeout(playSegment, 3000);
+      } else {
+        document.getElementById('repeatStatus').innerHTML = `5번 완료! 이제 받아쓰기 해보세요 ✏️`;
+      }
+    }
+  };
+}
+
+function startAutoRepeat(delay = 3000) {
+  if (autoRepeatTimer) { clearTimeout(autoRepeatTimer); autoRepeatTimer = null; }
+  document.getElementById('repeatStatus').textContent = '재생 준비 중...';
+  autoRepeatTimer = setTimeout(playSegment, delay);
+}
+
+function listenAgain() {
+  if (autoRepeatTimer) { clearTimeout(autoRepeatTimer); autoRepeatTimer = null; }
+  audio.pause();
+  audio.ontimeupdate = null;
+  isPlaying = false;
+  document.getElementById('repeatStatus').innerHTML = '추가 듣기 중...';
+  setTimeout(playSegment, 300);
+}
+
+function normalize(text) {
+  return text.toLowerCase()
+    .replace(/[.,!?;:'"()]/g, '')
+    .replace(/[-\u2013\u2014]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function submitDictation() {
+  const userInput = document.getElementById('dictationInput').value.trim();
+  if (!userInput) { alert('먼저 받아쓰기를 입력해주세요!'); return; }
+  if (autoRepeatTimer) { clearTimeout(autoRepeatTimer); autoRepeatTimer = null; }
+  audio.pause();
+  audio.ontimeupdate = null;
+
+  const answer = currentTrack.sentences[currentIndex].text;
+  const userWords = normalize(userInput).split(' ').filter(w => w);
+  const answerWords = normalize(answer).split(' ').filter(w => w);
+  const answerCopy = [...answerWords];
+  let correct = 0;
+  const userResults = userWords.map(w => {
+    const idx = answerCopy.indexOf(w);
+    if (idx !== -1) { answerCopy.splice(idx, 1); correct++; return { word: w, ok: true }; }
+    return { word: w, ok: false };
+  });
+
+  const score = Math.round((correct / answerWords.length) * 100);
+  const pass = score >= 80;
+  scores.push(score);
+  sessionDetails[currentIndex] = {
+    index: currentIndex,
+    text: answer,
+    userInput: userInput,
+    score: score
+  };
+
+  const scoreBig = document.getElementById('scoreBig');
+  scoreBig.textContent = `${score}점`;
+  scoreBig.className = `score-big ${score >= 80 ? 'great' : score >= 60 ? 'ok' : 'poor'}`;
+  const badge = document.getElementById('scoreBadge');
+  badge.textContent = pass ? '✓ PASS' : '✗ RETRY';
+  badge.className = `score-badge ${pass ? 'pass' : 'fail'}`;
+  document.getElementById('scoreDetail').textContent = '';
+
+  const answerWordSet = new Set(answerWords);
+  const userWordSet = new Set(userWords);
+
+  // Top: user's words in their original order
+  // correct (in answer) = green, wrong (not in answer) = red strikethrough
+  const diffHtml = userWords.map(w =>
+    answerWordSet.has(w)
+      ? `<span style="color:var(--success)">${w}</span>`
+      : `<span style="color:var(--danger);text-decoration:line-through">${w}</span>`
+  ).join(' ');
+  const diffBox = document.getElementById('diffBox');
+  diffBox.innerHTML = diffHtml || '(입력 없음)';
+  diffBox.style.display = 'block';
+
+  // Bottom: original answer words in order, missing ones in red
+  const originalAnswerWords = answer.split(' ').filter(w => w);
+  const answerHighlighted = originalAnswerWords.map(w => {
+    const normalized = normalize(w);
+    return userWordSet.has(normalized)
+      ? w
+      : `<span style="color:var(--danger);font-weight:500">${w}</span>`;
+  }).join(' ');
+  document.getElementById('answerText').innerHTML = answerHighlighted;
+  document.getElementById('resultArea').classList.add('show');
+  document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function skipSentence() {
+  if (autoRepeatTimer) { clearTimeout(autoRepeatTimer); autoRepeatTimer = null; }
+  audio.pause(); audio.ontimeupdate = null;
+  currentIndex++;
+  showSentence();
+}
+
+function retryThis() {
+  document.getElementById('dictationInput').value = '';
+  document.getElementById('resultArea').classList.remove('show');
+  repeatCount = 0;
+  updateDots();
+  startAutoRepeat(1500);
+}
+
+function nextSentence() { currentIndex++; showSentence(1500); }
+
+function showSummary() {
+  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  document.getElementById('testCard').style.display = 'none';
+  document.getElementById('summaryCard').classList.add('show');
+  document.getElementById('summaryScore').textContent = `${avg}점`;
+  document.getElementById('summaryScore').className = `summary-score ${avg >= 80 ? 'great' : avg >= 60 ? 'ok' : 'poor'}`;
+  document.getElementById('summaryLabel').textContent =
+    avg >= 80 ? '훌륭해요! 🎉' : avg >= 60 ? '잘 하고 있어요! 💪' : '더 연습이 필요해요. 파이팅! 🔥';
+  document.getElementById('progressFill').style.width = '100%';
+}
+
+function restart() { currentIndex = 0; scores = []; showSentence(); }
+
+function openSaveModal() {
+  document.getElementById('saveModal').style.display = 'flex';
+  document.getElementById('saveName').focus();
+}
+
+function closeSaveModal() {
+  document.getElementById('saveModal').style.display = 'none';
+  isSaving = false;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('saveModal').style.display === 'flex') saveRecord();
+});
+
+let isSaving = false;
+async function saveRecord() {
+  if (isSaving) return;
+  isSaving = true;
+  const name = document.getElementById('saveName').value.trim();
+  if (!name) { isSaving = false; document.getElementById('saveName').focus(); return; }
+  const avg = scores.length ? Math.round(scores.reduce((a,b) => a+b, 0) / scores.length) : null;
+  const progress = `${scores.length}/${currentTrack.sentences.length}문장`;
+  try {
+    await fetch('/api/records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        name, 
+        track: currentTrack.title, 
+        mode: '딕테이션', 
+        score: avg, 
+        progress,
+        details: Object.keys(sessionDetails).sort((a,b) => parseInt(a)-parseInt(b)).map(k => sessionDetails[k])
+      })
+    });
+    closeSaveModal();
+    window.location.href = 'history.html';
+  } catch(e) { alert('저장 중 오류가 발생했어요.'); }
+}
+
+window.addEventListener('DOMContentLoaded', () => { renderTrackSelector(); });
+</script>
+
+<footer style="border-top:1px solid var(--border);background:var(--bg);padding:28px 24px;text-align:center;position:relative;z-index:1;"><div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;"><a href="terms.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;">이용약관</a><span style="color:var(--border);">|</span><a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;">개인정보 처리방침</a><span style="color:var(--border);">|</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">© 2026 ListenUp. All Rights Reserved.</span></div></footer>
+</body>
+</html>

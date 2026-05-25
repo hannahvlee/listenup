@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>어휘 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="tracks.js"></script>
+<style>
+  :root {
+    --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+    --accent: #c8f060; --accent2: #60c8f0; --text: #f0ede8; --text-muted: #6e6e6e;
+    --text-dim: #3e3e3e; --danger: #f06060; --success: #60f0a0; --warn: #f0c060;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(200,240,96,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,200,240,0.04) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+  .container { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; position: relative; z-index: 1; }
+  .label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: clamp(28px, 5vw, 42px); line-height: 1.1; margin-bottom: 8px; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .subtitle { font-size: 14px; color: var(--text-muted); }
+  .track-selector { display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap; }
+  .track-btn { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .track-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .track-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
+
+  .section { margin-bottom: 24px; }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px 10px 0 0; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .section-score { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
+
+  .vocab-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-top: none; }
+  .vocab-table tr { border-bottom: 1px solid var(--border); }
+  .vocab-table tr:last-child { border-bottom: none; }
+  .vocab-table tr.correct-row { background: rgba(96,240,160,0.04); }
+  .vocab-table tr.wrong-row { background: rgba(240,96,96,0.04); }
+
+  .col-num { width: 44px; padding: 14px 0 14px 16px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .col-ko { padding: 14px 16px; font-size: 14px; color: var(--text); line-height: 1.5; }
+  .col-en { width: 260px; padding: 10px 12px; }
+  .col-answer { width: 240px; padding: 10px 16px; }
+
+  .vocab-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+  .vocab-input:focus { border-color: var(--accent); }
+  .vocab-input.correct { border-color: var(--success); background: rgba(96,240,160,0.06); color: var(--success); }
+  .vocab-input.wrong { border-color: var(--danger); background: rgba(240,96,96,0.06); color: var(--danger); text-decoration: line-through; }
+  .vocab-input::placeholder { color: var(--text-dim); }
+  .vocab-input:disabled { cursor: default; }
+
+  .answer-cell { display: flex; align-items: center; gap: 8px; }
+  .btn-reveal { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 11px; cursor: pointer; font-family: 'DM Mono', monospace; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+  .btn-reveal:hover { border-color: var(--accent2); color: var(--accent2); }
+  .answer-text { font-size: 13px; color: var(--text-muted); line-height: 1.4; display: none; }
+  .answer-text.show { display: block; }
+  .answer-text.revealed-correct { color: var(--success); }
+  .answer-text.revealed-wrong { color: var(--warn); }
+
+  .section-footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; flex-wrap: wrap; gap: 8px; }
+  .section-result { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+  .section-result.great { color: var(--success); }
+  .section-result.ok { color: var(--warn); }
+  .section-result.poor { color: var(--danger); }
+
+  .footer-btns { display: flex; gap: 8px; }
+  .btn { padding: 8px 20px; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+  .btn-primary { background: var(--accent); color: #0e0e0e; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary { background: transparent; color: var(--text-muted); border-color: var(--border); }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .mode-toggle { display: flex; gap: 0; margin-top: 0; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; width: fit-content; }
+  .mode-btn { padding: 8px 20px; border-radius: 7px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .mode-btn.active { background: var(--accent); color: #0e0e0e; }
+  .mode-btn:not(.active):hover { color: var(--text); }
+  .study-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-top: none; }
+  .study-table tr { border-bottom: 1px solid var(--border); }
+  .study-table tr:last-child { border-bottom: none; }
+  .study-table tr:hover { background: rgba(255,255,255,0.02); }
+  .col-study-num { width: 44px; padding: 14px 0 14px 16px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .col-study-ko { padding: 10px 16px; font-size: 14px; color: var(--text); line-height: 1.5; width: 30%; }
+  .col-study-en { padding: 10px 16px; font-size: 14px; color: var(--accent2); line-height: 1.5; font-weight: 400; width: 70%; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MDELTEL4XC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-MDELTEL4XC');
+</script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)"><a href="index.html" style="font-family:'DM Mono',monospace;font-size:15px;color:var(--accent2);text-decoration:none;letter-spacing:0.18em;font-weight:700;">🎧 ListenUp!</a></div>
+    <h1 id="pageTitle3"></h1>
+    <p class="subtitle">한국어 뜻을 보고 영어 단어/구문을 입력하세요</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;margin-bottom:24px;" id="modeTabs"></div>
+  </header>
+
+  <div class="track-selector" id="trackSelector" style="display:none"></div>
+
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btnQuiz" onclick="setMode('quiz')">✏️ 퀴즈 모드</button>
+    <button class="mode-btn" id="btnStudy" onclick="setMode('study')">📖 암기 모드</button>
+  </div>
+
+  <!-- Quiz mode -->
+  <div id="quizMode">
+  <!-- Words -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔤 단어</span>
+      <span class="section-score" id="wordScore"></span>
+    </div>
+    <table class="vocab-table">
+      <colgroup><col style="width:44px"><col><col style="width:260px"><col style="width:220px"></colgroup>
+      <thead>
+        <tr style="border-bottom:1px solid var(--border)">
+          <th class="col-num" style="color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10px;font-weight:400">#</th>
+          <th style="padding:10px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">뜻</th>
+          <th style="padding:10px 12px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">ENGLISH</th>
+          <th style="padding:10px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">정답</th>
+        </tr>
+      </thead>
+      <tbody id="wordBody"></tbody>
+    </table>
+    <div class="section-footer">
+      <span class="section-result" id="wordResult"></span>
+      <div class="footer-btns">
+        <button class="btn btn-secondary" onclick="resetSection('w')">다시 풀기</button>
+        <button class="btn btn-primary" onclick="gradeSection('w')">채점하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phrases -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">💬 구문</span>
+      <span class="section-score" id="phraseScore"></span>
+    </div>
+    <table class="vocab-table">
+      <colgroup><col style="width:44px"><col><col style="width:260px"><col style="width:220px"></colgroup>
+      <thead>
+        <tr style="border-bottom:1px solid var(--border)">
+          <th class="col-num" style="color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10px;font-weight:400">#</th>
+          <th style="padding:10px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">뜻</th>
+          <th style="padding:10px 12px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">ENGLISH</th>
+          <th style="padding:10px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">정답</th>
+        </tr>
+      </thead>
+      <tbody id="phraseBody"></tbody>
+    </table>
+    <div class="section-footer">
+      <span class="section-result" id="phraseResult"></span>
+      <div class="footer-btns">
+        <button class="btn btn-secondary" onclick="resetSection('p')">다시 풀기</button>
+        <button class="btn btn-primary" onclick="gradeSection('p')">채점하기</button>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- end quizMode -->
+
+  <!-- Study mode -->
+  <div id="studyMode" style="display:none">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🔤 단어</span>
+      </div>
+      <table class="study-table">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th class="col-study-num" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);font-weight:400">#</th>
+            <th style="padding:10px 20px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">한국어</th>
+            <th style="padding:10px 20px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">ENGLISH</th>
+          </tr>
+        </thead>
+        <tbody id="studyWordBody"></tbody>
+      </table>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">💬 구문</span>
+      </div>
+      <table class="study-table">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th class="col-study-num" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);font-weight:400">#</th>
+            <th style="padding:10px 20px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">한국어</th>
+            <th style="padding:10px 20px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400;letter-spacing:0.08em;text-transform:uppercase">ENGLISH</th>
+          </tr>
+        </thead>
+        <tbody id="studyPhraseBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Submit button -->
+  <div style="margin-top:32px;text-align:right;">
+    <button onclick="openSaveModal()" style="padding:12px 32px;border-radius:10px;border:none;background:var(--accent);color:#0e0e0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Submit</button>
+  </div>
+
+  <!-- Save modal -->
+  <div id="saveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:340px;max-width:90vw;">
+      <div style="font-family:'DM Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:8px">기록 저장</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">이름을 입력하면 학습 기록이 저장돼요</p>
+      <input type="text" id="saveName" placeholder="이름 입력..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;margin-bottom:16px;">
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="closeSaveModal()" style="padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">취소</button>
+        <button onclick="saveRecord()" style="padding:9px 22px;border-radius:8px;border:none;background:var(--accent);color:#0e0e0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">저장</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let currentTrack = null;
+let wordItems = [];
+let phraseItems = [];
+
+function setMode(mode) {
+  document.getElementById('quizMode').style.display = mode === 'quiz' ? 'block' : 'none';
+  document.getElementById('studyMode').style.display = mode === 'study' ? 'block' : 'none';
+  document.getElementById('btnQuiz').className = `mode-btn ${mode === 'quiz' ? 'active' : ''}`;
+  document.getElementById('btnStudy').className = `mode-btn ${mode === 'study' ? 'active' : ''}`;
+}
+
+function renderStudyTables() {
+  const renderStudy = (tbodyId, items) => {
+    const tbody = document.getElementById(tbodyId);
+    tbody.innerHTML = '';
+    items.forEach((item, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="col-study-num">${i + 1}</td>
+        <td class="col-study-ko">${item.ko}</td>
+        <td class="col-study-en">${item.en}</td>`;
+      tbody.appendChild(tr);
+    });
+  };
+  renderStudy('studyWordBody', wordItems);
+  renderStudy('studyPhraseBody', phraseItems);
+}
+
+function renderTrackSelector() {
+  const el = document.getElementById('trackSelector');
+  if (TRACKS.length <= 1) { el.style.display = 'none'; }
+  const params = new URLSearchParams(window.location.search);
+  const trackId = parseInt(params.get('id')) || 1;
+  const initialIndex = TRACKS.findIndex(t => t.id === trackId) || 0;
+  TRACKS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'track-btn' + (i === initialIndex ? ' active' : '');
+    btn.textContent = t.title;
+    btn.onclick = () => selectTrack(i, btn);
+    el.appendChild(btn);
+  });
+
+  // Render mode tabs
+  const tabContainer = document.getElementById('modeTabs');
+  const tabs = [
+    { label: '🎧 청취 테스트', href: 'listening.html?id=' + trackId, active: false },
+    { label: '🎙 쉐도잉', href: 'player.html?id=' + trackId, active: false },
+    { label: '✏️ 딕테이션', href: 'dictation.html?id=' + trackId, active: false },
+    { label: '📝 어휘 테스트', href: 'vocab.html?id=' + trackId, active: true },
+  ];
+  tabs.forEach(function(t) {
+    const a = document.createElement('a');
+    a.href = t.href;
+    a.textContent = t.label;
+    a.style.cssText = 'font-family:\'DM Mono\',monospace;font-size:11px;padding:7px 16px;border-radius:20px;letter-spacing:0.06em;border:1px solid;text-decoration:none;white-space:nowrap;margin-bottom:8px;' + (t.active ? 'background:rgba(200,240,96,0.12);color:var(--accent);border-color:rgba(200,240,96,0.4);' : 'color:var(--text-muted);border-color:var(--border);');
+    tabContainer.appendChild(a);
+  });
+
+  selectTrack(initialIndex, el.children[initialIndex]);
+}
+
+function selectTrack(i, btn) {
+  document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTrack = TRACKS[i];
+  const titleEl3 = document.getElementById('pageTitle3');
+  if (titleEl3) titleEl3.textContent = currentTrack.title;
+  const vocab = currentTrack.vocab || [];
+  wordItems = vocab.filter(v => v.type === 'word' || (!v.type && v.en.split(' ').length <= 2 && !v.en.includes('~') && !v.en.includes('A')));
+  phraseItems = vocab.filter(v => v.type === 'phrase' || (!v.type && !wordItems.includes(v)));
+  renderTable('wordBody', wordItems, 'w');
+  renderTable('phraseBody', phraseItems, 'p');
+  renderStudyTables();
+  document.getElementById('wordScore').textContent = `0 / ${wordItems.length}`;
+  document.getElementById('phraseScore').textContent = `0 / ${phraseItems.length}`;
+  document.getElementById('wordResult').textContent = '';
+  document.getElementById('phraseResult').textContent = '';
+}
+
+function renderTable(tbodyId, items, prefix) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  items.forEach((item, i) => {
+    const tr = document.createElement('tr');
+    tr.id = `row-${prefix}-${i}`;
+    tr.innerHTML = `
+      <td class="col-num">${i + 1}</td>
+      <td class="col-ko">${item.ko}</td>
+      <td class="col-en">
+        <input type="text" class="vocab-input" id="input-${prefix}-${i}"
+          placeholder="영어 입력..."
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          data-answer="${item.en}"
+          onkeydown="handleEnter(event, '${prefix}', ${i}, ${items.length - 1})">
+      </td>
+      <td class="col-answer">
+        <div class="answer-cell">
+          <button class="btn-reveal" onclick="toggleReveal('${prefix}', ${i})">정답 보기</button>
+          <span class="answer-text" id="answer-${prefix}-${i}">${item.en}</span>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleReveal(prefix, i) {
+  const answer = document.getElementById(`answer-${prefix}-${i}`);
+  const btn = answer.previousElementSibling;
+  if (answer.classList.contains('show')) {
+    answer.classList.remove('show');
+    btn.textContent = '정답 보기';
+  } else {
+    answer.classList.add('show');
+    btn.textContent = '정답 숨기기';
+  }
+}
+
+function showAllAnswers(prefix) {
+  const items = prefix === 'w' ? wordItems : phraseItems;
+  items.forEach((item, i) => {
+    const answer = document.getElementById(`answer-${prefix}-${i}`);
+    const btn = answer.previousElementSibling;
+    answer.classList.add('show');
+    btn.textContent = '정답 숨기기';
+  });
+}
+
+function handleEnter(e, prefix, i, max) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const next = document.getElementById(`input-${prefix}-${i + 1}`);
+    if (next) next.focus();
+  }
+}
+
+function normalize(text) {
+  return text.toLowerCase().replace(/[.,!?;:'"()]/g, '').trim();
+}
+
+function gradeSection(prefix) {
+  const items = prefix === 'w' ? wordItems : phraseItems;
+  let correct = 0;
+
+  items.forEach((item, i) => {
+    const input = document.getElementById(`input-${prefix}-${i}`);
+    const row = document.getElementById(`row-${prefix}-${i}`);
+    const answer = document.getElementById(`answer-${prefix}-${i}`);
+    const isCorrect = normalize(input.value) === normalize(item.en);
+
+    if (isCorrect) correct++;
+    input.className = `vocab-input ${isCorrect ? 'correct' : 'wrong'}`;
+    input.disabled = true;
+    answer.className = `answer-text show ${isCorrect ? 'revealed-correct' : 'revealed-wrong'}`;
+    row.classList.remove('correct-row', 'wrong-row');
+    row.classList.add(isCorrect ? 'correct-row' : 'wrong-row');
+  });
+
+  const pct = Math.round((correct / items.length) * 100);
+  const scoreEl = document.getElementById(`${prefix === 'w' ? 'word' : 'phrase'}Score`);
+  const resultEl = document.getElementById(`${prefix === 'w' ? 'word' : 'phrase'}Result`);
+  scoreEl.textContent = `${correct} / ${items.length}`;
+  resultEl.textContent = `${pct}점 · ${pct >= 80 ? '훌륭해요! 🎉' : pct >= 60 ? '잘 하고 있어요! 💪' : '더 연습이 필요해요 🔥'}`;
+  resultEl.className = `section-result ${pct >= 80 ? 'great' : pct >= 60 ? 'ok' : 'poor'}`;
+}
+
+function resetSection(prefix) {
+  const items = prefix === 'w' ? wordItems : phraseItems;
+  items.forEach((item, i) => {
+    const input = document.getElementById(`input-${prefix}-${i}`);
+    const row = document.getElementById(`row-${prefix}-${i}`);
+    const answer = document.getElementById(`answer-${prefix}-${i}`);
+    input.value = '';
+    input.className = 'vocab-input';
+    input.disabled = false;
+    answer.className = 'answer-text';
+    row.classList.remove('correct-row', 'wrong-row');
+  });
+  const scoreEl = document.getElementById(`${prefix === 'w' ? 'word' : 'phrase'}Score`);
+  const resultEl = document.getElementById(`${prefix === 'w' ? 'word' : 'phrase'}Result`);
+  scoreEl.textContent = `0 / ${items.length}`;
+  resultEl.textContent = '';
+  resultEl.className = 'section-result';
+  document.getElementById(`input-${prefix}-0`)?.focus();
+}
+
+function openSaveModal() {
+  document.getElementById('saveModal').style.display = 'flex';
+  document.getElementById('saveName').focus();
+}
+
+function closeSaveModal() {
+  document.getElementById('saveModal').style.display = 'none';
+  isSaving = false;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('saveModal').style.display === 'flex') saveRecord();
+});
+
+let isSaving = false;
+async function saveRecord() {
+  if (isSaving) return;
+  isSaving = true;
+  const name = document.getElementById('saveName').value.trim();
+  if (!name) { isSaving = false; document.getElementById('saveName').focus(); return; }
+  
+  const vocab = currentTrack.vocab || [];
+  let correct = 0;
+  const details = vocab.map((v, i) => {
+    const prefix = (v.type === 'phrase' || (!v.type && (v.en.includes(' ') || v.en.includes('~')))) ? 'p' : 'w';
+    const idx = (prefix === 'w' ? wordItems : phraseItems).indexOf(v);
+    const inputEl = document.getElementById(`input-${prefix}-${idx}`);
+    const userAnswer = inputEl ? inputEl.value.trim() : '';
+    const isCorrect = inputEl ? inputEl.classList.contains('correct') : false;
+    if (isCorrect) correct++;
+    return {
+      ko: v.ko,
+      en: v.en,
+      userAnswer,
+      correct: isCorrect
+    };
+  });
+  
+  const total = vocab.length;
+  const score = total > 0 ? Math.round((correct / total) * 100) : null;
+  const progress = `${correct}/${total}개`;
+  try {
+    await fetch('/api/records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, track: currentTrack.title, mode: '어휘테스트', score, progress, details })
+    });
+    closeSaveModal();
+    window.location.href = 'history.html';
+  } catch(e) { alert('저장 중 오류가 발생했어요.'); }
+}
+
+window.addEventListener('DOMContentLoaded', () => { renderTrackSelector(); });
+</script>
+
+<footer style="border-top:1px solid var(--border);background:var(--bg);padding:28px 24px;text-align:center;position:relative;z-index:1;"><div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;"><a href="terms.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;">이용약관</a><span style="color:var(--border);">|</span><a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;">개인정보 처리방침</a><span style="color:var(--border);">|</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">© 2026 ListenUp. All Rights Reserved.</span></div></footer>
+</body>
+</html>
