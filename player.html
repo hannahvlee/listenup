@@ -714,42 +714,9 @@ async function saveRecord() {
   } catch(e) { alert('저장 중 오류가 발생했어요.'); isSaving = false; }
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('saveModal').style.display === 'flex') {
-    saveRecord();
-  }
-});
+
 
 let isSaving = false;
-
-  const saveBtn = document.querySelector('.btn-save');
-  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '저장 중...'; }
-
-  const avg = sessionScores.length
-    ? Math.round(sessionScores.reduce((a,b) => a+b, 0) / sessionScores.length)
-    : null;
-  const progress = `${sessionScores.length}/${SENTENCES.length}문장`;
-
-  try {
-    await fetch('/api/records', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        track: track.title,
-        mode: '쉐도잉',
-        score: avg,
-        progress,
-        textVisible: !blurMode,
-        details: Object.keys(sessionDetails).sort((a,b) => parseInt(a)-parseInt(b)).map(k => sessionDetails[k])
-      })
-    });
-    closeSaveModal();
-    window.location.href = 'history.html';
-  } catch(e) {
-    alert('저장 중 오류가 발생했어요.');
-  }
-}
 
 function stopAll() {
   if (currentPlaying !== null) {
