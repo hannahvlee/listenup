@@ -93,6 +93,7 @@
               <th>W</th>
               <th>평균</th>
               <th>총점</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="mockBody"></tbody>
@@ -120,6 +121,7 @@
               <th>W</th>
               <th>평균</th>
               <th>총점</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="actualBody"></tbody>
@@ -190,6 +192,8 @@
     await loadScores();
   }
 
+  let mockRecords = [], actualRecords = [];
+
   async function loadScores() {
     const { data, error } = await _supabase
       .from('toefl_scores')
@@ -203,11 +207,11 @@
       return;
     }
 
-    const mock = (data || []).filter(r => r.type === 'mock');
-    const actual = (data || []).filter(r => r.type === 'actual');
+    mockRecords = (data || []).filter(r => r.type === 'mock');
+    actualRecords = (data || []).filter(r => r.type === 'actual');
 
-    renderTable('mock', mock);
-    renderTable('actual', actual);
+    renderTable('mock', mockRecords);
+    renderTable('actual', actualRecords);
   }
 
   function renderTable(type, records) {
@@ -240,9 +244,29 @@
         <td class="td-score">${r.writing}</td>
         <td class="td-score" style="color:var(--text-muted)">${avg}</td>
         <td class="td-total">${total}</td>
+        <td><button onclick="editScore(${r.id}, '${r.type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;padding:2px 6px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
       `;
       body.appendChild(tr);
     });
+  }
+
+  let editingId = null;
+
+  function editScore(id, type) {
+    const allRecords = type === 'mock' ? mockRecords : actualRecords;
+    const r = allRecords.find(r => r.id === id);
+    if (!r) return;
+    editingId = id;
+    currentType = type;
+    document.getElementById('modalTitle').textContent = type === 'mock' ? '모의 토플 수정' : '실제 토플 수정';
+    document.getElementById('inputDate').value = r.test_date;
+    document.getElementById('inputReading').value = r.reading;
+    document.getElementById('inputListening').value = r.listening;
+    document.getElementById('inputSpeaking').value = r.speaking;
+    document.getElementById('inputWriting').value = r.writing;
+    document.getElementById('inputTotal').value = r.total != null ? r.total : '';
+    calcAvg();
+    document.getElementById('modalOverlay').classList.add('show');
   }
 
   function calcAvg() {
@@ -262,7 +286,9 @@
   function openModal(type) {
     currentType = type;
     document.getElementById('modalTitle').textContent = type === 'mock' ? '모의 토플 점수 추가' : '실제 토플 점수 추가';
-    document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    const localDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    document.getElementById('inputDate').value = localDate;
     document.getElementById('inputReading').value = '';
     document.getElementById('inputListening').value = '';
     document.getElementById('inputSpeaking').value = '';
@@ -275,6 +301,7 @@
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('show');
     currentType = null;
+    editingId = null;
   }
 
   async function saveScore() {
@@ -290,15 +317,22 @@
     }
 
     const manualTotal = parseFloat(document.getElementById('inputTotal').value);
-    const total = !isNaN(manualTotal) ? manualTotal : (reading + listening + speaking + writing) / 4;
+    const total = !isNaN(manualTotal) ? manualTotal : null;
 
-    const { error } = await _supabase.from('toefl_scores').insert({
-      user_id: currentUser.id,
-      type: currentType,
-      reading, listening, speaking, writing,
-      total,
-      test_date: date
-    });
+    let error;
+    if (editingId) {
+      ({ error } = await _supabase.from('toefl_scores').update({
+        reading, listening, speaking, writing, total, test_date: date
+      }).eq('id', editingId));
+    } else {
+      ({ error } = await _supabase.from('toefl_scores').insert({
+        user_id: currentUser.id,
+        type: currentType,
+        reading, listening, speaking, writing,
+        total,
+        test_date: date
+      }));
+    }
 
     if (error) { alert('저장 실패: ' + error.message); return; }
 
