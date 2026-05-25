@@ -705,9 +705,7 @@ const TRACKS = [
       { type: "phrase", en: "attracting millions of", ko: "수백만 명을 끌어들이며" },
       { type: "phrase", en: "museums worldwide", ko: "전 세계 박물관" }
     ]
-  }
-,
-  ,
+  },
   {
     id: 12,
     title: "Test 9 - Social Capital",
