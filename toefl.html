@@ -91,6 +91,7 @@
               <th>L</th>
               <th>S</th>
               <th>W</th>
+              <th>평균</th>
               <th>총점</th>
             </tr>
           </thead>
@@ -117,6 +118,7 @@
               <th>L</th>
               <th>S</th>
               <th>W</th>
+              <th>평균</th>
               <th>총점</th>
             </tr>
           </thead>
@@ -228,13 +230,15 @@
 
     records.forEach(r => {
       const tr = document.createElement('tr');
-      const total = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(1);
+      const avg = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(2);
+      const total = r.total != null ? r.total : '-';
       tr.innerHTML = `
         <td class="td-date">${r.test_date}</td>
         <td class="td-score">${r.reading}</td>
         <td class="td-score">${r.listening}</td>
         <td class="td-score">${r.speaking}</td>
         <td class="td-score">${r.writing}</td>
+        <td class="td-score" style="color:var(--text-muted)">${avg}</td>
         <td class="td-total">${total}</td>
       `;
       body.appendChild(tr);
