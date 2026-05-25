@@ -59,9 +59,25 @@
 
   .btn-logout { width: 100%; padding: 13px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--danger); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s; margin-top: 32px; }
   .btn-logout:hover { border-color: var(--danger); background: rgba(240,96,96,0.06); }
-  .btn-secondary { padding: 9px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-block; }
+  .btn-secondary { padding: 9px 18px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-block; }
   .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
   .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .toefl-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  @media (max-width: 640px) { .toefl-columns { grid-template-columns: 1fr; } }
+  .toefl-section-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .btn-add { width: 100%; padding: 10px; background: transparent; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+  .toefl-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .toefl-modal-overlay.show { opacity: 1; pointer-events: all; }
+  .toefl-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 360px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .form-input { width: 100%; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--accent); }
+  .score-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-modal-save { width: 100%; padding: 12px; background: var(--accent); color: #0e0e0e; border: none; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  .btn-modal-save:hover { background: #d4f570; }
+  .btn-modal-cancel { width: 100%; padding: 10px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; margin-top: 8px; }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
@@ -113,9 +129,55 @@
     </div>
   </div>
 
-  <div style="display:flex;gap:10px;margin-bottom:24px;">
+  <div style="display:flex;gap:10px;margin-bottom:32px;">
     <a href="profile.html" class="btn-secondary">프로필 수정</a>
-    <a href="toefl.html" class="btn-secondary">토플 점수 →</a>
+  </div>
+
+  <!-- 토플 점수 -->
+  <div class="label" style="margin-bottom:16px;">TOEFL 점수</div>
+  <div class="toefl-columns">
+    <div>
+      <div class="toefl-section-title">모의 토플</div>
+      <div class="table-wrap" id="mockWrap">
+        <div class="loading" id="mockLoading">불러오는 중...</div>
+        <table id="mockTable" style="display:none;width:100%;border-collapse:collapse;">
+          <thead><tr style="background:var(--surface2);border-bottom:1px solid var(--border);">
+            <th style="padding:10px 12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">날짜</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">R</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">L</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">S</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">W</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">평균</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">총점</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="mockBody"></tbody>
+        </table>
+        <div id="mockEmpty" style="display:none;text-align:center;padding:24px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">기록 없음</div>
+      </div>
+      <button class="btn-add" style="margin-top:8px;" onclick="openToeflModal('mock')">+ 점수 추가</button>
+    </div>
+    <div>
+      <div class="toefl-section-title">실제 토플</div>
+      <div class="table-wrap" id="actualWrap">
+        <div class="loading" id="actualLoading">불러오는 중...</div>
+        <table id="actualTable" style="display:none;width:100%;border-collapse:collapse;">
+          <thead><tr style="background:var(--surface2);border-bottom:1px solid var(--border);">
+            <th style="padding:10px 12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">날짜</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">R</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">L</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">S</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">W</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">평균</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">총점</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="actualBody"></tbody>
+        </table>
+        <div id="actualEmpty" style="display:none;text-align:center;padding:24px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">기록 없음</div>
+      </div>
+      <button class="btn-add" style="margin-top:8px;" onclick="openToeflModal('actual')">+ 점수 추가</button>
+    </div>
   </div>
 
   <div class="filter-row">
@@ -160,6 +222,45 @@
   </div>
 
   <button class="btn-logout" onclick="logout()">로그아웃</button>
+</div>
+
+<!-- 토플 모달 -->
+<div class="toefl-modal-overlay" id="toeflModalOverlay">
+  <div class="toefl-modal">
+    <div style="font-size:15px;font-weight:600;margin-bottom:20px;" id="toeflModalTitle">점수 추가</div>
+    <div class="form-group">
+      <label class="form-label">시험 날짜</label>
+      <input type="date" class="form-input" id="toeflDate">
+    </div>
+    <div class="score-grid-2">
+      <div class="form-group">
+        <label class="form-label">리딩 (R)</label>
+        <input type="number" class="form-input" id="toeflR" min="0" max="6" step="0.5" placeholder="0-6" oninput="calcToeflAvg()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">리스닝 (L)</label>
+        <input type="number" class="form-input" id="toeflL" min="0" max="6" step="0.5" placeholder="0-6" oninput="calcToeflAvg()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">스피킹 (S)</label>
+        <input type="number" class="form-input" id="toeflS" min="0" max="6" step="0.5" placeholder="0-6" oninput="calcToeflAvg()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">라이팅 (W)</label>
+        <input type="number" class="form-input" id="toeflW" min="0" max="6" step="0.5" placeholder="0-6" oninput="calcToeflAvg()">
+      </div>
+    </div>
+    <div class="form-group" style="background:var(--surface2);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">평균 (자동계산)</span>
+      <span id="toeflAvgDisplay" style="font-family:'DM Mono',monospace;font-size:16px;font-weight:600;color:var(--accent);">-</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">총점 직접 입력 (선택)</label>
+      <input type="number" class="form-input" id="toeflTotal" min="0" max="6" step="0.5" placeholder="비워두면 평균으로 저장">
+    </div>
+    <button class="btn-modal-save" onclick="saveToeflScore()">저장</button>
+    <button class="btn-modal-cancel" onclick="closeToeflModal()">취소</button>
+  </div>
 </div>
 
 <footer style="border-top:1px solid var(--border);padding:20px 24px;text-align:center;position:relative;z-index:1;">
@@ -235,12 +336,7 @@
     document.getElementById('userEmail').textContent = user.email;
 
     // 프로필 불러오기
-    const { data: profile } = await _supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
+    const { data: profile } = await _supabase.from('profiles').select('*').eq('user_id', user.id).single();
     if (profile) {
       document.getElementById('userName').textContent = profile.name || user?.user_metadata?.full_name || '사용자';
       document.getElementById('userClass').textContent = profile.class || '-';
@@ -250,44 +346,142 @@
       document.getElementById('userName').textContent = user?.user_metadata?.full_name || '사용자';
     }
 
+    // 토플 점수 불러오기
+    loadToeflScores(user.id);
+
+    // 학습 기록 불러오기
     try {
       const res = await fetch('/api/records?email=' + encodeURIComponent(user.email) + '&t=' + Date.now(), { cache: 'no-store' });
       const { records } = await res.json();
-
       allRecords = records || [];
-
       if (allRecords.length === 0) {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('emptyState').style.display = 'block';
         document.getElementById('totalCount').textContent = '0';
         return;
       }
-
-      // 통계
       document.getElementById('totalCount').textContent = allRecords.length;
       const scores = allRecords.filter(r => r.score != null).map(r => r.score);
       if (scores.length) {
         document.getElementById('avgScore').textContent = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
         document.getElementById('bestScore').textContent = Math.max(...scores);
       }
-
-      // 트랙 필터 채우기
       const tracks = [...new Set(allRecords.map(r => r.track))];
       const trackFilter = document.getElementById('trackFilter');
-      tracks.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t; opt.textContent = t;
-        trackFilter.appendChild(opt);
-      });
-
+      tracks.forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t; trackFilter.appendChild(opt); });
       document.getElementById('loading').style.display = 'none';
       document.getElementById('recordTable').style.display = 'table';
       renderTable();
-
     } catch(e) {
       document.getElementById('loading').textContent = '기록을 불러올 수 없어요.';
     }
   }
+
+  // 토플
+  let toeflCurrentType = null, toeflEditingId = null, toeflMockRecords = [], toeflActualRecords = [], toeflUserId = null;
+
+  async function loadToeflScores(userId) {
+    toeflUserId = userId;
+    const { data, error } = await _supabase.from('toefl_scores').select('*').eq('user_id', userId).order('test_date', { ascending: false });
+    toeflMockRecords = (data || []).filter(r => r.type === 'mock');
+    toeflActualRecords = (data || []).filter(r => r.type === 'actual');
+    renderToeflTable('mock', toeflMockRecords);
+    renderToeflTable('actual', toeflActualRecords);
+  }
+
+  function renderToeflTable(type, records) {
+    const loading = document.getElementById(type + 'Loading');
+    const table = document.getElementById(type + 'Table');
+    const body = document.getElementById(type + 'Body');
+    const empty = document.getElementById(type + 'Empty');
+    loading.style.display = 'none';
+    if (records.length === 0) { table.style.display = 'none'; empty.style.display = 'block'; return; }
+    table.style.display = 'table'; empty.style.display = 'none';
+    body.innerHTML = '';
+    records.forEach(r => {
+      const tr = document.createElement('tr');
+      const avg = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(2);
+      const total = r.total != null ? r.total : '-';
+      tr.style.borderBottom = '1px solid var(--border)';
+      tr.innerHTML = `
+        <td style="padding:10px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${r.test_date}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.reading}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.listening}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.speaking}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.writing}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">${total}</td>
+        <td><button onclick="editToefl(${r.id},'${type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function openToeflModal(type) {
+    toeflCurrentType = type; toeflEditingId = null;
+    document.getElementById('toeflModalTitle').textContent = type === 'mock' ? '모의 토플 점수 추가' : '실제 토플 점수 추가';
+    const today = new Date();
+    document.getElementById('toeflDate').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    document.getElementById('toeflR').value = '';
+    document.getElementById('toeflL').value = '';
+    document.getElementById('toeflS').value = '';
+    document.getElementById('toeflW').value = '';
+    document.getElementById('toeflTotal').value = '';
+    document.getElementById('toeflAvgDisplay').textContent = '-';
+    document.getElementById('toeflModalOverlay').classList.add('show');
+  }
+
+  function editToefl(id, type) {
+    const records = type === 'mock' ? toeflMockRecords : toeflActualRecords;
+    const r = records.find(r => r.id === id);
+    if (!r) return;
+    toeflEditingId = id; toeflCurrentType = type;
+    document.getElementById('toeflModalTitle').textContent = type === 'mock' ? '모의 토플 수정' : '실제 토플 수정';
+    document.getElementById('toeflDate').value = r.test_date;
+    document.getElementById('toeflR').value = r.reading;
+    document.getElementById('toeflL').value = r.listening;
+    document.getElementById('toeflS').value = r.speaking;
+    document.getElementById('toeflW').value = r.writing;
+    document.getElementById('toeflTotal').value = r.total != null ? r.total : '';
+    calcToeflAvg();
+    document.getElementById('toeflModalOverlay').classList.add('show');
+  }
+
+  function closeToeflModal() {
+    document.getElementById('toeflModalOverlay').classList.remove('show');
+    toeflCurrentType = null; toeflEditingId = null;
+  }
+
+  function calcToeflAvg() {
+    const r = parseFloat(document.getElementById('toeflR').value);
+    const l = parseFloat(document.getElementById('toeflL').value);
+    const s = parseFloat(document.getElementById('toeflS').value);
+    const w = parseFloat(document.getElementById('toeflW').value);
+    if (![r,l,s,w].some(isNaN)) document.getElementById('toeflAvgDisplay').textContent = ((r+l+s+w)/4).toFixed(2);
+    else document.getElementById('toeflAvgDisplay').textContent = '-';
+  }
+
+  async function saveToeflScore() {
+    const date = document.getElementById('toeflDate').value;
+    const reading = parseFloat(document.getElementById('toeflR').value);
+    const listening = parseFloat(document.getElementById('toeflL').value);
+    const speaking = parseFloat(document.getElementById('toeflS').value);
+    const writing = parseFloat(document.getElementById('toeflW').value);
+    if (!date || isNaN(reading) || isNaN(listening) || isNaN(speaking) || isNaN(writing)) { alert('모든 항목을 입력해주세요!'); return; }
+    const manualTotal = parseFloat(document.getElementById('toeflTotal').value);
+    const total = !isNaN(manualTotal) ? manualTotal : null;
+    let error;
+    if (toeflEditingId) {
+      ({ error } = await _supabase.from('toefl_scores').update({ reading, listening, speaking, writing, total, test_date: date }).eq('id', toeflEditingId));
+    } else {
+      ({ error } = await _supabase.from('toefl_scores').insert({ user_id: toeflUserId, type: toeflCurrentType, reading, listening, speaking, writing, total, test_date: date }));
+    }
+    if (error) { alert('저장 실패: ' + error.message); return; }
+    closeToeflModal();
+    loadToeflScores(toeflUserId);
+  }
+
+  document.getElementById('toeflModalOverlay').addEventListener('click', function(e) { if (e.target === this) closeToeflModal(); });
 
   async function logout() {
     await _supabase.auth.signOut();
