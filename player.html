@@ -516,7 +516,7 @@
 
   <!-- Submit button - shown after all sentences -->
   <div id="submitWrap" style="display:block;margin-top:32px;text-align:right;">
-    <button onclick="openSaveModal()" style="padding:12px 32px;border-radius:10px;border:none;background:var(--accent);color:#0e0e0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Submit</button>
+    <button onclick="saveRecord()" style="padding:12px 32px;border-radius:10px;border:none;background:var(--accent);color:#0e0e0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Submit</button>
   </div>
 
   <!-- Save modal -->
@@ -741,7 +741,7 @@ async function saveRecord() {
       })
     });
     closeSaveModal();
-    window.location.href = 'history.html';
+    window.location.href = 'mypage.html';
   } catch(e) {
     alert('저장 중 오류가 발생했어요.');
   }

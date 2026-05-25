@@ -158,7 +158,7 @@
       <div class="nav-row">
         <button class="btn-nav" onclick="retryThis()">↺ 다시 시도</button>
         <button class="btn-next" onclick="nextSentence()">다음 →</button>
-        <button class="btn-skip" onclick="openSaveModal()" style="margin-left:8px;">Submit</button>
+        <button class="btn-skip" onclick="saveRecord()" style="margin-left:8px;">Submit</button>
       </div>
     </div>
   </div>
@@ -167,7 +167,7 @@
     <div class="summary-label" id="summaryLabel"></div>
     <br>
     <button class="btn-restart" onclick="restart()">다시 시작</button>
-    <button class="btn-restart" onclick="openSaveModal()" style="background:var(--accent2);color:#0e0e0e;">Submit</button>
+    <button class="btn-restart" onclick="saveRecord()" style="background:var(--accent2);color:#0e0e0e;">Submit</button>
     <button class="btn-restart" onclick="location.href='index.html'" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">홈으로</button>
   </div>
 
@@ -454,7 +454,7 @@ async function saveRecord() {
       })
     });
     closeSaveModal();
-    window.location.href = 'history.html';
+    window.location.href = 'mypage.html';
   } catch(e) { alert('저장 중 오류가 발생했어요.'); }
 }
 
