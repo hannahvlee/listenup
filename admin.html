@@ -139,6 +139,7 @@
           <th style="width:100px">반</th>
           <th style="width:100px">목표 점수</th>
           <th style="width:130px">목표 날짜</th>
+          <th style="width:120px">최고 토플</th>
           <th style="width:80px">상세</th>
         </tr></thead>
         <tbody id="usersBody"></tbody>
@@ -412,11 +413,22 @@ function renderUsers() {
     const tr = document.createElement('tr');
     tr.style.cursor = 'pointer';
     tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
+
+    // 최고 토플 점수 찾기
+    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.total != null);
+    let bestToefl = '-', bestType = '';
+    if (userToefl.length) {
+      const best = userToefl.reduce((a, b) => a.total > b.total ? a : b);
+      bestToefl = best.total;
+      bestType = best.type === 'mock' ? '모의' : '실제';
+    }
+
     tr.innerHTML = `
       <td style="font-weight:500;">${u.name || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score+'점' : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${bestToefl !== '-' ? `<span style="color:var(--accent);font-weight:600;">${bestToefl}</span> <span style="font-size:10px;color:var(--text-muted);">${bestType}</span>` : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
     `;
     tbody.appendChild(tr);
