@@ -234,15 +234,14 @@
 
     records.forEach(r => {
       const tr = document.createElement('tr');
-      const vals = [r.reading, r.listening, r.speaking, r.writing].filter(v => v != null);
-      const avg = vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2) : '-';
+      const avg = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(2);
       const total = r.total != null ? r.total : '-';
       tr.innerHTML = `
         <td class="td-date">${r.test_date}</td>
-        <td class="td-score">${r.reading}</td>
-        <td class="td-score">${r.listening}</td>
-        <td class="td-score">${r.speaking}</td>
-        <td class="td-score">${r.writing}</td>
+        <td class="td-score">${r.reading ?? '-'}</td>
+        <td class="td-score">${r.listening ?? '-'}</td>
+        <td class="td-score">${r.speaking ?? '-'}</td>
+        <td class="td-score">${r.writing ?? '-'}</td>
         <td class="td-score" style="color:var(--text-muted)">${avg}</td>
         <td class="td-total">${total}</td>
         <td><button onclick="editScore(${r.id}, '${r.type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;padding:2px 6px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
@@ -276,8 +275,9 @@
     const s = parseFloat(document.getElementById('inputSpeaking').value);
     const w = parseFloat(document.getElementById('inputWriting').value);
     const vals = [r, l, s, w].filter(v => !isNaN(v));
-    if (vals.length >= 2) {
-      document.getElementById('avgDisplay').textContent = (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2);
+    if (vals.length === 4) {
+      const avg = (r + l + s + w) / 4;
+      document.getElementById('avgDisplay').textContent = avg.toFixed(2);
     } else {
       document.getElementById('avgDisplay').textContent = '-';
     }
@@ -311,33 +311,24 @@
     const speaking = parseFloat(document.getElementById('inputSpeaking').value);
     const writing = parseFloat(document.getElementById('inputWriting').value);
 
-    if (!date || isNaN(reading) || isNaN(listening)) {
-      alert('날짜, 리딩, 리스닝은 필수예요!');
+    if (!date || isNaN(reading) || isNaN(listening) || isNaN(speaking) || isNaN(writing)) {
+      alert('모든 항목을 입력해주세요!');
       return;
     }
 
     const manualTotal = parseFloat(document.getElementById('inputTotal').value);
-    const vals = [reading, listening, isNaN(speaking) ? null : speaking, isNaN(writing) ? null : writing].filter(v => v !== null);
-    const avgTotal = vals.reduce((a, b) => a + b, 0) / vals.length;
     const total = !isNaN(manualTotal) ? manualTotal : null;
 
     let error;
     if (editingId) {
       ({ error } = await _supabase.from('toefl_scores').update({
-        reading,
-        listening,
-        speaking: isNaN(speaking) ? null : speaking,
-        writing: isNaN(writing) ? null : writing,
-        total, test_date: date
+        reading, listening, speaking, writing, total, test_date: date
       }).eq('id', editingId));
     } else {
       ({ error } = await _supabase.from('toefl_scores').insert({
         user_id: currentUser.id,
         type: currentType,
-        reading,
-        listening,
-        speaking: isNaN(speaking) ? null : speaking,
-        writing: isNaN(writing) ? null : writing,
+        reading, listening, speaking, writing,
         total,
         test_date: date
       }));
