@@ -89,6 +89,7 @@
   <div class="tabs">
     <button class="tab active" onclick="showTab('stats')">📊 통계</button>
     <button class="tab" onclick="showTab('users')">👥 유저 관리</button>
+    <button class="tab" onclick="showTab('newusers')">🆕 신규 유저</button>
     <button class="tab" onclick="showTab('toefl')">🏆 토플 기록</button>
     <button class="tab" onclick="showTab('records')">📋 학습 기록</button>
     <button class="tab" onclick="showTab('tracks')">🎵 트랙 관리</button>
@@ -150,6 +151,27 @@
         <tbody id="usersBody"></tbody>
       </table>
       <div class="empty" id="usersEmpty" style="display:none;">유저가 없어요</div>
+    </div>
+  </div>
+
+  <!-- 신규 유저 탭 -->
+  <div id="tab-newusers" style="display:none;">
+    <div class="filter-row">
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">최근 1일 이내 가입한 유저</span>
+      <span class="record-count" id="newUserCount"></span>
+    </div>
+    <div class="table-wrap">
+      <table id="newUsersTable" style="display:none;">
+        <thead><tr>
+          <th style="width:120px;">이름</th>
+          <th style="width:80px;">반</th>
+          <th style="width:100px;">목표 점수</th>
+          <th style="width:120px;">목표 날짜</th>
+          <th style="width:160px;">가입일</th>
+        </tr></thead>
+        <tbody id="newUsersBody"></tbody>
+      </table>
+      <div class="empty" id="newUsersEmpty" style="display:none;">최근 신규 가입 유저가 없어요</div>
     </div>
   </div>
 
@@ -283,11 +305,11 @@ async function init() {
 }
 
 function showTab(name) {
-  ['stats','users','toefl','records','tracks','feedback'].forEach(t => {
+  ['stats','users','newusers','toefl','records','tracks','feedback'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach((el, i) => {
-    el.classList.toggle('active', ['stats','users','toefl','records','tracks','feedback'][i] === name);
+    el.classList.toggle('active', ['stats','users','newusers','toefl','records','tracks','feedback'][i] === name);
   });
   location.hash = name;
 }
@@ -320,6 +342,7 @@ async function loadUsers() {
     document.getElementById('usersLoading').style.display = 'none';
     document.getElementById('usersTable').style.display = 'table';
     renderUsers();
+    renderNewUsers();
   } catch(e) {
     document.getElementById('usersLoading').textContent = '불러오기 실패';
   }
@@ -395,6 +418,36 @@ function renderStats() {
     const cnt = scored.filter(r => r.score >= b.min && r.score < b.max).length;
     return `<div class="score-bucket"><div class="val" style="color:${b.color}">${cnt}</div><div class="lbl">${b.label}점</div></div>`;
   }).join('');
+}
+
+// 신규 유저 렌더
+function renderNewUsers() {
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo);
+  newUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  document.getElementById('newUserCount').textContent = `${newUsers.length}명`;
+  const tbody = document.getElementById('newUsersBody');
+  tbody.innerHTML = '';
+  if (!newUsers.length) {
+    document.getElementById('newUsersTable').style.display = 'none';
+    document.getElementById('newUsersEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('newUsersTable').style.display = 'table';
+  document.getElementById('newUsersEmpty').style.display = 'none';
+  newUsers.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
+    tr.innerHTML = `
+      <td style="font-weight:500;">${u.name || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score+'점' : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.created_at ? formatDate(u.created_at) : '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 // 유저 렌더
@@ -678,7 +731,7 @@ function toggleTrack(id) {
 
 init().then(() => {
   const hash = location.hash.replace('#', '');
-  const valid = ['stats','users','toefl','records','tracks','feedback'];
+  const valid = ['stats','users','newusers','toefl','records','tracks','feedback'];
   if (hash && valid.includes(hash)) showTab(hash);
 });
 </script>
