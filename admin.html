@@ -431,8 +431,8 @@ function renderUsers() {
       bv = (b.class || '').toLowerCase();
       return userSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
     } else if (userSortKey === 'target_score') {
-      av = a.target_score ?? -1;
-      bv = b.target_score ?? -1;
+      av = a.target_score != null ? (a.target_score > 6 ? a.target_score / 20 : a.target_score) : -1;
+      bv = b.target_score != null ? (b.target_score > 6 ? b.target_score / 20 : b.target_score) : -1;
     } else if (userSortKey === 'target_date') {
       av = a.target_date ? new Date(a.target_date).getTime() : Infinity;
       bv = b.target_date ? new Date(b.target_date).getTime() : Infinity;
