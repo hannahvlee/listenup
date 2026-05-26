@@ -157,7 +157,7 @@
   <!-- 신규 유저 탭 -->
   <div id="tab-newusers" style="display:none;">
     <div class="filter-row">
-      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">최근 1일 이내 가입한 유저</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">최근 3일 이내 가입한 유저</span>
       <span class="record-count" id="newUserCount"></span>
     </div>
     <div class="table-wrap">
@@ -422,7 +422,7 @@ function renderStats() {
 
 // 신규 유저 렌더
 function renderNewUsers() {
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const oneDayAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
   const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo);
   newUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   document.getElementById('newUserCount').textContent = `${newUsers.length}명`;
