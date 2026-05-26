@@ -282,6 +282,7 @@ function showTab(name) {
   document.querySelectorAll('.tab').forEach((el, i) => {
     el.classList.toggle('active', ['stats','users','toefl','records','tracks','feedback'][i] === name);
   });
+  location.hash = name;
 }
 
 // 기록 불러오기
@@ -604,7 +605,11 @@ function toggleTrack(id) {
   setTimeout(() => { notice.style.display = 'none'; }, 2000);
 }
 
-init();
+init().then(() => {
+  const hash = location.hash.replace('#', '');
+  const valid = ['stats','users','toefl','records','tracks','feedback'];
+  if (hash && valid.includes(hash)) showTab(hash);
+});
 </script>
 </body>
 </html>
