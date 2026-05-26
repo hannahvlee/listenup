@@ -186,7 +186,6 @@
           <th style="width:60px">텍스트</th>
           <th style="width:60px">점수</th>
           <th style="width:120px">날짜</th>
-          <th style="width:60px"></th>
         </tr></thead>
         <tbody id="recordsBody"></tbody>
       </table>
@@ -458,7 +457,6 @@ function renderRecords() {
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${r.textVisible === true ? '👁' : r.textVisible === false ? '🙈' : '-'}</td>
       <td class="${sc}">${r.score != null ? r.score+'점' : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${formatDate(r.date)}</td>
-      <td><button onclick="startEdit(${r.id},'${r.name.replace(/'/g,"\\'")}')" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;">✏️</button></td>
     `;
     tbody.appendChild(tr);
   });
