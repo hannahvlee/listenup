@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>학습 기록</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
@@ -81,6 +82,17 @@
 
   <div class="filter-row">
     <input type="text" class="filter-input" id="nameFilter" placeholder="이름으로 검색..." oninput="renderTable()">
+    <select class="filter-select" id="classFilter" onchange="renderTable()">
+      <option value="">전체 반</option>
+      <option value="완초1">완초1</option>
+      <option value="완초2">완초2</option>
+      <option value="인터">인터</option>
+      <option value="케이">케이</option>
+      <option value="주니어 U">주니어 U</option>
+      <option value="주니어 S">주니어 S</option>
+      <option value="주니어 H">주니어 H</option>
+      <option value="주니어 E">주니어 E</option>
+    </select>
     <select class="filter-select" id="modeFilter" onchange="renderTable()">
       <option value="">전체 모드</option>
       <option value="쉐도잉">쉐도잉</option>
@@ -124,10 +136,31 @@
 </div>
 
 <script>
+const ADMIN_EMAIL = 'hannahlee.v17@gmail.com';
+const _supabase = supabase.createClient(
+  'https://wccuzwkswtaehcdijtcf.supabase.co',
+  'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
+);
+
 let allRecords = [];
+let userProfiles = {}; // email -> {class}
+
+async function checkAdmin() {
+  const { data: { session } } = await _supabase.auth.getSession();
+  if (!session || session.user.email !== ADMIN_EMAIL) {
+    window.location.href = 'index.html'; return false;
+  }
+  return true;
+}
 
 async function loadRecords() {
+  if (!await checkAdmin()) return;
   try {
+    // 프로필 불러오기 (반 필터용)
+    const profileRes = await fetch('/api/admin-users');
+    const profileData = await profileRes.json();
+    (profileData.users || []).forEach(u => { userProfiles[u.name] = u; });
+
     const res = await fetch('/api/records');
     const data = await res.json();
     allRecords = data.records || [];
@@ -156,6 +189,7 @@ function formatDate(iso) {
 
 function renderTable() {
   const nameQ = document.getElementById('nameFilter').value.toLowerCase();
+  const classQ = document.getElementById('classFilter').value;
   const modeQ = document.getElementById('modeFilter').value;
   const trackQ = document.getElementById('trackFilter').value;
   const dateQ = document.getElementById('dateFilter').value;
@@ -172,6 +206,7 @@ function renderTable() {
       (dateQ === 'week' && d >= startOfWeek) ||
       (dateQ === 'month' && d >= startOfMonth);
     return (!nameQ || r.name.toLowerCase().includes(nameQ)) &&
+      (!classQ || (userProfiles[r.name] && userProfiles[r.name].class === classQ)) &&
       (!modeQ || r.mode === modeQ) &&
       (!trackQ || r.track === trackQ) &&
       dateOk;
