@@ -93,7 +93,6 @@
               <th>W</th>
               <th>평균</th>
               <th>총점</th>
-              <th>입력일</th>
               <th></th>
             </tr>
           </thead>
@@ -122,7 +121,6 @@
               <th>W</th>
               <th>평균</th>
               <th>총점</th>
-              <th>입력일</th>
               <th></th>
             </tr>
           </thead>
@@ -246,7 +244,6 @@
         <td class="td-score">${r.writing ?? '-'}</td>
         <td class="td-score" style="color:var(--text-muted)">${avg}</td>
         <td class="td-total">${total}</td>
-        <td class="td-date">${r.created_at ? formatCreatedAt(r.created_at) : '-'}</td>
         <td><button onclick="editScore(${r.id}, '${r.type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;padding:2px 6px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
       `;
       body.appendChild(tr);
@@ -270,11 +267,6 @@
     document.getElementById('inputTotal').value = r.total != null ? r.total : '';
     calcAvg();
     document.getElementById('modalOverlay').classList.add('show');
-  }
-
-  function formatCreatedAt(iso) {
-    const d = new Date(iso);
-    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
   }
 
   function calcAvg() {
