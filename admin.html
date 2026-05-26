@@ -11,7 +11,7 @@
   :root {
     --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
     --accent: #c8f060; --accent2: #60c8f0; --text: #f0ede8; --text-muted: #6e6e6e;
-    --danger: #f06060; --success: #60f0a0; --warn: #f0c060;
+    --danger: #f06060; --success: #60f0a0; --warn: #f0c060; --pink: #f060a0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
@@ -222,13 +222,13 @@
           <th style="width:120px">이름</th>
           <th style="width:80px">반</th>
           <th style="width:70px">구분</th>
-          <th style="width:55px">R</th>
-          <th style="width:55px">L</th>
-          <th style="width:55px">S</th>
-          <th style="width:55px">W</th>
-          <th style="width:65px">평균</th>
-          <th style="width:65px">총점</th>
-          <th style="width:110px">날짜</th>
+          <th style="width:55px;cursor:pointer;" id="th-reading" onclick="sortToefl('reading')">R</th>
+          <th style="width:55px;cursor:pointer;" id="th-listening" onclick="sortToefl('listening')">L</th>
+          <th style="width:55px;cursor:pointer;" id="th-speaking" onclick="sortToefl('speaking')">S</th>
+          <th style="width:55px;cursor:pointer;" id="th-writing" onclick="sortToefl('writing')">W</th>
+          <th style="width:65px;cursor:pointer;" id="th-avg" onclick="sortToefl('avg')">평균</th>
+          <th style="width:65px;cursor:pointer;" id="th-total" onclick="sortToefl('total')">총점</th>
+          <th style="width:110px;cursor:pointer;" id="th-date" onclick="sortToefl('date')">날짜</th>
         </tr></thead>
         <tbody id="toeflBody"></tbody>
       </table>
@@ -485,16 +485,45 @@ async function saveName(id) {
 }
 
 // 토플 렌더
+let toeflSortKey = null, toeflSortAsc = false;
+
+function sortToefl(key) {
+  if (toeflSortKey === key) { toeflSortAsc = !toeflSortAsc; } else { toeflSortKey = key; toeflSortAsc = false; }
+  ['reading','listening','speaking','writing','avg','total','date'].forEach(k => {
+    const el = document.getElementById('th-' + k);
+    if (el) el.style.color = k === key ? 'var(--pink)' : '';
+  });
+  renderToefl();
+}
+
 function renderToefl() {
   const nameQ = document.getElementById('toeflNameFilter').value.toLowerCase();
   const classQ = document.getElementById('toeflClassFilter').value;
   const typeQ = document.getElementById('toeflTypeFilter').value;
-  const filtered = allToefl.filter(s => {
+  let filtered = allToefl.filter(s => {
     const p = profileMap[s.user_id] || {};
     return (!nameQ || (p.name||'').toLowerCase().includes(nameQ)) &&
       (!classQ || p.class === classQ) &&
       (!typeQ || s.type === typeQ);
   });
+  if (toeflSortKey) {
+    filtered = filtered.slice().sort((a, b) => {
+      let av, bv;
+      if (toeflSortKey === 'avg') {
+        const vA = [a.reading, a.listening, a.speaking, a.writing].filter(v => v != null);
+        const vB = [b.reading, b.listening, b.speaking, b.writing].filter(v => v != null);
+        av = vA.length ? vA.reduce((x,y)=>x+y,0)/vA.length : -1;
+        bv = vB.length ? vB.reduce((x,y)=>x+y,0)/vB.length : -1;
+      } else if (toeflSortKey === 'date') {
+        av = new Date(a.test_date).getTime();
+        bv = new Date(b.test_date).getTime();
+      } else {
+        av = a[toeflSortKey] ?? -1;
+        bv = b[toeflSortKey] ?? -1;
+      }
+      return toeflSortAsc ? av - bv : bv - av;
+    });
+  }
   document.getElementById('toeflCount').textContent = `${filtered.length}개`;
   const tbody = document.getElementById('toeflBody');
   tbody.innerHTML = '';
@@ -511,7 +540,7 @@ function renderToefl() {
     const avg = vals.length ? (vals.reduce((a,b) => a+b,0)/vals.length).toFixed(2) : '-';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="font-weight:500;font-family:'DM Sans',sans-serif;">${p.name || '-'}</td>
+      <td style="font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--accent2);" onclick="window.location.href='admin-user-detail.html?id=${s.user_id}'">${p.name || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${p.class || '-'}</td>
       <td><span class="${s.type === 'mock' ? 'type-mock' : 'type-actual'}">${s.type === 'mock' ? '모의' : '실제'}</span></td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${s.reading ?? '-'}</td>
