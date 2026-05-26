@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>유저 관리 - ListenUp!</title>
+<title>토플 점수 기록 - ListenUp!</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -15,7 +15,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
   body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(200,240,96,0.04) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,200,240,0.04) 0%, transparent 60%); pointer-events: none; z-index: 0; }
-  .container { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; position: relative; z-index: 1; flex: 1; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; position: relative; z-index: 1; flex: 1; }
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
   .logo { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--accent2); text-decoration: none; letter-spacing: 0.18em; font-weight: 700; }
   .label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
@@ -25,13 +25,15 @@
   .filter-select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 32px 8px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236e6e6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
   .record-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-left: auto; }
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table { width: 100%; border-collapse: collapse; }
   thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
-  th { padding: 12px 16px; text-align: left; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; cursor: pointer; }
+  th { padding: 12px 14px; text-align: left; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.03); }
-  td { padding: 14px 16px; font-size: 13px; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 13px 14px; font-size: 13px; font-family: 'DM Mono', monospace; }
+  .type-mock { background: rgba(200,240,96,0.1); color: var(--accent); border: 1px solid rgba(200,240,96,0.2); display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 6px; }
+  .type-actual { background: rgba(96,200,240,0.1); color: var(--accent2); border: 1px solid rgba(96,200,240,0.2); display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 6px; }
   .loading { text-align: center; padding: 40px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; }
   .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -41,15 +43,11 @@
 <div class="container">
   <div class="header">
     <a href="index.html" class="logo">🎧 ListenUp!</a>
-    <a href="index.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);text-decoration:none;">← 홈</a>
+    <a href="admin-users.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);text-decoration:none;">← 유저 관리</a>
   </div>
 
   <div class="label">Admin</div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-    <h1 style="font-size:28px;font-weight:600;">유저 관리</h1>
-    <a href="history.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2);text-decoration:none;border:1px solid var(--border);padding:8px 16px;border-radius:8px;">전체 학습기록 →</a>
-    <a href="toefl-history.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2);text-decoration:none;border:1px solid var(--border);padding:8px 16px;border-radius:8px;">전체 토플기록 →</a>
-  </div>
+  <h1 style="font-size:28px;font-weight:600;margin-bottom:24px;">토플 점수 기록</h1>
 
   <div class="filter-row">
     <input type="text" class="filter-input" id="nameFilter" placeholder="이름으로 검색..." oninput="renderTable()">
@@ -64,25 +62,35 @@
       <option value="주니어 H">주니어 H</option>
       <option value="주니어 E">주니어 E</option>
     </select>
+    <select class="filter-select" id="typeFilter" onchange="renderTable()">
+      <option value="">모의 + 실제</option>
+      <option value="mock">모의 토플</option>
+      <option value="actual">실제 토플</option>
+    </select>
     <span class="record-count" id="recordCount"></span>
   </div>
 
   <div class="table-wrap">
-    <div class="loading" id="loading">유저 불러오는 중...</div>
-    <table id="userTable" style="display:none">
+    <div class="loading" id="loading">불러오는 중...</div>
+    <table id="scoreTable" style="display:none">
       <thead>
         <tr>
-          <th style="width:160px">이름</th>
-          <th style="width:100px">반</th>
-          <th style="width:100px">목표 점수</th>
-          <th style="width:130px">목표 날짜</th>
-          <th style="width:80px">상세</th>
+          <th style="width:120px">이름</th>
+          <th style="width:90px">반</th>
+          <th style="width:80px">구분</th>
+          <th style="width:60px">R</th>
+          <th style="width:60px">L</th>
+          <th style="width:60px">S</th>
+          <th style="width:60px">W</th>
+          <th style="width:70px">평균</th>
+          <th style="width:70px">총점</th>
+          <th style="width:120px">날짜</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
     <div class="empty" id="emptyState" style="display:none">
-      <p>유저가 없어요</p>
+      <p>기록이 없어요</p>
     </div>
   </div>
 </div>
@@ -94,51 +102,69 @@
     'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
   );
 
-  let allUsers = [];
+  let allScores = [];
+  let profileMap = {}; // user_id -> {name, class}
 
   async function init() {
     const { data: { session } } = await _supabase.auth.getSession();
-    if (!session) { window.location.href = 'login.html'; return; }
-    if (session.user.email !== ADMIN_EMAIL) { window.location.href = 'index.html'; return; }
-    await loadUsers();
-  }
+    if (!session || session.user.email !== ADMIN_EMAIL) { window.location.href = 'index.html'; return; }
 
-  async function loadUsers() {
-    const res = await fetch('/api/admin-users');
+    // 프로필 불러오기
+    const profileRes = await fetch('/api/admin-users');
+    const profileData = await profileRes.json();
+    (profileData.users || []).forEach(u => { profileMap[u.user_id] = u; });
+
+    // 전체 토플 점수 불러오기
+    const res = await fetch('/api/admin-toefl');
     const data = await res.json();
-    if (data.error) { document.getElementById('loading').textContent = '불러오기 실패'; return; }
-    allUsers = data.users || [];
+    allScores = data.scores || [];
+
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('userTable').style.display = 'table';
+    document.getElementById('scoreTable').style.display = 'table';
     renderTable();
   }
 
   function renderTable() {
     const nameQ = document.getElementById('nameFilter').value.toLowerCase();
     const classQ = document.getElementById('classFilter').value;
-    const filtered = allUsers.filter(u =>
-      (!nameQ || (u.name || '').toLowerCase().includes(nameQ)) &&
-      (!classQ || u.class === classQ)
-    );
-    document.getElementById('recordCount').textContent = `${filtered.length}명`;
+    const typeQ = document.getElementById('typeFilter').value;
+
+    const filtered = allScores.filter(s => {
+      const profile = profileMap[s.user_id] || {};
+      return (!nameQ || (profile.name || '').toLowerCase().includes(nameQ)) &&
+        (!classQ || profile.class === classQ) &&
+        (!typeQ || s.type === typeQ);
+    });
+
+    document.getElementById('recordCount').textContent = `${filtered.length}개`;
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
+
     if (filtered.length === 0) {
-      document.getElementById('userTable').style.display = 'none';
+      document.getElementById('scoreTable').style.display = 'none';
       document.getElementById('emptyState').style.display = 'block';
       return;
     }
-    document.getElementById('userTable').style.display = 'table';
+
+    document.getElementById('scoreTable').style.display = 'table';
     document.getElementById('emptyState').style.display = 'none';
-    filtered.forEach(u => {
+
+    filtered.forEach(s => {
+      const profile = profileMap[s.user_id] || {};
+      const vals = [s.reading, s.listening, s.speaking, s.writing].filter(v => v != null);
+      const avg = vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2) : '-';
       const tr = document.createElement('tr');
-      tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
       tr.innerHTML = `
-        <td style="font-weight:500;">${u.name || '-'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score + '점' : '-'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
+        <td style="font-weight:500;font-family:'DM Sans',sans-serif;">${profile.name || '-'}</td>
+        <td style="color:var(--text-muted)">${profile.class || '-'}</td>
+        <td><span class="${s.type === 'mock' ? 'type-mock' : 'type-actual'}">${s.type === 'mock' ? '모의' : '실제'}</span></td>
+        <td>${s.reading ?? '-'}</td>
+        <td>${s.listening ?? '-'}</td>
+        <td>${s.speaking ?? '-'}</td>
+        <td>${s.writing ?? '-'}</td>
+        <td style="color:var(--text-muted)">${avg}</td>
+        <td style="color:var(--accent);font-weight:600">${s.total ?? '-'}</td>
+        <td style="color:var(--text-muted);font-size:11px">${s.test_date}</td>
       `;
       tbody.appendChild(tr);
     });
