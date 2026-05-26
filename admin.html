@@ -229,6 +229,7 @@
           <th style="width:65px;cursor:pointer;" id="th-avg" onclick="sortToefl('avg')">평균</th>
           <th style="width:65px;cursor:pointer;" id="th-total" onclick="sortToefl('total')">총점</th>
           <th style="width:110px;cursor:pointer;" id="th-date" onclick="sortToefl('date')">날짜</th>
+          <th style="width:140px;">입력일</th>
         </tr></thead>
         <tbody id="toeflBody"></tbody>
       </table>
@@ -551,6 +552,7 @@ function renderToefl() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${s.total ?? '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${s.test_date}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${s.created_at ? formatDate(s.created_at) : '-'}</td>
     `;
     tbody.appendChild(tr);
   });
