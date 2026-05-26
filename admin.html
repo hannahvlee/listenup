@@ -219,8 +219,8 @@
       <div class="loading" id="toeflLoading">불러오는 중...</div>
       <table id="toeflTable" style="display:none;">
         <thead><tr>
-          <th style="width:120px">이름</th>
-          <th style="width:80px">반</th>
+          <th style="width:120px;cursor:pointer;" id="th-name" onclick="sortToefl('name')">이름</th>
+          <th style="width:80px;cursor:pointer;" id="th-class" onclick="sortToefl('class')">반</th>
           <th style="width:70px">구분</th>
           <th style="width:55px;cursor:pointer;" id="th-reading" onclick="sortToefl('reading')">R</th>
           <th style="width:55px;cursor:pointer;" id="th-listening" onclick="sortToefl('listening')">L</th>
@@ -229,7 +229,7 @@
           <th style="width:65px;cursor:pointer;" id="th-avg" onclick="sortToefl('avg')">평균</th>
           <th style="width:65px;cursor:pointer;" id="th-total" onclick="sortToefl('total')">총점</th>
           <th style="width:110px;cursor:pointer;" id="th-date" onclick="sortToefl('date')">날짜</th>
-          <th style="width:140px;">입력일</th>
+          <th style="width:140px;cursor:pointer;" id="th-created" onclick="sortToefl('created')">입력일</th>
         </tr></thead>
         <tbody id="toeflBody"></tbody>
       </table>
@@ -491,7 +491,7 @@ let toeflSortKey = null, toeflSortAsc = false;
 
 function sortToefl(key) {
   if (toeflSortKey === key) { toeflSortAsc = !toeflSortAsc; } else { toeflSortKey = key; toeflSortAsc = false; }
-  ['reading','listening','speaking','writing','avg','total','date'].forEach(k => {
+  ['name','class','reading','listening','speaking','writing','avg','total','date','created'].forEach(k => {
     const el = document.getElementById('th-' + k);
     if (el) el.style.color = k === key ? 'var(--pink)' : '';
   });
@@ -519,6 +519,17 @@ function renderToefl() {
       } else if (toeflSortKey === 'date') {
         av = new Date(a.test_date).getTime();
         bv = new Date(b.test_date).getTime();
+      } else if (toeflSortKey === 'created') {
+        av = new Date(a.created_at || 0).getTime();
+        bv = new Date(b.created_at || 0).getTime();
+      } else if (toeflSortKey === 'name') {
+        av = (profileMap[a.user_id]?.name || '').toLowerCase();
+        bv = (profileMap[b.user_id]?.name || '').toLowerCase();
+        return toeflSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+      } else if (toeflSortKey === 'class') {
+        av = (profileMap[a.user_id]?.class || '').toLowerCase();
+        bv = (profileMap[b.user_id]?.class || '').toLowerCase();
+        return toeflSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
       } else {
         av = a[toeflSortKey] ?? -1;
         bv = b[toeflSortKey] ?? -1;
