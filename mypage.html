@@ -89,10 +89,7 @@
   </div>
 
   <div class="label">My Account</div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-    <h1 id="userName" style="font-size:28px;font-weight:600;">...</h1>
-    <a href="profile.html" class="btn-secondary">프로필 수정</a>
-  </div>
+  <h1 id="userName" style="font-size:28px;font-weight:600;margin-bottom:24px;">...</h1>
 
   <div class="stat-grid">
     <div class="stat-card">
@@ -132,7 +129,9 @@
     </div>
   </div>
 
-  <div style="margin-bottom:32px;"></div>
+  <div style="display:flex;gap:10px;margin-bottom:32px;">
+    <a href="profile.html" class="btn-secondary">프로필 수정</a>
+  </div>
 
   <!-- 토플 점수 -->
   <div class="label" style="margin-bottom:16px;">TOEFL 점수</div>
@@ -401,7 +400,7 @@
     body.innerHTML = '';
     records.forEach(r => {
       const tr = document.createElement('tr');
-      const avg = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(2);
+      const avg = (() => { const vals = [r.reading, r.listening, r.speaking, r.writing].filter(v => v != null); return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2) : '-'; })();
       const total = r.total != null ? r.total : '-';
       tr.style.borderBottom = '1px solid var(--border)';
       tr.innerHTML = `
@@ -458,7 +457,8 @@
     const l = parseFloat(document.getElementById('toeflL').value);
     const s = parseFloat(document.getElementById('toeflS').value);
     const w = parseFloat(document.getElementById('toeflW').value);
-    if (![r,l,s,w].some(isNaN)) document.getElementById('toeflAvgDisplay').textContent = ((r+l+s+w)/4).toFixed(2);
+    const vals = [r,l,s,w].filter(v => !isNaN(v));
+    if (vals.length >= 2) document.getElementById('toeflAvgDisplay').textContent = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2);
     else document.getElementById('toeflAvgDisplay').textContent = '-';
   }
 
@@ -468,14 +468,14 @@
     const listening = parseFloat(document.getElementById('toeflL').value);
     const speaking = parseFloat(document.getElementById('toeflS').value);
     const writing = parseFloat(document.getElementById('toeflW').value);
-    if (!date || isNaN(reading) || isNaN(listening) || isNaN(speaking) || isNaN(writing)) { alert('모든 항목을 입력해주세요!'); return; }
+    if (!date || isNaN(reading) || isNaN(listening)) { alert('날짜, 리딩, 리스닝은 필수예요!'); return; }
     const manualTotal = parseFloat(document.getElementById('toeflTotal').value);
     const total = !isNaN(manualTotal) ? manualTotal : null;
     let error;
     if (toeflEditingId) {
-      ({ error } = await _supabase.from('toefl_scores').update({ reading, listening, speaking, writing, total, test_date: date }).eq('id', toeflEditingId));
+      ({ error } = await _supabase.from('toefl_scores').update({ reading, listening, speaking: isNaN(speaking) ? null : speaking, writing: isNaN(writing) ? null : writing, total, test_date: date }).eq('id', toeflEditingId));
     } else {
-      ({ error } = await _supabase.from('toefl_scores').insert({ user_id: toeflUserId, type: toeflCurrentType, reading, listening, speaking, writing, total, test_date: date }));
+      ({ error } = await _supabase.from('toefl_scores').insert({ user_id: toeflUserId, type: toeflCurrentType, reading, listening, speaking: isNaN(speaking) ? null : speaking, writing: isNaN(writing) ? null : writing, total, test_date: date }));
     }
     if (error) { alert('저장 실패: ' + error.message); return; }
     closeToeflModal();
