@@ -135,10 +135,10 @@
       <div class="loading" id="usersLoading">불러오는 중...</div>
       <table id="usersTable" style="display:none;">
         <thead><tr>
-          <th style="width:80px">이름</th>
-          <th style="width:70px">반</th>
-          <th style="width:75px">목표 점수</th>
-          <th style="width:100px">목표 날짜</th>
+          <th style="width:80px;cursor:pointer;" onclick="sortUsers('name')">이름</th>
+          <th style="width:70px;cursor:pointer;" onclick="sortUsers('class')">반</th>
+          <th style="width:75px;cursor:pointer;" onclick="sortUsers('target_score')">목표 점수</th>
+          <th style="width:100px;cursor:pointer;" onclick="sortUsers('target_date')">목표 날짜</th>
           <th style="width:45px">R</th>
           <th style="width:45px">L</th>
           <th style="width:45px">S</th>
@@ -398,13 +398,47 @@ function renderStats() {
 }
 
 // 유저 렌더
+let userSortKey = 'name', userSortAsc = true;
+
+function sortUsers(key) {
+  if (userSortKey === key) {
+    userSortAsc = !userSortAsc;
+  } else {
+    userSortKey = key;
+    // 목표 점수는 기본 내림차순, 목표 날짜는 기본 오름차순(가장 가까운 날짜 먼저)
+    userSortAsc = key === 'target_date' ? true : key === 'target_score' ? false : true;
+  }
+  renderUsers();
+}
+
 function renderUsers() {
   const nameQ = document.getElementById('userNameFilter').value.toLowerCase();
   const classQ = document.getElementById('userClassFilter').value;
-  const filtered = allUsers.filter(u =>
+  let filtered = allUsers.filter(u =>
     (!nameQ || (u.name||'').toLowerCase().includes(nameQ)) &&
     (!classQ || u.class === classQ)
   );
+
+  // 정렬
+  filtered = filtered.slice().sort((a, b) => {
+    let av, bv;
+    if (userSortKey === 'name') {
+      av = (a.name || '').toLowerCase();
+      bv = (b.name || '').toLowerCase();
+      return userSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    } else if (userSortKey === 'class') {
+      av = (a.class || '').toLowerCase();
+      bv = (b.class || '').toLowerCase();
+      return userSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    } else if (userSortKey === 'target_score') {
+      av = a.target_score ?? -1;
+      bv = b.target_score ?? -1;
+    } else if (userSortKey === 'target_date') {
+      av = a.target_date ? new Date(a.target_date).getTime() : Infinity;
+      bv = b.target_date ? new Date(b.target_date).getTime() : Infinity;
+    }
+    return userSortAsc ? av - bv : bv - av;
+  });
   document.getElementById('userCount').textContent = `${filtered.length}명`;
   const tbody = document.getElementById('usersBody');
   tbody.innerHTML = '';
