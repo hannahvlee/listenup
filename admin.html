@@ -329,6 +329,7 @@ async function loadToefl() {
     document.getElementById('toeflLoading').style.display = 'none';
     document.getElementById('toeflTable').style.display = 'table';
     renderToefl();
+    renderUsers();
   } catch(e) {
     document.getElementById('toeflLoading').textContent = '불러오기 실패';
   }
