@@ -9,15 +9,28 @@ export default async function handler(req, res) {
   if (!serviceKey) return res.status(500).json({ error: 'Service key not configured' });
 
   try {
-    const r = await fetch('https://wccuzwkswtaehcdijtcf.supabase.co/rest/v1/profiles?select=*&order=name.asc', {
-      headers: {
-        'apikey': serviceKey,
-        'Authorization': `Bearer ${serviceKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    const users = await r.json();
-    return res.status(200).json({ users });
+    const [profilesRes, authRes] = await Promise.all([
+      fetch('https://wccuzwkswtaehcdijtcf.supabase.co/rest/v1/profiles?select=*&order=name.asc', {
+        headers: {
+          'apikey': serviceKey,
+          'Authorization': `Bearer ${serviceKey}`,
+          'Content-Type': 'application/json'
+        }
+      }),
+      fetch('https://wccuzwkswtaehcdijtcf.supabase.co/auth/v1/admin/users?per_page=1000', {
+        headers: {
+          'apikey': serviceKey,
+          'Authorization': `Bearer ${serviceKey}`,
+          'Content-Type': 'application/json'
+        }
+      })
+    ]);
+    const users = await profilesRes.json();
+    const authData = await authRes.json();
+    const authMap = {};
+    (authData.users || []).forEach(u => { authMap[u.id] = u.created_at; });
+    const merged = users.map(u => ({ ...u, created_at: authMap[u.user_id] || u.created_at || null }));
+    return res.status(200).json({ users: merged });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
