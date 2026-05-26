@@ -400,7 +400,7 @@
     body.innerHTML = '';
     records.forEach(r => {
       const tr = document.createElement('tr');
-      const avg = ((r.reading + r.listening + r.speaking + r.writing) / 4).toFixed(2);
+      const avg = (() => { const vals = [r.reading, r.listening, r.speaking, r.writing].filter(v => v != null); return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2) : '-'; })();
       const total = r.total != null ? r.total : '-';
       tr.style.borderBottom = '1px solid var(--border)';
       tr.innerHTML = `
@@ -467,14 +467,14 @@
     const listening = parseFloat(document.getElementById('toeflL').value);
     const speaking = parseFloat(document.getElementById('toeflS').value);
     const writing = parseFloat(document.getElementById('toeflW').value);
-    if (!date || isNaN(reading) || isNaN(listening) || isNaN(speaking) || isNaN(writing)) { alert('모든 항목을 입력해주세요!'); return; }
+    if (!date || isNaN(reading) || isNaN(listening)) { alert('날짜, 리딩, 리스닝은 필수예요!'); return; }
     const manualTotal = parseFloat(document.getElementById('toeflTotal').value);
     const total = !isNaN(manualTotal) ? manualTotal : null;
     let error;
     if (toeflEditingId) {
-      ({ error } = await _supabase.from('toefl_scores').update({ reading, listening, speaking, writing, total, test_date: date }).eq('id', toeflEditingId));
+      ({ error } = await _supabase.from('toefl_scores').update({ reading, listening, speaking: isNaN(speaking) ? null : speaking, writing: isNaN(writing) ? null : writing, total, test_date: date }).eq('id', toeflEditingId));
     } else {
-      ({ error } = await _supabase.from('toefl_scores').insert({ user_id: toeflUserId, type: toeflCurrentType, reading, listening, speaking, writing, total, test_date: date }));
+      ({ error } = await _supabase.from('toefl_scores').insert({ user_id: toeflUserId, type: toeflCurrentType, reading, listening, speaking: isNaN(speaking) ? null : speaking, writing: isNaN(writing) ? null : writing, total, test_date: date }));
     }
     if (error) { alert('저장 실패: ' + error.message); return; }
     closeToeflModal();
