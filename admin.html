@@ -135,12 +135,12 @@
       <div class="loading" id="usersLoading">불러오는 중...</div>
       <table id="usersTable" style="display:none;">
         <thead><tr>
-          <th style="width:160px">이름</th>
-          <th style="width:100px">반</th>
-          <th style="width:100px">목표 점수</th>
-          <th style="width:130px">목표 날짜</th>
-          <th style="width:120px">최고 토플</th>
-          <th style="width:80px">상세</th>
+          <th style="width:80px">이름</th>
+          <th style="width:80px">반</th>
+          <th style="width:80px">목표 점수</th>
+          <th style="width:100px">목표 날짜</th>
+          <th style="width:280px">최고 토플</th>
+          <th style="width:60px">상세</th>
         </tr></thead>
         <tbody id="usersBody"></tbody>
       </table>
@@ -417,10 +417,10 @@ function renderUsers() {
 
     // 최고 토플 점수 찾기
     const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
-    let bestToefl = '-', bestType = '';
+    let bestToefl = '-', bestType = '', best = null;
     if (userToefl.length) {
       const withAvg = userToefl.map(s => ({ ...s, avg: (s.reading + s.listening + s.speaking + s.writing) / 4 }));
-      const best = withAvg.reduce((a, b) => a.avg > b.avg ? a : b);
+      best = withAvg.reduce((a, b) => a.avg > b.avg ? a : b);
       bestToefl = best.avg.toFixed(2);
       bestType = best.type === 'mock' ? '모의' : '실제';
     }
@@ -430,7 +430,7 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score+'점' : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;">${bestToefl !== '-' ? `<span style="color:var(--accent);font-weight:600;">${bestToefl}</span> <span style="font-size:10px;color:var(--text-muted);">${bestType}</span>` : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${bestToefl !== '-' ? `<span style="color:var(--accent);font-weight:600;">${bestToefl}</span> <span style="font-size:10px;color:var(--text-muted);">${bestType}</span> <span style="font-size:11px;color:var(--text-muted);margin-left:6px;">R${best.reading} L${best.listening} S${best.speaking} W${best.writing}</span>` : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
     `;
     tbody.appendChild(tr);
