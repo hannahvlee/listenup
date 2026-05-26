@@ -148,6 +148,7 @@
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">W</th>
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">평균</th>
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">총점</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">입력일</th>
             <th></th>
           </tr></thead>
           <tbody id="mockBody"></tbody>
@@ -169,6 +170,7 @@
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">W</th>
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">평균</th>
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">총점</th>
+            <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">입력일</th>
             <th></th>
           </tr></thead>
           <tbody id="actualBody"></tbody>
@@ -379,6 +381,11 @@
   // 토플
   let toeflCurrentType = null, toeflEditingId = null, toeflMockRecords = [], toeflActualRecords = [], toeflUserId = null;
 
+  function formatToeflDate(iso) {
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+
   async function loadToeflScores(userId) {
     toeflUserId = userId;
     const { data, error } = await _supabase.from('toefl_scores').select('*').eq('user_id', userId).order('test_date', { ascending: false });
@@ -410,6 +417,7 @@
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.writing ?? '-'}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">${total}</td>
+        <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${r.created_at ? formatToeflDate(r.created_at) : '-'}</td>
         <td><button onclick="editToefl(${r.id},'${type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
       `;
       body.appendChild(tr);
