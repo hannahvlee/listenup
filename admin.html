@@ -11,7 +11,7 @@
   :root {
     --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
     --accent: #c8f060; --accent2: #60c8f0; --text: #f0ede8; --text-muted: #6e6e6e;
-    --danger: #f06060; --success: #60f0a0; --warn: #f0c060; --pink: #f060a0;
+    --danger: #f06060; --success: #60f0a0; --warn: #f0c060;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
@@ -89,8 +89,8 @@
   <div class="tabs">
     <button class="tab active" onclick="showTab('stats')">📊 통계</button>
     <button class="tab" onclick="showTab('users')">👥 유저 관리</button>
-    <button class="tab" onclick="showTab('records')">📋 기록 관리</button>
     <button class="tab" onclick="showTab('toefl')">🏆 토플 기록</button>
+    <button class="tab" onclick="showTab('records')">📋 학습 기록</button>
     <button class="tab" onclick="showTab('tracks')">🎵 트랙 관리</button>
     <button class="tab" onclick="showTab('feedback')">💬 피드백</button>
   </div>
@@ -222,13 +222,13 @@
           <th style="width:120px">이름</th>
           <th style="width:80px">반</th>
           <th style="width:70px">구분</th>
-          <th style="width:55px;cursor:pointer;" id="th-reading" onclick="sortToefl('reading')">R</th>
-          <th style="width:55px;cursor:pointer;" id="th-listening" onclick="sortToefl('listening')">L</th>
-          <th style="width:55px;cursor:pointer;" id="th-speaking" onclick="sortToefl('speaking')">S</th>
-          <th style="width:55px;cursor:pointer;" id="th-writing" onclick="sortToefl('writing')">W</th>
-          <th style="width:65px;cursor:pointer;" id="th-avg" onclick="sortToefl('avg')">평균</th>
-          <th style="width:65px;cursor:pointer;" id="th-total" onclick="sortToefl('total')">총점</th>
-          <th style="width:110px;cursor:pointer;" id="th-date" onclick="sortToefl('date')">날짜</th>
+          <th style="width:55px">R</th>
+          <th style="width:55px">L</th>
+          <th style="width:55px">S</th>
+          <th style="width:55px">W</th>
+          <th style="width:65px">평균</th>
+          <th style="width:65px">총점</th>
+          <th style="width:110px">날짜</th>
         </tr></thead>
         <tbody id="toeflBody"></tbody>
       </table>
@@ -275,11 +275,11 @@ async function init() {
 }
 
 function showTab(name) {
-  ['stats','users','records','toefl','tracks','feedback'].forEach(t => {
+  ['stats','users','toefl','records','tracks','feedback'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach((el, i) => {
-    el.classList.toggle('active', ['stats','users','records','toefl','tracks','feedback'][i] === name);
+    el.classList.toggle('active', ['stats','users','toefl','records','tracks','feedback'][i] === name);
   });
 }
 
@@ -484,48 +484,16 @@ async function saveName(id) {
 }
 
 // 토플 렌더
-let toeflSortKey = null, toeflSortAsc = false;
-
-function sortToefl(key) {
-  if (toeflSortKey === key) { toeflSortAsc = !toeflSortAsc; } else { toeflSortKey = key; toeflSortAsc = false; }
-  ['reading','listening','speaking','writing','avg','total','date'].forEach(k => {
-    const el = document.getElementById('th-' + k);
-    if (el) el.style.color = k === key ? 'var(--pink)' : '';
-  });
-  renderToefl();
-}
-
 function renderToefl() {
   const nameQ = document.getElementById('toeflNameFilter').value.toLowerCase();
   const classQ = document.getElementById('toeflClassFilter').value;
   const typeQ = document.getElementById('toeflTypeFilter').value;
-  let filtered = allToefl.filter(s => {
+  const filtered = allToefl.filter(s => {
     const p = profileMap[s.user_id] || {};
     return (!nameQ || (p.name||'').toLowerCase().includes(nameQ)) &&
       (!classQ || p.class === classQ) &&
       (!typeQ || s.type === typeQ);
   });
-
-  // 정렬
-  if (toeflSortKey) {
-    filtered = filtered.slice().sort((a, b) => {
-      let av, bv;
-      if (toeflSortKey === 'avg') {
-        const avalsA = [a.reading, a.listening, a.speaking, a.writing].filter(v => v != null);
-        const avalsB = [b.reading, b.listening, b.speaking, b.writing].filter(v => v != null);
-        av = avalsA.length ? avalsA.reduce((x,y)=>x+y,0)/avalsA.length : -1;
-        bv = avalsB.length ? avalsB.reduce((x,y)=>x+y,0)/avalsB.length : -1;
-      } else if (toeflSortKey === 'date') {
-        av = new Date(a.test_date).getTime();
-        bv = new Date(b.test_date).getTime();
-      } else {
-        av = a[toeflSortKey] ?? -1;
-        bv = b[toeflSortKey] ?? -1;
-      }
-      return toeflSortAsc ? av - bv : bv - av;
-    });
-  }
-
   document.getElementById('toeflCount').textContent = `${filtered.length}개`;
   const tbody = document.getElementById('toeflBody');
   tbody.innerHTML = '';
@@ -542,7 +510,7 @@ function renderToefl() {
     const avg = vals.length ? (vals.reduce((a,b) => a+b,0)/vals.length).toFixed(2) : '-';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--accent2);" onclick="window.location.href='admin-user-detail.html?id=${s.user_id}'">${p.name || '-'}</td>
+      <td style="font-weight:500;font-family:'DM Sans',sans-serif;">${p.name || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${p.class || '-'}</td>
       <td><span class="${s.type === 'mock' ? 'type-mock' : 'type-actual'}">${s.type === 'mock' ? '모의' : '실제'}</span></td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${s.reading ?? '-'}</td>
