@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 - ListenUp!</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="tracks.js"></script>
+<style>
+  :root {
+    --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+    --accent: #c8f060; --accent2: #60c8f0; --text: #f0ede8; --text-muted: #6e6e6e;
+    --danger: #f06060; --success: #60f0a0; --warn: #f0c060; --pink: #f060a0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(200,240,96,0.04) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+  .container { max-width: 1300px; margin: 0 auto; padding: 48px 24px 80px; position: relative; z-index: 1; flex: 1; width: 100%; }
+  .label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: clamp(24px, 4vw, 32px); font-weight: 600; margin-bottom: 32px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; width: fit-content; flex-wrap: wrap; }
+  .tab { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; padding: 8px 16px; border-radius: 7px; cursor: pointer; color: var(--text-muted); border: none; background: none; transition: all 0.15s; }
+  .tab.active { background: var(--surface2); color: var(--text); }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--accent); font-family: 'DM Mono', monospace; }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .chart-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .bar-label { font-size: 12px; color: var(--text-muted); min-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); min-width: 30px; text-align: right; }
+  .score-grid-buckets { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .score-bucket { background: var(--surface2); border-radius: 8px; padding: 12px 8px; text-align: center; }
+  .score-bucket .val { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 600; }
+  .score-bucket .lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+  .filter-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; }
+  .filter-input:focus { border-color: var(--accent); }
+  .filter-select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 32px 8px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236e6e6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+  .record-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-left: auto; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+  th { padding: 12px 16px; text-align: left; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 12px 16px; font-size: 13px; }
+  .mode-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 6px; }
+  .mode-shadowing { background: rgba(200,240,96,0.1); color: var(--accent); border: 1px solid rgba(200,240,96,0.2); }
+  .mode-listening { background: rgba(96,200,240,0.1); color: var(--accent2); border: 1px solid rgba(96,200,240,0.2); }
+  .mode-dictation { background: rgba(180,96,240,0.1); color: #c060f0; border: 1px solid rgba(180,96,240,0.2); }
+  .mode-vocab { background: rgba(240,150,60,0.1); color: #f09640; border: 1px solid rgba(240,150,60,0.2); }
+  .score-great { color: var(--success); font-family: 'DM Mono', monospace; }
+  .score-ok { color: var(--warn); font-family: 'DM Mono', monospace; }
+  .score-poor { color: var(--danger); font-family: 'DM Mono', monospace; }
+  .track-list { display: flex; flex-direction: column; gap: 10px; }
+  .track-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: opacity 0.2s; }
+  .track-row.hidden-track { opacity: 0.4; }
+  .track-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); min-width: 24px; }
+  .track-name { flex: 1; font-size: 14px; }
+  .track-status { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-right: 8px; }
+  .toggle-btn { position: relative; width: 44px; height: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+  .toggle-btn.on { background: var(--accent); border-color: var(--accent); }
+  .toggle-btn::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--text-muted); border-radius: 50%; transition: all 0.2s; }
+  .toggle-btn.on::after { left: 23px; background: #0e0e0e; }
+  .save-notice { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--success); margin-top: 12px; display: none; }
+  .type-mock { background: rgba(200,240,96,0.1); color: var(--accent); border: 1px solid rgba(200,240,96,0.2); display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 6px; font-family: 'DM Mono', monospace; }
+  .type-actual { background: rgba(96,200,240,0.1); color: var(--accent2); border: 1px solid rgba(96,200,240,0.2); display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 6px; font-family: 'DM Mono', monospace; }
+  .loading { text-align: center; padding: 40px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; }
+  .empty { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" style="font-family:'DM Mono',monospace;font-size:15px;color:var(--accent2);text-decoration:none;letter-spacing:0.18em;font-weight:700;">🎧 ListenUp!</a>
+    <a href="index.html" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);text-decoration:none;">← 홈</a>
+  </div>
+  <div class="label">Admin</div>
+  <h1>관리자 페이지</h1>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('stats')">📊 통계</button>
+    <button class="tab" onclick="showTab('users')">👥 유저 관리</button>
+    <button class="tab" onclick="showTab('newusers')">🆕 신규 유저</button>
+    <button class="tab" onclick="showTab('toefl')">🏆 토플 기록</button>
+    <button class="tab" onclick="showTab('records')">📋 학습 기록</button>
+    <button class="tab" onclick="showTab('tracks')">🎵 트랙 관리</button>
+    <button class="tab" onclick="showTab('feedback')">💬 피드백</button>
+  </div>
+
+  <!-- 통계 탭 -->
+  <div id="tab-stats">
+    <div class="stat-grid" id="statGrid"><div class="loading">불러오는 중...</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="chart-section">
+        <div class="chart-title">모드별 학습 횟수</div>
+        <div id="modeChart"></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-title">트랙별 학습 횟수</div>
+        <div id="trackChart"></div>
+      </div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">점수 분포</div>
+      <div class="score-grid-buckets" id="scoreGrid"></div>
+    </div>
+  </div>
+
+  <!-- 유저 관리 탭 -->
+  <div id="tab-users" style="display:none;">
+    <div class="filter-row">
+      <input type="text" class="filter-input" id="userNameFilter" placeholder="이름으로 검색..." oninput="renderUsers()">
+      <select class="filter-select" id="userClassFilter" onchange="renderUsers()">
+        <option value="">전체 반</option>
+        <option value="완초1">완초1</option>
+        <option value="완초2">완초2</option>
+        <option value="인터">인터</option>
+        <option value="케이">케이</option>
+        <option value="주니어 U">주니어 U</option>
+        <option value="주니어 S">주니어 S</option>
+        <option value="주니어 H">주니어 H</option>
+        <option value="주니어 E">주니어 E</option>
+      </select>
+      <span class="record-count" id="userCount"></span>
+    </div>
+    <div class="table-wrap">
+      <div class="loading" id="usersLoading">불러오는 중...</div>
+      <table id="usersTable" style="display:none;">
+        <thead><tr>
+          <th style="width:80px;cursor:pointer;" onclick="sortUsers('name')">이름</th>
+          <th style="width:70px;cursor:pointer;" onclick="sortUsers('class')">반</th>
+          <th style="width:75px;cursor:pointer;" onclick="sortUsers('target_score')">목표 점수</th>
+          <th style="width:100px;cursor:pointer;" onclick="sortUsers('target_date')">목표 날짜</th>
+          <th style="width:45px">R</th>
+          <th style="width:45px">L</th>
+          <th style="width:45px">S</th>
+          <th style="width:45px">W</th>
+          <th style="width:55px">평균</th>
+          <th style="width:50px">구분</th>
+          <th style="width:60px">상세</th>
+        </tr></thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+      <div class="empty" id="usersEmpty" style="display:none;">유저가 없어요</div>
+    </div>
+  </div>
+
+  <!-- 신규 유저 탭 -->
+  <div id="tab-newusers" style="display:none;">
+    <div class="filter-row">
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">최근 1일 이내 가입한 유저</span>
+      <span class="record-count" id="newUserCount"></span>
+    </div>
+    <div class="table-wrap">
+      <table id="newUsersTable" style="display:none;">
+        <thead><tr>
+          <th style="width:120px;">이름</th>
+          <th style="width:80px;">반</th>
+          <th style="width:100px;">목표 점수</th>
+          <th style="width:120px;">목표 날짜</th>
+          <th style="width:160px;">가입일</th>
+        </tr></thead>
+        <tbody id="newUsersBody"></tbody>
+      </table>
+      <div class="empty" id="newUsersEmpty" style="display:none;">최근 신규 가입 유저가 없어요</div>
+    </div>
+  </div>
+
+  <!-- 기록 관리 탭 -->
+  <div id="tab-records" style="display:none;">
+    <div class="filter-row">
+      <input type="text" class="filter-input" id="nameFilter" placeholder="이름 검색..." oninput="renderRecords()">
+      <select class="filter-select" id="classFilter" onchange="renderRecords()">
+        <option value="">전체 반</option>
+        <option value="완초1">완초1</option>
+        <option value="완초2">완초2</option>
+        <option value="인터">인터</option>
+        <option value="케이">케이</option>
+        <option value="주니어 U">주니어 U</option>
+        <option value="주니어 S">주니어 S</option>
+        <option value="주니어 H">주니어 H</option>
+        <option value="주니어 E">주니어 E</option>
+      </select>
+      <select class="filter-select" id="modeFilter" onchange="renderRecords()">
+        <option value="">전체 모드</option>
+        <option value="쉐도잉">쉐도잉</option>
+        <option value="청취테스트">청취테스트</option>
+        <option value="딕테이션">딕테이션</option>
+        <option value="어휘테스트">어휘테스트</option>
+      </select>
+      <select class="filter-select" id="trackFilter" onchange="renderRecords()">
+        <option value="">전체 트랙</option>
+      </select>
+      <span class="record-count" id="recordCount"></span>
+    </div>
+    <div class="table-wrap">
+      <div class="loading" id="recordsLoading">불러오는 중...</div>
+      <table id="recordsTable" style="display:none;">
+        <thead><tr>
+          <th style="width:120px">이름</th>
+          <th style="width:80px">반</th>
+          <th style="width:180px">트랙</th>
+          <th style="width:90px">모드</th>
+          <th style="width:80px">완료</th>
+          <th style="width:60px">텍스트</th>
+          <th style="width:60px">점수</th>
+          <th style="width:120px">날짜</th>
+        </tr></thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+      <div class="empty" id="recordsEmpty" style="display:none;">기록이 없어요</div>
+    </div>
+  </div>
+
+  <!-- 토플 기록 탭 -->
+  <div id="tab-toefl" style="display:none;">
+    <div class="filter-row">
+      <input type="text" class="filter-input" id="toeflNameFilter" placeholder="이름으로 검색..." oninput="renderToefl()">
+      <select class="filter-select" id="toeflClassFilter" onchange="renderToefl()">
+        <option value="">전체 반</option>
+        <option value="완초1">완초1</option>
+        <option value="완초2">완초2</option>
+        <option value="인터">인터</option>
+        <option value="케이">케이</option>
+        <option value="주니어 U">주니어 U</option>
+        <option value="주니어 S">주니어 S</option>
+        <option value="주니어 H">주니어 H</option>
+        <option value="주니어 E">주니어 E</option>
+      </select>
+      <select class="filter-select" id="toeflTypeFilter" onchange="renderToefl()">
+        <option value="">모의 + 실제</option>
+        <option value="mock">모의 토플</option>
+        <option value="actual">실제 토플</option>
+      </select>
+      <span class="record-count" id="toeflCount"></span>
+    </div>
+    <div class="table-wrap">
+      <div class="loading" id="toeflLoading">불러오는 중...</div>
+      <table id="toeflTable" style="display:none;">
+        <thead><tr>
+          <th style="width:120px;cursor:pointer;" id="th-name" onclick="sortToefl('name')">이름</th>
+          <th style="width:80px;cursor:pointer;" id="th-class" onclick="sortToefl('class')">반</th>
+          <th style="width:70px">구분</th>
+          <th style="width:55px;cursor:pointer;" id="th-reading" onclick="sortToefl('reading')">R</th>
+          <th style="width:55px;cursor:pointer;" id="th-listening" onclick="sortToefl('listening')">L</th>
+          <th style="width:55px;cursor:pointer;" id="th-speaking" onclick="sortToefl('speaking')">S</th>
+          <th style="width:55px;cursor:pointer;" id="th-writing" onclick="sortToefl('writing')">W</th>
+          <th style="width:65px;cursor:pointer;" id="th-avg" onclick="sortToefl('avg')">평균</th>
+          <th style="width:65px;cursor:pointer;" id="th-total" onclick="sortToefl('total')">총점</th>
+          <th style="width:110px;cursor:pointer;" id="th-date" onclick="sortToefl('date')">날짜</th>
+          <th style="width:140px;cursor:pointer;" id="th-created" onclick="sortToefl('created')">입력일</th>
+        </tr></thead>
+        <tbody id="toeflBody"></tbody>
+      </table>
+      <div class="empty" id="toeflEmpty" style="display:none;">기록이 없어요</div>
+    </div>
+  </div>
+
+  <!-- 트랙 관리 탭 -->
+  <div id="tab-tracks" style="display:none;">
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">홈 화면에서 보여줄 트랙을 선택하세요.</p>
+    <div class="track-list" id="trackToggleList"></div>
+    <div class="save-notice" id="saveNotice">✓ 저장됐어요</div>
+  </div>
+
+  <!-- 피드백 탭 -->
+  <div id="tab-feedback" style="display:none;">
+    <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+      <span class="record-count" id="feedbackCount"></span>
+    </div>
+    <div id="feedbackList"><div class="loading">불러오는 중...</div></div>
+  </div>
+</div>
+
+<footer style="border-top:1px solid var(--border);background:var(--bg);padding:28px 24px;text-align:center;position:relative;z-index:1;">
+  <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">© 2026 ListenUp. All Rights Reserved.</span>
+</footer>
+
+<script>
+const ADMIN_EMAIL = 'hannahlee.v17@gmail.com';
+const _supabase = supabase.createClient(
+  'https://wccuzwkswtaehcdijtcf.supabase.co',
+  'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
+);
+
+let allRecords = [], allUsers = [], allToefl = [], allFeedback = [];
+let profileMap = {}; // user_id -> profile
+
+async function init() {
+  const { data: { session } } = await _supabase.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+  if (session.user.email !== ADMIN_EMAIL) { window.location.href = 'index.html'; return; }
+  await loadUsers();
+  await Promise.all([loadRecords(), loadToefl(), loadFeedback()]);
+  renderTrackToggles();
+}
+
+function showTab(name) {
+  ['stats','users','newusers','toefl','records','tracks','feedback'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['stats','users','newusers','toefl','records','tracks','feedback'][i] === name);
+  });
+  location.hash = name;
+}
+
+// 기록 불러오기
+async function loadRecords() {
+  try {
+    const res = await fetch('/api/records');
+    const data = await res.json();
+    allRecords = data.records || [];
+    const tracks = [...new Set(allRecords.map(r => r.track))];
+    const tf = document.getElementById('trackFilter');
+    tracks.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; tf.appendChild(o); });
+    document.getElementById('recordsLoading').style.display = 'none';
+    document.getElementById('recordsTable').style.display = 'table';
+    renderRecords();
+    renderStats();
+  } catch(e) {
+    document.getElementById('recordsLoading').textContent = '불러오기 실패';
+  }
+}
+
+// 유저 불러오기
+async function loadUsers() {
+  try {
+    const res = await fetch('/api/admin-users');
+    const data = await res.json();
+    allUsers = data.users || [];
+    allUsers.forEach(u => { profileMap[u.user_id] = u; });
+    document.getElementById('usersLoading').style.display = 'none';
+    document.getElementById('usersTable').style.display = 'table';
+    renderUsers();
+    renderNewUsers();
+  } catch(e) {
+    document.getElementById('usersLoading').textContent = '불러오기 실패';
+  }
+}
+
+// 토플 불러오기
+async function loadToefl() {
+  try {
+    const res = await fetch('/api/admin-toefl');
+    const data = await res.json();
+    allToefl = data.scores || [];
+    document.getElementById('toeflLoading').style.display = 'none';
+    document.getElementById('toeflTable').style.display = 'table';
+    renderToefl();
+    renderUsers();
+  } catch(e) {
+    document.getElementById('toeflLoading').textContent = '불러오기 실패';
+  }
+}
+
+// 피드백 불러오기
+async function loadFeedback() {
+  try {
+    const res = await fetch('/api/feedback');
+    const data = await res.json();
+    allFeedback = data.feedbacks || [];
+    renderFeedback();
+  } catch(e) {
+    document.getElementById('feedbackList').innerHTML = '<div class="empty">불러오기 실패</div>';
+  }
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// 통계
+function renderStats() {
+  const total = allRecords.length;
+  const scored = allRecords.filter(r => r.score != null);
+  const avgScore = scored.length ? Math.round(scored.reduce((s,r) => s + r.score, 0) / scored.length) : 0;
+  const names = [...new Set(allRecords.map(r => r.name))];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayCount = allRecords.filter(r => new Date(r.date) >= today).length;
+  document.getElementById('statGrid').innerHTML =
+    `<div class="stat-card"><div class="stat-label">총 학습 기록</div><div class="stat-value">${total}</div><div class="stat-sub">전체 제출 수</div></div>` +
+    `<div class="stat-card"><div class="stat-label">유저 수</div><div class="stat-value">${allUsers.length || names.length}</div><div class="stat-sub">등록 유저 기준</div></div>` +
+    `<div class="stat-card"><div class="stat-label">평균 점수</div><div class="stat-value">${avgScore}<span style="font-size:14px">점</span></div><div class="stat-sub">전체 평균</div></div>` +
+    `<div class="stat-card"><div class="stat-label">오늘 학습</div><div class="stat-value">${todayCount}</div><div class="stat-sub">오늘 제출 수</div></div>`;
+  const modes = ['쉐도잉','청취테스트','딕테이션','어휘테스트'];
+  const modeColors = ['var(--accent)','var(--accent2)','#c060f0','#f09640'];
+  const modeCounts = modes.map(m => allRecords.filter(r => r.mode === m).length);
+  const modeMax = Math.max(...modeCounts, 1);
+  document.getElementById('modeChart').innerHTML = modes.map((m,i) =>
+    `<div class="bar-row"><span class="bar-label">${m}</span><div class="bar-wrap"><div class="bar-fill" style="width:${(modeCounts[i]/modeMax*100).toFixed(1)}%;background:${modeColors[i]}"></div></div><span class="bar-count">${modeCounts[i]}</span></div>`
+  ).join('');
+  const trackCounts = {};
+  allRecords.forEach(r => { trackCounts[r.track] = (trackCounts[r.track] || 0) + 1; });
+  const sortedTracks = Object.entries(trackCounts).sort((a,b) => b[1]-a[1]);
+  const trackMax = Math.max(...Object.values(trackCounts), 1);
+  document.getElementById('trackChart').innerHTML = sortedTracks.length ? sortedTracks.map(([k,v]) =>
+    `<div class="bar-row"><span class="bar-label" title="${k}">${k}</span><div class="bar-wrap"><div class="bar-fill" style="width:${(v/trackMax*100).toFixed(1)}%;background:var(--accent2)"></div></div><span class="bar-count">${v}</span></div>`
+  ).join('') : '<div style="color:var(--text-muted);font-size:13px;">데이터 없음</div>';
+  const buckets = [
+    {label:'0–19',min:0,max:20,color:'var(--danger)'},
+    {label:'20–39',min:20,max:40,color:'var(--danger)'},
+    {label:'40–59',min:40,max:60,color:'var(--warn)'},
+    {label:'60–79',min:60,max:80,color:'var(--warn)'},
+    {label:'80–100',min:80,max:101,color:'var(--success)'}
+  ];
+  document.getElementById('scoreGrid').innerHTML = buckets.map(b => {
+    const cnt = scored.filter(r => r.score >= b.min && r.score < b.max).length;
+    return `<div class="score-bucket"><div class="val" style="color:${b.color}">${cnt}</div><div class="lbl">${b.label}점</div></div>`;
+  }).join('');
+}
+
+// 신규 유저 렌더
+function renderNewUsers() {
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo);
+  newUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  document.getElementById('newUserCount').textContent = `${newUsers.length}명`;
+  const tbody = document.getElementById('newUsersBody');
+  tbody.innerHTML = '';
+  if (!newUsers.length) {
+    document.getElementById('newUsersTable').style.display = 'none';
+    document.getElementById('newUsersEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('newUsersTable').style.display = 'table';
+  document.getElementById('newUsersEmpty').style.display = 'none';
+  newUsers.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
+    tr.innerHTML = `
+      <td style="font-weight:500;">${u.name || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score+'점' : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.created_at ? formatDate(u.created_at) : '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// 유저 렌더
+let userSortKey = 'name', userSortAsc = true;
+
+function sortUsers(key) {
+  if (userSortKey === key) {
+    userSortAsc = !userSortAsc;
+  } else {
+    userSortKey = key;
+    // 목표 점수는 기본 내림차순, 목표 날짜는 기본 오름차순(가장 가까운 날짜 먼저)
+    userSortAsc = key === 'target_date' ? true : key === 'target_score' ? false : true;
+  }
+  renderUsers();
+}
+
+function renderUsers() {
+  const nameQ = document.getElementById('userNameFilter').value.toLowerCase();
+  const classQ = document.getElementById('userClassFilter').value;
+  let filtered = allUsers.filter(u =>
+    (!nameQ || (u.name||'').toLowerCase().includes(nameQ)) &&
+    (!classQ || u.class === classQ)
+  );
+
+  // 정렬
+  filtered = filtered.slice().sort((a, b) => {
+    let av, bv;
+    if (userSortKey === 'name') {
+      av = (a.name || '').toLowerCase();
+      bv = (b.name || '').toLowerCase();
+      return userSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    } else if (userSortKey === 'class') {
+      av = (a.class || '').toLowerCase();
+      bv = (b.class || '').toLowerCase();
+      return userSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    } else if (userSortKey === 'target_score') {
+      av = a.target_score != null ? (a.target_score > 6 ? a.target_score / 20 : a.target_score) : -1;
+      bv = b.target_score != null ? (b.target_score > 6 ? b.target_score / 20 : b.target_score) : -1;
+    } else if (userSortKey === 'target_date') {
+      av = a.target_date ? new Date(a.target_date).getTime() : Infinity;
+      bv = b.target_date ? new Date(b.target_date).getTime() : Infinity;
+    }
+    return userSortAsc ? av - bv : bv - av;
+  });
+  document.getElementById('userCount').textContent = `${filtered.length}명`;
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '';
+  if (!filtered.length) {
+    document.getElementById('usersTable').style.display = 'none';
+    document.getElementById('usersEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('usersTable').style.display = 'table';
+  document.getElementById('usersEmpty').style.display = 'none';
+  filtered.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
+
+    // 최고 토플 점수 찾기
+    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
+    let bestToefl = '-', bestType = '', best = null;
+    if (userToefl.length) {
+      const withAvg = userToefl.map(s => ({ ...s, avg: (s.reading + s.listening + s.speaking + s.writing) / 4 }));
+      best = withAvg.reduce((a, b) => a.avg > b.avg ? a : b);
+      bestToefl = best.avg.toFixed(2);
+      bestType = best.type === 'mock' ? '모의' : '실제';
+    }
+
+    tr.innerHTML = `
+      <td style="font-weight:500;">${u.name || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score+'점' : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.reading : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.listening : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.speaking : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.writing : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? best.avg.toFixed(2) : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// 기록 렌더
+function renderRecords() {
+  const nameQ = document.getElementById('nameFilter').value.toLowerCase();
+  const classQ = document.getElementById('classFilter').value;
+  const modeQ = document.getElementById('modeFilter').value;
+  const trackQ = document.getElementById('trackFilter').value;
+  const filtered = allRecords.filter(r => {
+    const profile = Object.values(profileMap).find(p => p.name === r.name) || {};
+    return (!nameQ || r.name.toLowerCase().includes(nameQ)) &&
+      (!classQ || profile.class === classQ) &&
+      (!modeQ || r.mode === modeQ) &&
+      (!trackQ || r.track === trackQ);
+  });
+  document.getElementById('recordCount').textContent = `${filtered.length}개`;
+  const tbody = document.getElementById('recordsBody');
+  tbody.innerHTML = '';
+  if (!filtered.length) {
+    document.getElementById('recordsTable').style.display = 'none';
+    document.getElementById('recordsEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('recordsTable').style.display = 'table';
+  document.getElementById('recordsEmpty').style.display = 'none';
+  filtered.forEach(r => {
+    const tr = document.createElement('tr');
+    const sc = r.score >= 80 ? 'score-great' : r.score >= 60 ? 'score-ok' : 'score-poor';
+    const mc = r.mode === '쉐도잉' ? 'mode-shadowing' : r.mode === '청취테스트' ? 'mode-listening' : r.mode === '어휘테스트' ? 'mode-vocab' : 'mode-dictation';
+    const profile = Object.values(profileMap).find(p => p.name === r.name) || {};
+    tr.innerHTML = `
+      <td id="name-${r.id}" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${profile.class || '-'}</td>
+      <td style="color:var(--text-muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.track}</td>
+      <td><span class="mode-badge ${mc}">${r.mode}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${r.progress || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${r.textVisible === true ? '👁' : r.textVisible === false ? '🙈' : '-'}</td>
+      <td class="${sc}">${r.score != null ? r.score+'점' : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${formatDate(r.date)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function startEdit(id, currentName) {
+  const cell = document.getElementById('name-' + id);
+  cell.innerHTML = `<input id="input-${id}" value="${currentName}" style="background:var(--surface2);border:1px solid var(--accent2);border-radius:6px;padding:4px 8px;color:var(--text);font-size:13px;outline:none;width:120px;">
+    <button onclick="saveName(${id})" style="font-family:'DM Mono',monospace;font-size:10px;color:#0e0e0e;background:var(--accent);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;margin-left:4px;">저장</button>
+    <button onclick="cancelEdit(${id},'${currentName.replace(/'/g,"\\'")}') " style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;margin-left:2px;">취소</button>`;
+  document.getElementById('input-' + id).focus();
+}
+function cancelEdit(id, name) { document.getElementById('name-' + id).innerHTML = name; }
+async function saveName(id) {
+  const newName = document.getElementById('input-' + id).value.trim();
+  if (!newName) return;
+  try {
+    const res = await fetch('/api/records?id=' + id, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name: newName}) });
+    if (res.ok) {
+      document.getElementById('name-' + id).innerHTML = newName;
+      const r = allRecords.find(r => String(r.id) === String(id));
+      if (r) r.name = newName;
+    } else { alert('저장 실패'); }
+  } catch(e) { alert('오류 발생'); }
+}
+
+// 토플 렌더
+let toeflSortKey = null, toeflSortAsc = false;
+
+function sortToefl(key) {
+  if (toeflSortKey === key) { toeflSortAsc = !toeflSortAsc; } else { toeflSortKey = key; toeflSortAsc = false; }
+  ['name','class','reading','listening','speaking','writing','avg','total','date','created'].forEach(k => {
+    const el = document.getElementById('th-' + k);
+    if (el) el.style.color = k === key ? 'var(--pink)' : '';
+  });
+  renderToefl();
+}
+
+function renderToefl() {
+  const nameQ = document.getElementById('toeflNameFilter').value.toLowerCase();
+  const classQ = document.getElementById('toeflClassFilter').value;
+  const typeQ = document.getElementById('toeflTypeFilter').value;
+  let filtered = allToefl.filter(s => {
+    const p = profileMap[s.user_id] || {};
+    return (!nameQ || (p.name||'').toLowerCase().includes(nameQ)) &&
+      (!classQ || p.class === classQ) &&
+      (!typeQ || s.type === typeQ);
+  });
+  if (toeflSortKey) {
+    filtered = filtered.slice().sort((a, b) => {
+      let av, bv;
+      if (toeflSortKey === 'avg') {
+        const vA = [a.reading, a.listening, a.speaking, a.writing].filter(v => v != null);
+        const vB = [b.reading, b.listening, b.speaking, b.writing].filter(v => v != null);
+        av = vA.length ? vA.reduce((x,y)=>x+y,0)/vA.length : -1;
+        bv = vB.length ? vB.reduce((x,y)=>x+y,0)/vB.length : -1;
+      } else if (toeflSortKey === 'date') {
+        av = new Date(a.test_date).getTime();
+        bv = new Date(b.test_date).getTime();
+      } else if (toeflSortKey === 'created') {
+        av = new Date(a.created_at || 0).getTime();
+        bv = new Date(b.created_at || 0).getTime();
+      } else if (toeflSortKey === 'name') {
+        av = (profileMap[a.user_id]?.name || '').toLowerCase();
+        bv = (profileMap[b.user_id]?.name || '').toLowerCase();
+        return toeflSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+      } else if (toeflSortKey === 'class') {
+        av = (profileMap[a.user_id]?.class || '').toLowerCase();
+        bv = (profileMap[b.user_id]?.class || '').toLowerCase();
+        return toeflSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+      } else {
+        av = a[toeflSortKey] ?? -1;
+        bv = b[toeflSortKey] ?? -1;
+      }
+      return toeflSortAsc ? av - bv : bv - av;
+    });
+  }
+  document.getElementById('toeflCount').textContent = `${filtered.length}개`;
+  const tbody = document.getElementById('toeflBody');
+  tbody.innerHTML = '';
+  if (!filtered.length) {
+    document.getElementById('toeflTable').style.display = 'none';
+    document.getElementById('toeflEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('toeflTable').style.display = 'table';
+  document.getElementById('toeflEmpty').style.display = 'none';
+  filtered.forEach(s => {
+    const p = profileMap[s.user_id] || {};
+    const vals = [s.reading, s.listening, s.speaking, s.writing].filter(v => v != null);
+    const avg = vals.length ? (vals.reduce((a,b) => a+b,0)/vals.length).toFixed(2) : '-';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--accent2);" onclick="window.location.href='admin-user-detail.html?id=${s.user_id}'">${p.name || '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${p.class || '-'}</td>
+      <td><span class="${s.type === 'mock' ? 'type-mock' : 'type-actual'}">${s.type === 'mock' ? '모의' : '실제'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${s.reading ?? '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${s.listening ?? '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${s.speaking ?? '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${s.writing ?? '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${s.total ?? '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${s.test_date}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${s.created_at ? formatDate(s.created_at) : '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// 피드백 렌더
+function renderFeedback() {
+  const list = document.getElementById('feedbackList');
+  document.getElementById('feedbackCount').textContent = allFeedback.length + '개';
+  if (!allFeedback.length) { list.innerHTML = '<div class="empty">아직 피드백이 없어요</div>'; return; }
+  const catLabels = {bug:'🐛 버그',satisfaction:'⭐ 만족도',feature:'💡 기능 제안',other:'💬 기타'};
+  const catColors = {bug:'rgba(240,96,96,0.1)',satisfaction:'rgba(200,240,96,0.1)',feature:'rgba(96,200,240,0.1)',other:'rgba(180,96,240,0.1)'};
+  const catBorderColors = {bug:'rgba(240,96,96,0.3)',satisfaction:'rgba(200,240,96,0.3)',feature:'rgba(96,200,240,0.3)',other:'rgba(180,96,240,0.3)'};
+  list.innerHTML = allFeedback.map(f => {
+    const dateStr = formatDate(f.date);
+    const ratingStr = f.rating ? ' · ' + '★'.repeat(f.rating) + '☆'.repeat(5-f.rating) : '';
+    return `<div style="background:var(--surface);border:1px solid ${catBorderColors[f.category]||'var(--border)'};border-radius:10px;padding:16px 20px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:6px;background:${catColors[f.category]||'var(--surface2)'};border:1px solid ${catBorderColors[f.category]||'var(--border)'}">${catLabels[f.category]||f.category}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted)">${f.name}${ratingStr}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);margin-left:auto">${dateStr}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6">${f.message}</div>
+    </div>`;
+  }).join('');
+}
+
+// 트랙 관리
+function getHiddenTracks() { try { return JSON.parse(localStorage.getItem('hiddenTracks')||'[]').map(Number); } catch(e) { return []; } }
+function saveHiddenTracks(arr) { localStorage.setItem('hiddenTracks', JSON.stringify(arr)); }
+function renderTrackToggles() {
+  const list = document.getElementById('trackToggleList');
+  if (typeof TRACKS === 'undefined') { list.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">tracks.js를 불러올 수 없어요.</div>'; return; }
+  const hidden = getHiddenTracks();
+  list.innerHTML = '';
+  TRACKS.forEach((t, i) => {
+    const isVisible = !hidden.includes(Number(t.id));
+    const row = document.createElement('div');
+    row.className = 'track-row' + (isVisible ? '' : ' hidden-track');
+    row.innerHTML = `<span class="track-num">${String(i+1).padStart(2,'0')}</span><span class="track-name">${t.title}</span><span class="track-status">${isVisible ? '표시 중' : '숨김'}</span><div class="toggle-btn ${isVisible?'on':''}" onclick="toggleTrack(${Number(t.id)})"></div>`;
+    list.appendChild(row);
+  });
+}
+function toggleTrack(id) {
+  const hidden = getHiddenTracks();
+  const idx = hidden.indexOf(id);
+  if (idx === -1) hidden.push(id); else hidden.splice(idx, 1);
+  saveHiddenTracks(hidden);
+  renderTrackToggles();
+  const notice = document.getElementById('saveNotice');
+  notice.style.display = 'block';
+  setTimeout(() => { notice.style.display = 'none'; }, 2000);
+}
+
+init().then(() => {
+  const hash = location.hash.replace('#', '');
+  const valid = ['stats','users','newusers','toefl','records','tracks','feedback'];
+  if (hash && valid.includes(hash)) showTab(hash);
+});
+</script>
+</body>
+</html>
