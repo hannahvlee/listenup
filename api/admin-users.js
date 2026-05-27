@@ -32,7 +32,11 @@ export default async function handler(req, res) {
     const merged = users.map(u => ({ ...u, created_at: authMap[u.user_id] || u.created_at || null }));
     const authCount = (authData.users || []).length;
     const authUserIds = (authData.users || []).map(u => u.id);
-    return res.status(200).json({ users: merged, authCount, authUserIds });
+    const profileUserIds = new Set(users.map(u => u.user_id));
+    const ghostUsers = (authData.users || [])
+      .filter(u => !profileUserIds.has(u.id))
+      .map(u => ({ user_id: u.id, email: u.email, created_at: u.created_at }));
+    return res.status(200).json({ users: merged, authCount, authUserIds, ghostUsers });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
