@@ -130,6 +130,17 @@
         <option value="주니어 H">주니어 H</option>
         <option value="주니어 E">주니어 E</option>
       </select>
+      <select class="filter-select" id="userStatusFilter" onchange="renderUsers()">
+        <option value="">전체 상태</option>
+        <option value="active">재원</option>
+        <option value="graduated">졸업</option>
+        <option value="dropped">중퇴</option>
+      </select>
+      <select class="filter-select" id="userToeflTypeFilter" onchange="renderUsers()">
+        <option value="">모의 + 실제</option>
+        <option value="mock">모의</option>
+        <option value="actual">실제</option>
+      </select>
       <span class="record-count" id="userCount"></span>
     </div>
     <div class="table-wrap">
@@ -147,6 +158,7 @@
           <th style="width:55px">평균</th>
           <th style="width:50px">구분</th>
           <th style="width:90px;cursor:pointer;" onclick="sortUsers('best_date')">취득일</th>
+          <th style="width:65px">상태</th>
           <th style="width:60px">상세</th>
         </tr></thead>
         <tbody id="usersBody"></tbody>
@@ -451,6 +463,22 @@ function renderNewUsers() {
   });
 }
 
+// 유저 상태 변경
+async function updateUserStatus(userId, status) {
+  try {
+    const r = await fetch('/api/admin-update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, status })
+    });
+    if (!r.ok) throw new Error('업데이트 실패');
+    const u = allUsers.find(u => u.user_id === userId);
+    if (u) u.status = status;
+  } catch (e) {
+    alert('상태 변경 실패: ' + e.message);
+  }
+}
+
 // 유저 렌더
 let userSortKey = 'name', userSortAsc = true;
 
@@ -468,9 +496,12 @@ function sortUsers(key) {
 function renderUsers() {
   const nameQ = document.getElementById('userNameFilter').value.toLowerCase();
   const classQ = document.getElementById('userClassFilter').value;
+  const statusQ = document.getElementById('userStatusFilter').value;
+  const toeflTypeQ = document.getElementById('userToeflTypeFilter').value;
   let filtered = allUsers.filter(u =>
     (!nameQ || (u.name||'').toLowerCase().includes(nameQ)) &&
-    (!classQ || u.class === classQ)
+    (!classQ || u.class === classQ) &&
+    (!statusQ || (u.status || 'active') === statusQ)
   );
 
   // 정렬
@@ -516,7 +547,7 @@ function renderUsers() {
     tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
 
     // 최고 토플 점수 찾기
-    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
+    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null && (!toeflTypeQ || s.type === toeflTypeQ));
     let bestToefl = '-', bestType = '', best = null;
     if (userToefl.length) {
       const withAvg = userToefl.map(s => ({ ...s, avg: (s.reading + s.listening + s.speaking + s.writing) / 4 }));
@@ -524,6 +555,10 @@ function renderUsers() {
       bestToefl = best.avg.toFixed(2);
       bestType = best.type === 'mock' ? '모의' : '실제';
     }
+
+    const statusLabel = { active: '재원', graduated: '졸업', dropped: '중퇴' };
+    const statusColor = { active: 'var(--accent)', graduated: 'var(--success)', dropped: 'var(--text-muted)' };
+    const currentStatus = u.status || 'active';
 
     tr.innerHTML = `
       <td style="font-weight:500;">${u.name || '-'}</td>
@@ -537,6 +572,13 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? best.avg.toFixed(2) : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${best?.test_date ? formatDate(best.test_date) : '-'}</td>
+      <td onclick="event.stopPropagation()">
+        <select style="font-size:11px;background:transparent;border:1px solid var(--border);border-radius:4px;color:${statusColor[currentStatus]};padding:2px 4px;cursor:pointer;" onchange="updateUserStatus('${u.user_id}', this.value)">
+          <option value="active" ${currentStatus==='active'?'selected':''}>재원</option>
+          <option value="graduated" ${currentStatus==='graduated'?'selected':''}>졸업</option>
+          <option value="dropped" ${currentStatus==='dropped'?'selected':''}>중퇴</option>
+        </select>
+      </td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
     `;
     tbody.appendChild(tr);
