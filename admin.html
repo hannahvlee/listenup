@@ -307,6 +307,7 @@ const _supabase = supabase.createClient(
 
 let allRecords = [], allUsers = [], allToefl = [], allFeedback = [];
 let profileMap = {}; // user_id -> profile
+let authUserCount = 0;
 
 async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
@@ -351,6 +352,7 @@ async function loadUsers() {
     const res = await fetch('/api/admin-users');
     const data = await res.json();
     allUsers = data.users || [];
+    authUserCount = data.authCount || 0;
     allUsers.forEach(u => { profileMap[u.user_id] = u; });
     document.getElementById('usersLoading').style.display = 'none';
     document.getElementById('usersTable').style.display = 'table';
@@ -403,7 +405,7 @@ function renderStats() {
   const todayCount = allRecords.filter(r => new Date(r.date) >= today).length;
   document.getElementById('statGrid').innerHTML =
     `<div class="stat-card"><div class="stat-label">총 학습 기록</div><div class="stat-value">${total}</div><div class="stat-sub">전체 제출 수</div></div>` +
-    `<div class="stat-card"><div class="stat-label">유저 수</div><div class="stat-value">${allUsers.length || names.length}</div><div class="stat-sub">등록 유저 기준</div></div>` +
+    `<div class="stat-card"><div class="stat-label">유저 수</div><div class="stat-value">${authUserCount}</div><div class="stat-sub">구글 로그인 기준</div></div>` +
     `<div class="stat-card"><div class="stat-label">평균 점수</div><div class="stat-value">${avgScore}<span style="font-size:14px">점</span></div><div class="stat-sub">전체 평균</div></div>` +
     `<div class="stat-card"><div class="stat-label">오늘 학습</div><div class="stat-value">${todayCount}</div><div class="stat-sub">오늘 제출 수</div></div>`;
   const modes = ['쉐도잉','청취테스트','딕테이션','어휘테스트'];
