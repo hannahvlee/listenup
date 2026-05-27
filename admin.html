@@ -159,7 +159,6 @@
           <th style="width:50px">구분</th>
           <th style="width:90px;cursor:pointer;" onclick="sortUsers('best_date')">취득일</th>
           <th style="width:65px">상태</th>
-          <th style="width:60px">상세</th>
         </tr></thead>
         <tbody id="usersBody"></tbody>
       </table>
@@ -556,8 +555,7 @@ function renderUsers() {
       bestType = best.type === 'mock' ? '모의' : '실제';
     }
 
-    const statusLabel = { active: '재원', graduated: '졸업', dropped: '중퇴' };
-    const statusColor = { active: 'var(--accent)', graduated: 'var(--success)', dropped: 'var(--text-muted)' };
+    const statusColor = { active: 'var(--text-muted)', graduated: '#4a9eff', dropped: 'var(--danger)' };
     const currentStatus = u.status || 'active';
 
     tr.innerHTML = `
@@ -579,7 +577,6 @@ function renderUsers() {
           <option value="dropped" ${currentStatus==='dropped'?'selected':''}>중퇴</option>
         </select>
       </td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
     `;
     tbody.appendChild(tr);
   });
