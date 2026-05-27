@@ -31,7 +31,8 @@ export default async function handler(req, res) {
     (authData.users || []).forEach(u => { authMap[u.id] = u.created_at; });
     const merged = users.map(u => ({ ...u, created_at: authMap[u.user_id] || u.created_at || null }));
     const authCount = (authData.users || []).length;
-    return res.status(200).json({ users: merged, authCount });
+    const authUserIds = (authData.users || []).map(u => u.id);
+    return res.status(200).json({ users: merged, authCount, authUserIds });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
