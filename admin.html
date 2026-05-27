@@ -500,7 +500,8 @@ function renderUsers() {
   let filtered = allUsers.filter(u =>
     (!nameQ || (u.name||'').toLowerCase().includes(nameQ)) &&
     (!classQ || u.class === classQ) &&
-    (!statusQ || (u.status || 'active') === statusQ)
+    (!statusQ || (u.status || 'active') === statusQ) &&
+    (!toeflTypeQ || allToefl.some(s => s.user_id === u.user_id && s.type === toeflTypeQ && s.reading != null && s.listening != null && s.speaking != null && s.writing != null))
   );
 
   // 정렬
@@ -546,7 +547,7 @@ function renderUsers() {
     tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
 
     // 최고 토플 점수 찾기
-    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null && (!toeflTypeQ || s.type === toeflTypeQ));
+    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null && (!toeflTypeQ || s.type === toeflTypeQ || (toeflTypeQ === 'actual' && s.type === 'real')));
     let bestToefl = '-', bestType = '', best = null;
     if (userToefl.length) {
       const withAvg = userToefl.map(s => ({ ...s, avg: (s.reading + s.listening + s.speaking + s.writing) / 4 }));
