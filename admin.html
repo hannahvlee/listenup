@@ -146,6 +146,7 @@
           <th style="width:45px">W</th>
           <th style="width:55px">평균</th>
           <th style="width:50px">구분</th>
+          <th style="width:90px;cursor:pointer;" onclick="sortUsers('best_date')">취득일</th>
           <th style="width:60px">상세</th>
         </tr></thead>
         <tbody id="usersBody"></tbody>
@@ -459,7 +460,7 @@ function sortUsers(key) {
   } else {
     userSortKey = key;
     // 목표 점수는 기본 내림차순, 목표 날짜는 기본 오름차순(가장 가까운 날짜 먼저)
-    userSortAsc = key === 'target_date' ? true : key === 'target_score' ? false : true;
+    userSortAsc = key === 'target_date' ? true : key === 'target_score' ? false : key === 'best_date' ? false : true;
   }
   renderUsers();
 }
@@ -489,6 +490,13 @@ function renderUsers() {
     } else if (userSortKey === 'target_date') {
       av = a.target_date ? new Date(a.target_date).getTime() : Infinity;
       bv = b.target_date ? new Date(b.target_date).getTime() : Infinity;
+    } else if (userSortKey === 'best_date') {
+      const aBest = allToefl.filter(s => s.user_id === a.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
+      const bBest = allToefl.filter(s => s.user_id === b.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
+      const aBestScore = aBest.length ? aBest.reduce((x, y) => ((x.reading+x.listening+x.speaking+x.writing)/4 > (y.reading+y.listening+y.speaking+y.writing)/4) ? x : y) : null;
+      const bBestScore = bBest.length ? bBest.reduce((x, y) => ((x.reading+x.listening+x.speaking+x.writing)/4 > (y.reading+y.listening+y.speaking+y.writing)/4) ? x : y) : null;
+      av = aBestScore?.test_date ? new Date(aBestScore.test_date).getTime() : -Infinity;
+      bv = bBestScore?.test_date ? new Date(bBestScore.test_date).getTime() : -Infinity;
     }
     return userSortAsc ? av - bv : bv - av;
   });
@@ -528,6 +536,7 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.writing : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? best.avg.toFixed(2) : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${best?.test_date ? formatDate(best.test_date) : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
     `;
     tbody.appendChild(tr);
