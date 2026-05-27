@@ -156,6 +156,7 @@
           <th style="width:45px">S</th>
           <th style="width:45px">W</th>
           <th style="width:55px">평균</th>
+          <th style="width:50px">총점</th>
           <th style="width:50px">구분</th>
           <th style="width:90px;cursor:pointer;" onclick="sortUsers('best_date')">취득일</th>
           <th style="width:65px">상태</th>
@@ -548,13 +549,14 @@ function renderUsers() {
 
     // 최고 토플 점수 찾기
     const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null && (!toeflTypeQ || s.type === toeflTypeQ || (toeflTypeQ === 'actual' && s.type === 'real')));
-    let bestToefl = '-', bestType = '', best = null;
+    let bestType = '', best = null;
     if (userToefl.length) {
       const withAvg = userToefl.map(s => ({ ...s, avg: (s.reading + s.listening + s.speaking + s.writing) / 4 }));
       best = withAvg.reduce((a, b) => a.avg > b.avg ? a : b);
-      bestToefl = best.avg.toFixed(2);
       bestType = best.type === 'mock' ? '모의' : '실제';
     }
+    const isOldToefl = best && (best.reading > 6 || best.listening > 6 || best.speaking > 6 || best.writing > 6);
+    const scoreDisplay = best ? (isOldToefl ? (best.total != null ? best.total : '-') : best.avg.toFixed(2)) : '-';
 
     const statusColor = { active: 'var(--text-muted)', graduated: '#4a9eff', dropped: 'var(--danger)' };
     const currentStatus = u.status || 'active';
@@ -568,7 +570,8 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.listening : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.speaking : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.writing : '-'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? best.avg.toFixed(2) : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? (isOldToefl ? '-' : best.avg.toFixed(2)) : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${best ? (best.total != null ? best.total : '-') : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${best?.test_date ? formatDate(best.test_date) : '-'}</td>
       <td onclick="event.stopPropagation()">
