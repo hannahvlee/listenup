@@ -186,6 +186,22 @@
       </table>
       <div class="empty" id="newUsersEmpty" style="display:none;">최근 신규 가입 유저가 없어요</div>
     </div>
+    <div style="margin-top:24px;">
+      <div class="filter-row">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">프로필 미설정 유저</span>
+        <span class="record-count" id="ghostUserCount"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="ghostUsersTable" style="display:none;">
+          <thead><tr>
+            <th style="width:220px;">이메일</th>
+            <th style="width:160px;">가입일</th>
+          </tr></thead>
+          <tbody id="ghostUsersBody"></tbody>
+        </table>
+        <div class="empty" id="ghostUsersEmpty" style="display:none;">프로필 미설정 유저가 없어요</div>
+      </div>
+    </div>
   </div>
 
   <!-- 기록 관리 탭 -->
@@ -309,6 +325,7 @@ let allRecords = [], allUsers = [], allToefl = [], allFeedback = [];
 let profileMap = {}; // user_id -> profile
 let authUserCount = 0;
 let authUserIds = new Set();
+let ghostUsers = [];
 
 async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
@@ -355,6 +372,7 @@ async function loadUsers() {
     allUsers = data.users || [];
     authUserCount = data.authCount || 0;
     authUserIds = new Set(data.authUserIds || []);
+    ghostUsers = data.ghostUsers || [];
     allUsers.forEach(u => { profileMap[u.user_id] = u; });
     document.getElementById('usersLoading').style.display = 'none';
     document.getElementById('usersTable').style.display = 'table';
@@ -465,9 +483,27 @@ function renderNewUsers() {
     `;
     tbody.appendChild(tr);
   });
-}
 
-// 유저 상태 변경
+  // 프로필 미설정 유저
+  document.getElementById('ghostUserCount').textContent = `${ghostUsers.length}명`;
+  const ghostTbody = document.getElementById('ghostUsersBody');
+  ghostTbody.innerHTML = '';
+  if (!ghostUsers.length) {
+    document.getElementById('ghostUsersTable').style.display = 'none';
+    document.getElementById('ghostUsersEmpty').style.display = 'block';
+  } else {
+    document.getElementById('ghostUsersTable').style.display = 'table';
+    document.getElementById('ghostUsersEmpty').style.display = 'none';
+    ghostUsers.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.email || '-'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.created_at ? formatDate(u.created_at) : '-'}</td>
+      `;
+      ghostTbody.appendChild(tr);
+    });
+  }
+}
 async function updateUserStatus(userId, status) {
   try {
     const r = await fetch('/api/admin-update-status', {
