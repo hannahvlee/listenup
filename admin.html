@@ -270,6 +270,12 @@
         <option value="mock">모의 토플</option>
         <option value="actual">실제 토플</option>
       </select>
+      <select class="filter-select" id="toeflStatusFilter" onchange="renderToefl()">
+        <option value="">전체 상태</option>
+        <option value="active">재원</option>
+        <option value="graduated">졸업</option>
+        <option value="dropped">중퇴</option>
+      </select>
       <span class="record-count" id="toeflCount"></span>
     </div>
     <div class="table-wrap">
@@ -705,11 +711,13 @@ function renderToefl() {
   const nameQ = document.getElementById('toeflNameFilter').value.toLowerCase();
   const classQ = document.getElementById('toeflClassFilter').value;
   const typeQ = document.getElementById('toeflTypeFilter').value;
+  const statusQ = document.getElementById('toeflStatusFilter').value;
   let filtered = allToefl.filter(s => {
     const p = profileMap[s.user_id] || {};
     return (!nameQ || (p.name||'').toLowerCase().includes(nameQ)) &&
       (!classQ || p.class === classQ) &&
-      (!typeQ || s.type === typeQ);
+      (!typeQ || s.type === typeQ) &&
+      (!statusQ || (p.status || 'active') === statusQ);
   });
   if (toeflSortKey) {
     filtered = filtered.slice().sort((a, b) => {
