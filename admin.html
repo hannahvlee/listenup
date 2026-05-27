@@ -308,6 +308,7 @@ const _supabase = supabase.createClient(
 let allRecords = [], allUsers = [], allToefl = [], allFeedback = [];
 let profileMap = {}; // user_id -> profile
 let authUserCount = 0;
+let authUserIds = new Set();
 
 async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
@@ -353,6 +354,7 @@ async function loadUsers() {
     const data = await res.json();
     allUsers = data.users || [];
     authUserCount = data.authCount || 0;
+    authUserIds = new Set(data.authUserIds || []);
     allUsers.forEach(u => { profileMap[u.user_id] = u; });
     document.getElementById('usersLoading').style.display = 'none';
     document.getElementById('usersTable').style.display = 'table';
@@ -438,7 +440,7 @@ function renderStats() {
 // 신규 유저 렌더
 function renderNewUsers() {
   const oneDayAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-  const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo);
+  const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo && authUserIds.has(u.user_id));
   newUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   document.getElementById('newUserCount').textContent = `${newUsers.length}명`;
   const tbody = document.getElementById('newUsersBody');
