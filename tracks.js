@@ -45,8 +45,7 @@ const TRACKS = [
       { ko: "내려놓다", en: "put down", isPhrase: true },
       { ko: "~를 빤히 쳐다보다", en: "stare at", isPhrase: true },
     ]
-  }
-  ,
+  },
   {
     id: 2,
     title: "[LC14] TPO 11 - Advertising",
@@ -124,8 +123,7 @@ const TRACKS = [
       { ko: "A와 B를 연관시키다", en: "associate A with B", isPhrase: true },
       { ko: "다시 한자리에 모이다", en: "get back together", isPhrase: true },
     ]
-  }
-  ,
+  },
   {
     id: 3,
     title: "[LC14] TPO 11 - Landscape & Climate",
@@ -226,8 +224,7 @@ const TRACKS = [
       { ko: "~이 예측되다", en: "be predicted by", isPhrase: true },
       { ko: "어는점에 가깝다", en: "be close to the freezing point", isPhrase: true },
     ]
-  }
-  ,
+  },
   {
     id: 4,
     title: "Test 10 - Volcanoes",
@@ -280,8 +277,7 @@ const TRACKS = [
       { ko: "~보다 훨씬 더 많은", en: "far more ~ than", isPhrase: true },
       { ko: "~을 기억해야 한다", en: "it must be remembered that", isPhrase: true },
     ]
-  }
-  ,
+  },
   {
     id: 5,
     title: "Test 10 - Bioluminescence",
@@ -334,8 +330,7 @@ const TRACKS = [
       { ko: "~에 활용되다", en: "be used in", isPhrase: true },
       { ko: "~을 개발하는 데 활용되다", en: "be harnessed for developing", isPhrase: true },
     ]
-  }
-  ,
+  },
   {
     id: 6,
     title: "[LC 14] TPO 11 - Work for the committee",
@@ -408,8 +403,7 @@ const TRACKS = [
       { ko: "~하는 것이 필요하다고 느끼다", en: "feel it necessary to", isPhrase: true },
       { ko: "어려운 결정", en: "tough decision", isPhrase: true },
     ]
-  }
-  ,
+  },
   {
     id: 7,
     title: "Test 10 - Graffiti",
@@ -463,20 +457,9 @@ const TRACKS = [
       { type: "phrase", en: "designate specific areas", ko: "특정 구역을 지정하다" },
       { type: "phrase", en: "reduce tension", ko: "긴장을 완화하다" }
     ]
-  }
-  // 새 음원 추가 시 여기에 추가:
-  // {
-  //   id: 8,
-  //   title: "제목",
-  //   file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/파일명.mp3",
-  //   sentences: [
-  //     { start: 0.00, end: 5.00, text: "문장 텍스트" },
-  //     ...
-  //   ]
-  // }
-  ,
+  },
   {
-    id: 9,
+    id: 8,
     title: "[LC 14] TPO 11 - Cape Cod House",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-3_CapeCodHouse.mp3",
     sentences: [
@@ -571,10 +554,9 @@ const TRACKS = [
       { type: "phrase", en: "in just a moment", ko: "잠시 후에" },
       { type: "phrase", en: "precisely that", ko: "바로 그것" }
     ]
-  }
-  ,
+  },
   {
-    id: 10,
+    id: 9,
     title: "[LC 14] TPO 11 - Distraction Display",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-2_DistractionDisplay.mp3",
     sentences: [
@@ -647,10 +629,9 @@ const TRACKS = [
       { type: "phrase", en: "take care of themselves", ko: "스스로를 돌보다" },
       { type: "phrase", en: "put on a performance", ko: "연기를 하다" }
     ]
-  }
-  ,
+  },
   {
-    id: 11,
+    id: 10,
     title: "Test 9 - Impressionism",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Impressionism.mp3",
     sentences: [
@@ -707,7 +688,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 12,
+    id: 11,
     title: "Test 9 - Social Capital",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Social_Capital.mp3",
     sentences: [
@@ -766,10 +747,9 @@ const TRACKS = [
       { type: "phrase", en: "in terms of", ko: "~의 관점에서, ~면에서" },
       { type: "phrase", en: "be celebrated for", ko: "~로 칭송받다" }
     ]
-  }
-  ,
+  },
   {
-    id: 13,
+    id: 12,
     title: "Test 9 - Photography",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_1_Photography.mp3",
     sentences: [
@@ -832,7 +812,7 @@ const TRACKS = [
   },
   {
     id: 13,
-    title: "Academic Talk - Ecological Footprint",
+    title: "Test 1 - Ecological Footprint",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/4__Academic_Talk__Ecological_footprint_.mp3",
     sentences: [
       { start: 5.00, end: 13.81, text: "An ecological footprint is a measure of the environmental impact of an individual, community, or country." },
