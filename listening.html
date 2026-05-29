@@ -268,17 +268,21 @@ function playSegment(i) {
   }
   currentPlaying = i;
   audio.playbackRate = parseFloat(speedSlider.value);
-  audio.currentTime = s.start;
-  audio.play();
-  btn.textContent = '⏸ 정지'; btn.classList.add('playing');
-  document.getElementById(`card-${i}`).classList.add('active');
-  audio.ontimeupdate = () => {
-    if (audio.currentTime >= s.end) {
-      audio.pause(); btn.textContent = '▶ 다시 듣기'; btn.classList.remove('playing');
-      document.getElementById(`card-${i}`).classList.remove('active');
-      audio.ontimeupdate = null; currentPlaying = null;
-    }
+  audio.ontimeupdate = null;
+  audio.onseeked = () => {
+    audio.onseeked = null;
+    audio.play();
+    btn.textContent = '⏸ 정지'; btn.classList.add('playing');
+    document.getElementById(`card-${i}`).classList.add('active');
+    audio.ontimeupdate = () => {
+      if (audio.currentTime >= s.end) {
+        audio.pause(); btn.textContent = '▶ 다시 듣기'; btn.classList.remove('playing');
+        document.getElementById(`card-${i}`).classList.remove('active');
+        audio.ontimeupdate = null; currentPlaying = null;
+      }
+    };
   };
+  audio.currentTime = s.start;
 }
 
 // Record + STT
