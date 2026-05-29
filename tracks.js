@@ -2,7 +2,7 @@ const TRACKS = [
   {
     id: 1,
     title: "Test 1 - Fascination",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/1_1_Fascination.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/1_1_Fascination.mp3",
     sentences: [
       { start: 5.00, end: 9.77, text: "Did you see that new thriller movie that came out last week?", chunking: "너는 봤니 / 그 새로운 스릴러 영화를 / 지난주에 나온" },
       { start: 9.77, end: 18.68, text: "I did and loved it. The action, the plot twists.... I was totally captivated. Time just flew by.", chunking: "나는 봤다 / 그리고 사랑했다 / 그 액션 / 그 플롯 반전들 / 나는 완전히 매료되었다 / 시간이 금방 지나갔다" },
@@ -50,7 +50,7 @@ const TRACKS = [
   {
     id: 2,
     title: "[LC14] TPO 11 - Advertising",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/LC14_TPO11_Set2-3_Advertising.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-3_Advertising.mp3",
     sentences: [
       { start: 7.00, end: 13.13, text: "Let's get started. Last time we were talking about the need for advertising." },
       { start: 13.13, end: 20.29, text: "Now, let's look at how you can successfully call attention to the service or product you want to sell." },
@@ -129,7 +129,7 @@ const TRACKS = [
   {
     id: 3,
     title: "[LC14] TPO 11 - Landscape & Climate",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/LC14_TPO11_Set2-2_Landscape & Climate.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-2_Landscape & Climate.mp3",
     sentences: [
       { start: 7.00, end: 12.27, text: "When land gets developed for human use, the landscape changes." },
       { start: 12.27, end: 16.83, text: "We don't see as many types of vegetation, trees, grasses, and so forth." },
@@ -231,7 +231,7 @@ const TRACKS = [
   {
     id: 4,
     title: "Test 10 - Volcanoes",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/10_2_2_Volcanoes.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_2_2_Volcanoes.mp3",
     sentences: [
       { start: 4.00, end: 7.68, text: "Today we're going to discuss volcanoes." },
       { start: 7.68, end: 14.05, text: "When a volcano erupts, it releases a variety of gases and particles into the atmosphere." },
@@ -285,7 +285,7 @@ const TRACKS = [
   {
     id: 5,
     title: "Test 10 - Bioluminescence",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/10_2_2_Bioluminescence.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_2_2_Bioluminescence.mp3",
     sentences: [
       { start: 5.00, end: 10.86, text: "Some living organisms emit their own light, a process we call bioluminescence." },
       { start: 10.86, end: 18.50, text: "This phenomenon occurs in various species, including certain types of fungi, fish, and insects like fireflies." },
@@ -339,7 +339,7 @@ const TRACKS = [
   {
     id: 6,
     title: "[LC 14] TPO 11 - Work for the committee",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/LC14_TPO11_Set2-1_Work of the biology committee.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-1_Work of the biology committee.mp3",
     sentences: [
       { start: 7.00, end: 9.72, text: "Hi, Professor Atkins. You wanted to see me?" },
       { start: 9.72, end: 13.52, text: "Hi, Bill. Thanks for coming. I wanted to talk to you about," },
@@ -413,7 +413,7 @@ const TRACKS = [
   {
     id: 7,
     title: "Test 10 - Graffiti",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/10_1_Graffiti.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_1_Graffiti.mp3",
     sentences: [
       { start: 7.00, end: 14.20, text: "Graffiti are writings and drawings created by private citizens in public places, like on walls." },
       { start: 14.50, end: 18.12, text: "graffiti have long been a controversial form of expression." },
@@ -468,7 +468,7 @@ const TRACKS = [
   // {
   //   id: 8,
   //   title: "제목",
-  //   file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/파일명.mp3",
+  //   file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/파일명.mp3",
   //   sentences: [
   //     { start: 0.00, end: 5.00, text: "문장 텍스트" },
   //     ...
@@ -478,7 +478,7 @@ const TRACKS = [
   {
     id: 9,
     title: "[LC 14] TPO 11 - Cape Cod House",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/LC14_TPO11_Set1-3_CapeCodHouse.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-3_CapeCodHouse.mp3",
     sentences: [
       { start: 7.00, end: 10.10, text: "Today, we're taking a little detour" },
       { start: 10.10, end: 14.05, text: "from the grand styles of public architecture we've been studying" },
@@ -576,7 +576,7 @@ const TRACKS = [
   {
     id: 10,
     title: "[LC 14] TPO 11 - Distraction Display",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/LC14_TPO11_Set1-2_DistractionDisplay.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-2_DistractionDisplay.mp3",
     sentences: [
       { start: 11.50, end: 17.80, text: "Okay. Today, we're going to continue our discussion of the parenting behaviors of birds" },
       { start: 17.80, end: 23.40, text: "and we're going to start by talking about what are known as \"distraction displays.\"" },
@@ -652,7 +652,7 @@ const TRACKS = [
   {
     id: 11,
     title: "Test 9 - Impressionism",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/9_2_1_Impressionism.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Impressionism.mp3",
     sentences: [
       { start: 0.00, end: 5.21, text: "Impressionism is a painting style that began in France in the late 19th century." },
       { start: 5.21, end: 9.00, text: "It challenged traditional painting techniques and subject matter." },
@@ -709,7 +709,7 @@ const TRACKS = [
   {
     id: 12,
     title: "Test 9 - Social Capital",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/9_2_1_Social_Capital.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Social_Capital.mp3",
     sentences: [
       { start: 0.00, end: 3.50, text: "Social capital refers to the networks of relationships" },
       { start: 3.60, end: 7.30, text: "among people who live and work in a particular society." },
@@ -771,7 +771,7 @@ const TRACKS = [
   {
     id: 13,
     title: "Test 9 - Photography",
-    file: "https://raw.githubusercontent.com/hannahvlee/shadowing/main/9_1_Photography.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_1_Photography.mp3",
     sentences: [
       { start: 0.00, end: 2.20, text: "Over its two centuries of existence," },
       { start: 2.20, end: 8.00, text: "photography has undergone remarkable changes in how it's created, shared, and understood." },
@@ -833,7 +833,7 @@ const TRACKS = [
   {
     id: 13,
     title: "Academic Talk - Ecological Footprint",
-    file: "4__Academic_Talk__Ecological_footprint_.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/4__Academic_Talk__Ecological_footprint_.mp3",
     sentences: [
       { start: 5.00, end: 13.81, text: "An ecological footprint is a measure of the environmental impact of an individual, community, or country." },
       { start: 13.81, end: 20.56, text: "It calculates the amount of natural resources consumed and the waste generated by human activities," },
