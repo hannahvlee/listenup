@@ -271,6 +271,7 @@ function playSegment(i) {
   audio.ontimeupdate = null;
   audio.onseeked = () => {
     audio.onseeked = null;
+    audio.playbackRate = parseFloat(speedSlider.value);
     audio.play();
     btn.textContent = '⏸ 정지'; btn.classList.add('playing');
     document.getElementById(`card-${i}`).classList.add('active');
@@ -282,7 +283,12 @@ function playSegment(i) {
       }
     };
   };
-  audio.currentTime = s.start;
+  if (audio.readyState === 0) {
+    audio.load();
+    audio.addEventListener('canplay', () => { audio.currentTime = s.start; }, { once: true });
+  } else {
+    audio.currentTime = s.start;
+  }
 }
 
 // Record + STT
