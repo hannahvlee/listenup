@@ -1,6 +1,6 @@
 const TRACKS = [
   {
-    id: 1,
+    id: 12,
     title: "Test 1 - Fascination",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/1_1_Fascination.mp3",
     sentences: [
@@ -47,7 +47,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 2,
+    id: 11,
     title: "[LC14] TPO 11 - Advertising",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-3_Advertising.mp3",
     sentences: [
@@ -125,7 +125,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 3,
+    id: 10,
     title: "[LC14] TPO 11 - Landscape & Climate",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-2_Landscape & Climate.mp3",
     sentences: [
@@ -226,7 +226,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 4,
+    id: 9,
     title: "Test 10 - Volcanoes",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_2_2_Volcanoes.mp3",
     sentences: [
@@ -279,7 +279,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 5,
+    id: 8,
     title: "Test 10 - Bioluminescence",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_2_2_Bioluminescence.mp3",
     sentences: [
@@ -332,7 +332,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 6,
+    id: 7,
     title: "[LC 14] TPO 11 - Work for the committee",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-1_Work of the biology committee.mp3",
     sentences: [
@@ -405,7 +405,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 7,
+    id: 6,
     title: "Test 10 - Graffiti",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_1_Graffiti.mp3",
     sentences: [
@@ -459,7 +459,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 8,
+    id: 5,
     title: "[LC 14] TPO 11 - Cape Cod House",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-3_CapeCodHouse.mp3",
     sentences: [
@@ -556,7 +556,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 9,
+    id: 4,
     title: "[LC 14] TPO 11 - Distraction Display",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-2_DistractionDisplay.mp3",
     sentences: [
@@ -631,7 +631,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 10,
+    id: 3,
     title: "Test 9 - Impressionism",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Impressionism.mp3",
     sentences: [
@@ -688,7 +688,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 11,
+    id: 2,
     title: "Test 9 - Social Capital",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Social_Capital.mp3",
     sentences: [
@@ -749,7 +749,7 @@ const TRACKS = [
     ]
   },
   {
-    id: 12,
+    id: 1,
     title: "Test 9 - Photography",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_1_Photography.mp3",
     sentences: [
