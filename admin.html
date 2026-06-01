@@ -321,7 +321,6 @@
 </footer>
 
 <script>
-const ADMIN_EMAIL = 'hannahlee.v17@gmail.com';
 const _supabase = supabase.createClient(
   'https://wccuzwkswtaehcdijtcf.supabase.co',
   'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
@@ -336,7 +335,14 @@ let ghostUsers = [];
 async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
-  if (session.user.email !== ADMIN_EMAIL) { window.location.href = 'index.html'; return; }
+  const adminRes = await fetch('/api/check-admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: session.user.email })
+  });
+  const adminData = await adminRes.json();
+  if (!adminData.isAdmin) { window.location.href = 'index.html'; return; }
+  window._adminRole = adminData.role;
   await loadUsers();
   await Promise.all([loadRecords(), loadToefl(), loadFeedback()]);
   renderTrackToggles();
@@ -621,11 +627,12 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${best?.test_date ? formatDate(best.test_date) : '-'}</td>
       <td onclick="event.stopPropagation()">
+        ${window._adminRole === 'super' ? `
         <select style="font-size:11px;background:transparent;border:1px solid var(--border);border-radius:4px;color:${statusColor[currentStatus]};padding:2px 4px;cursor:pointer;" onchange="updateUserStatus('${u.user_id}', this.value)">
           <option value="active" ${currentStatus==='active'?'selected':''}>재원</option>
           <option value="graduated" ${currentStatus==='graduated'?'selected':''}>졸업</option>
           <option value="dropped" ${currentStatus==='dropped'?'selected':''}>중퇴</option>
-        </select>
+        </select>` : `<span style="font-size:11px;color:${statusColor[currentStatus]}">${{active:'재원',graduated:'졸업',dropped:'중퇴'}[currentStatus]}</span>`}
       </td>
     `;
     tbody.appendChild(tr);
