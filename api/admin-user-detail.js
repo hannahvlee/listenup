@@ -1,22 +1,40 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const supabaseUrl = 'https://wccuzwkswtaehcdijtcf.supabase.co';
   if (!serviceKey) return res.status(500).json({ error: 'Service key not configured' });
-
-  const userId = req.query.id;
-  if (!userId) return res.status(400).json({ error: 'Missing user id' });
 
   const headers = {
     'apikey': serviceKey,
     'Authorization': `Bearer ${serviceKey}`,
     'Content-Type': 'application/json'
   };
+
+  // POST: 토플 점수 추가
+  if (req.method === 'POST') {
+    const { user_id, type, reading, listening, speaking, writing, total, test_date } = req.body;
+    if (!user_id || !type || !test_date) return res.status(400).json({ error: 'Missing required fields' });
+    try {
+      const r = await fetch(`${supabaseUrl}/rest/v1/toefl_scores`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=representation' },
+        body: JSON.stringify({ user_id, type, reading, listening, speaking, writing, total, test_date })
+      });
+      const data = await r.json();
+      return res.status(200).json({ success: true, data });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const userId = req.query.id;
+  if (!userId) return res.status(400).json({ error: 'Missing user id' });
 
   try {
     const [profileRes, toeflRes, userRes] = await Promise.all([
