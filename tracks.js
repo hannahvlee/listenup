@@ -985,7 +985,7 @@ const TRACKS = [
       { start: 61.33, end: 68.49, text: "The availability heuristic is another bias that involves making decisions based on the information that is most readily available," },
       { start: 68.49, end: 70.54, text: "rather than all relevant information." },
       { start: 70.54, end: 73.40, text: "This can lead to skewed perceptions and choices," },
-      { start: 73.40, end: 77.94, text: "as easily remembered or recent events can disproportionately influence decisions." },
+      { start: 73.35, end: 77.94, text: "as easily remembered or recent events can disproportionately influence decisions." },
       { start: 78.14, end: 83.00, text: "Understanding cognitive biases is crucial for improving decision-making processes." },
       { start: 83.00, end: 87.80, text: "By recognizing these biases, individuals can work to mitigate their effects," },
       { start: 87.90, end: 90.70, text: "leading to more rational and effective decisions." },
