@@ -269,8 +269,9 @@ function playSegment(i) {
   currentPlaying = i;
   audio.playbackRate = parseFloat(speedSlider.value);
   audio.ontimeupdate = null;
-  audio.onseeked = () => {
-    audio.onseeked = null;
+  audio.onseeked = null;
+
+  const startPlayback = () => {
     audio.playbackRate = parseFloat(speedSlider.value);
     audio.play();
     btn.textContent = '⏸ 정지'; btn.classList.add('playing');
@@ -283,11 +284,30 @@ function playSegment(i) {
       }
     };
   };
-  if (audio.readyState === 0) {
-    audio.load();
-    audio.addEventListener('canplay', () => { audio.currentTime = s.start; }, { once: true });
-  } else {
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    audio.pause();
     audio.currentTime = s.start;
+    const checkReady = () => {
+      if (Math.abs(audio.currentTime - s.start) < 0.3) {
+        audio.removeEventListener('timeupdate', checkReady);
+        startPlayback();
+      }
+    };
+    audio.addEventListener('timeupdate', checkReady);
+    audio.play().catch(() => {});
+  } else {
+    audio.onseeked = () => {
+      audio.onseeked = null;
+      startPlayback();
+    };
+    if (audio.readyState === 0) {
+      audio.load();
+      audio.addEventListener('canplay', () => { audio.currentTime = s.start; }, { once: true });
+    } else {
+      audio.currentTime = s.start;
+    }
   }
 }
 
