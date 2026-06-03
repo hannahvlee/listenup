@@ -130,6 +130,17 @@
         <option value="주니어 H">주니어 H</option>
         <option value="주니어 E">주니어 E</option>
       </select>
+      <select class="filter-select" id="userStatusFilter" onchange="renderUsers()">
+        <option value="">전체 상태</option>
+        <option value="active">재원</option>
+        <option value="graduated">졸업</option>
+        <option value="dropped">중퇴</option>
+      </select>
+      <select class="filter-select" id="userToeflTypeFilter" onchange="renderUsers()">
+        <option value="">모의 + 실제</option>
+        <option value="mock">모의</option>
+        <option value="actual">실제</option>
+      </select>
       <span class="record-count" id="userCount"></span>
     </div>
     <div class="table-wrap">
@@ -145,8 +156,10 @@
           <th style="width:45px">S</th>
           <th style="width:45px">W</th>
           <th style="width:55px">평균</th>
+          <th style="width:50px">총점</th>
           <th style="width:50px">구분</th>
-          <th style="width:60px">상세</th>
+          <th style="width:90px;cursor:pointer;" onclick="sortUsers('best_date')">취득일</th>
+          <th style="width:65px">상태</th>
         </tr></thead>
         <tbody id="usersBody"></tbody>
       </table>
@@ -157,7 +170,7 @@
   <!-- 신규 유저 탭 -->
   <div id="tab-newusers" style="display:none;">
     <div class="filter-row">
-      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">최근 1일 이내 가입한 유저</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">최근 3일 이내 가입한 유저</span>
       <span class="record-count" id="newUserCount"></span>
     </div>
     <div class="table-wrap">
@@ -172,6 +185,22 @@
         <tbody id="newUsersBody"></tbody>
       </table>
       <div class="empty" id="newUsersEmpty" style="display:none;">최근 신규 가입 유저가 없어요</div>
+    </div>
+    <div style="margin-top:24px;">
+      <div class="filter-row">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">프로필 미설정 유저</span>
+        <span class="record-count" id="ghostUserCount"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="ghostUsersTable" style="display:none;">
+          <thead><tr>
+            <th style="width:220px;">이메일</th>
+            <th style="width:160px;">가입일</th>
+          </tr></thead>
+          <tbody id="ghostUsersBody"></tbody>
+        </table>
+        <div class="empty" id="ghostUsersEmpty" style="display:none;">프로필 미설정 유저가 없어요</div>
+      </div>
     </div>
   </div>
 
@@ -236,6 +265,12 @@
         <option value="주니어 H">주니어 H</option>
         <option value="주니어 E">주니어 E</option>
       </select>
+      <select class="filter-select" id="toeflStatusFilter" onchange="renderToefl()">
+        <option value="">전체 상태</option>
+        <option value="active">재원</option>
+        <option value="graduated">졸업</option>
+        <option value="dropped">중퇴</option>
+      </select>
       <select class="filter-select" id="toeflTypeFilter" onchange="renderToefl()">
         <option value="">모의 + 실제</option>
         <option value="mock">모의 토플</option>
@@ -286,7 +321,6 @@
 </footer>
 
 <script>
-const ADMIN_EMAIL = 'hannahlee.v17@gmail.com';
 const _supabase = supabase.createClient(
   'https://wccuzwkswtaehcdijtcf.supabase.co',
   'sb_publishable_eZS7VnthlclvotZvFA5C_w_ek_tSJ-y'
@@ -294,11 +328,21 @@ const _supabase = supabase.createClient(
 
 let allRecords = [], allUsers = [], allToefl = [], allFeedback = [];
 let profileMap = {}; // user_id -> profile
+let authUserCount = 0;
+let authUserIds = new Set();
+let ghostUsers = [];
 
 async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
-  if (session.user.email !== ADMIN_EMAIL) { window.location.href = 'index.html'; return; }
+  const adminRes = await fetch('/api/check-admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: session.user.email })
+  });
+  const adminData = await adminRes.json();
+  if (!adminData.isAdmin) { window.location.href = 'index.html'; return; }
+  window._adminRole = adminData.role;
   await loadUsers();
   await Promise.all([loadRecords(), loadToefl(), loadFeedback()]);
   renderTrackToggles();
@@ -338,6 +382,9 @@ async function loadUsers() {
     const res = await fetch('/api/admin-users');
     const data = await res.json();
     allUsers = data.users || [];
+    authUserCount = data.authCount || 0;
+    authUserIds = new Set(data.authUserIds || []);
+    ghostUsers = data.ghostUsers || [];
     allUsers.forEach(u => { profileMap[u.user_id] = u; });
     document.getElementById('usersLoading').style.display = 'none';
     document.getElementById('usersTable').style.display = 'table';
@@ -377,7 +424,7 @@ async function loadFeedback() {
 
 function formatDate(iso) {
   const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
 // 통계
@@ -390,7 +437,7 @@ function renderStats() {
   const todayCount = allRecords.filter(r => new Date(r.date) >= today).length;
   document.getElementById('statGrid').innerHTML =
     `<div class="stat-card"><div class="stat-label">총 학습 기록</div><div class="stat-value">${total}</div><div class="stat-sub">전체 제출 수</div></div>` +
-    `<div class="stat-card"><div class="stat-label">유저 수</div><div class="stat-value">${allUsers.length || names.length}</div><div class="stat-sub">등록 유저 기준</div></div>` +
+    `<div class="stat-card"><div class="stat-label">유저 수</div><div class="stat-value">${authUserCount}</div><div class="stat-sub">구글 로그인 기준</div></div>` +
     `<div class="stat-card"><div class="stat-label">평균 점수</div><div class="stat-value">${avgScore}<span style="font-size:14px">점</span></div><div class="stat-sub">전체 평균</div></div>` +
     `<div class="stat-card"><div class="stat-label">오늘 학습</div><div class="stat-value">${todayCount}</div><div class="stat-sub">오늘 제출 수</div></div>`;
   const modes = ['쉐도잉','청취테스트','딕테이션','어휘테스트'];
@@ -422,8 +469,8 @@ function renderStats() {
 
 // 신규 유저 렌더
 function renderNewUsers() {
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo);
+  const oneDayAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+  const newUsers = allUsers.filter(u => u.created_at && new Date(u.created_at) >= oneDayAgo && authUserIds.has(u.user_id));
   newUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   document.getElementById('newUserCount').textContent = `${newUsers.length}명`;
   const tbody = document.getElementById('newUsersBody');
@@ -448,6 +495,40 @@ function renderNewUsers() {
     `;
     tbody.appendChild(tr);
   });
+
+  // 프로필 미설정 유저
+  document.getElementById('ghostUserCount').textContent = `${ghostUsers.length}명`;
+  const ghostTbody = document.getElementById('ghostUsersBody');
+  ghostTbody.innerHTML = '';
+  if (!ghostUsers.length) {
+    document.getElementById('ghostUsersTable').style.display = 'none';
+    document.getElementById('ghostUsersEmpty').style.display = 'block';
+  } else {
+    document.getElementById('ghostUsersTable').style.display = 'table';
+    document.getElementById('ghostUsersEmpty').style.display = 'none';
+    ghostUsers.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.email || '-'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.created_at ? formatDate(u.created_at) : '-'}</td>
+      `;
+      ghostTbody.appendChild(tr);
+    });
+  }
+}
+async function updateUserStatus(userId, status) {
+  try {
+    const r = await fetch('/api/admin-update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, status })
+    });
+    if (!r.ok) throw new Error('업데이트 실패');
+    const u = allUsers.find(u => u.user_id === userId);
+    if (u) u.status = status;
+  } catch (e) {
+    alert('상태 변경 실패: ' + e.message);
+  }
 }
 
 // 유저 렌더
@@ -459,7 +540,7 @@ function sortUsers(key) {
   } else {
     userSortKey = key;
     // 목표 점수는 기본 내림차순, 목표 날짜는 기본 오름차순(가장 가까운 날짜 먼저)
-    userSortAsc = key === 'target_date' ? true : key === 'target_score' ? false : true;
+    userSortAsc = key === 'target_date' ? true : key === 'target_score' ? false : key === 'best_date' ? false : true;
   }
   renderUsers();
 }
@@ -467,9 +548,13 @@ function sortUsers(key) {
 function renderUsers() {
   const nameQ = document.getElementById('userNameFilter').value.toLowerCase();
   const classQ = document.getElementById('userClassFilter').value;
+  const statusQ = document.getElementById('userStatusFilter').value;
+  const toeflTypeQ = document.getElementById('userToeflTypeFilter').value;
   let filtered = allUsers.filter(u =>
     (!nameQ || (u.name||'').toLowerCase().includes(nameQ)) &&
-    (!classQ || u.class === classQ)
+    (!classQ || u.class === classQ) &&
+    (!statusQ || (u.status || 'active') === statusQ) &&
+    (!toeflTypeQ || allToefl.some(s => s.user_id === u.user_id && s.type === toeflTypeQ && s.reading != null && s.listening != null && s.speaking != null && s.writing != null))
   );
 
   // 정렬
@@ -489,6 +574,13 @@ function renderUsers() {
     } else if (userSortKey === 'target_date') {
       av = a.target_date ? new Date(a.target_date).getTime() : Infinity;
       bv = b.target_date ? new Date(b.target_date).getTime() : Infinity;
+    } else if (userSortKey === 'best_date') {
+      const aBest = allToefl.filter(s => s.user_id === a.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
+      const bBest = allToefl.filter(s => s.user_id === b.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
+      const aBestScore = aBest.length ? aBest.reduce((x, y) => ((x.reading+x.listening+x.speaking+x.writing)/4 > (y.reading+y.listening+y.speaking+y.writing)/4) ? x : y) : null;
+      const bBestScore = bBest.length ? bBest.reduce((x, y) => ((x.reading+x.listening+x.speaking+x.writing)/4 > (y.reading+y.listening+y.speaking+y.writing)/4) ? x : y) : null;
+      av = aBestScore?.test_date ? new Date(aBestScore.test_date).getTime() : -Infinity;
+      bv = bBestScore?.test_date ? new Date(bBestScore.test_date).getTime() : -Infinity;
     }
     return userSortAsc ? av - bv : bv - av;
   });
@@ -508,14 +600,18 @@ function renderUsers() {
     tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
 
     // 최고 토플 점수 찾기
-    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null);
-    let bestToefl = '-', bestType = '', best = null;
+    const userToefl = allToefl.filter(s => s.user_id === u.user_id && s.reading != null && s.listening != null && s.speaking != null && s.writing != null && (!toeflTypeQ || s.type === toeflTypeQ || (toeflTypeQ === 'actual' && s.type === 'real')));
+    let bestType = '', best = null;
     if (userToefl.length) {
       const withAvg = userToefl.map(s => ({ ...s, avg: (s.reading + s.listening + s.speaking + s.writing) / 4 }));
       best = withAvg.reduce((a, b) => a.avg > b.avg ? a : b);
-      bestToefl = best.avg.toFixed(2);
       bestType = best.type === 'mock' ? '모의' : '실제';
     }
+    const isOldToefl = best && (best.reading > 6 || best.listening > 6 || best.speaking > 6 || best.writing > 6);
+    const scoreDisplay = best ? (isOldToefl ? (best.total != null ? best.total : '-') : best.avg.toFixed(2)) : '-';
+
+    const statusColor = { active: 'var(--text-muted)', graduated: '#4a9eff', dropped: 'var(--danger)' };
+    const currentStatus = u.status || 'active';
 
     tr.innerHTML = `
       <td style="font-weight:500;">${u.name || '-'}</td>
@@ -526,9 +622,18 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.listening : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.speaking : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;">${best ? best.writing : '-'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? best.avg.toFixed(2) : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:600;">${best ? (isOldToefl ? '-' : best.avg.toFixed(2)) : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${best ? (best.total != null ? best.total : '-') : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);">상세 →</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${best?.test_date ? formatDate(best.test_date) : '-'}</td>
+      <td onclick="event.stopPropagation()">
+        ${window._adminRole === 'admin' ? `
+        <select style="font-size:11px;background:transparent;border:1px solid var(--border);border-radius:4px;color:${statusColor[currentStatus]};padding:2px 4px;cursor:pointer;" onchange="updateUserStatus('${u.user_id}', this.value)">
+          <option value="active" ${currentStatus==='active'?'selected':''}>재원</option>
+          <option value="graduated" ${currentStatus==='graduated'?'selected':''}>졸업</option>
+          <option value="dropped" ${currentStatus==='dropped'?'selected':''}>중퇴</option>
+        </select>` : `<span style="font-size:11px;color:${statusColor[currentStatus]}">${{active:'재원',graduated:'졸업',dropped:'중퇴'}[currentStatus]}</span>`}
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -613,11 +718,13 @@ function renderToefl() {
   const nameQ = document.getElementById('toeflNameFilter').value.toLowerCase();
   const classQ = document.getElementById('toeflClassFilter').value;
   const typeQ = document.getElementById('toeflTypeFilter').value;
+  const statusQ = document.getElementById('toeflStatusFilter').value;
   let filtered = allToefl.filter(s => {
     const p = profileMap[s.user_id] || {};
     return (!nameQ || (p.name||'').toLowerCase().includes(nameQ)) &&
       (!classQ || p.class === classQ) &&
-      (!typeQ || s.type === typeQ);
+      (!typeQ || s.type === typeQ) &&
+      (!statusQ || (p.status || 'active') === statusQ);
   });
   if (toeflSortKey) {
     filtered = filtered.slice().sort((a, b) => {
