@@ -242,6 +242,7 @@
   }
 
   async function saveTargetInfo() {
+    const cls = document.getElementById('editClass').value;
     const target = document.getElementById('editTarget').value;
     const date = document.getElementById('editTargetDate').value;
     try {
@@ -251,6 +252,7 @@
         body: JSON.stringify({
           user_id: currentUserId,
           type: 'update_profile',
+          class: cls || null,
           target_score: target !== '' ? parseFloat(target) : null,
           target_date: date || null
         })
