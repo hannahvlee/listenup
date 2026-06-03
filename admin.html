@@ -667,12 +667,14 @@ function renderRecords() {
     const sc = r.score >= 80 ? 'score-great' : r.score >= 60 ? 'score-ok' : 'score-poor';
     const mc = r.mode === '쉐도잉' ? 'mode-shadowing' : r.mode === '청취테스트' ? 'mode-listening' : r.mode === '어휘테스트' ? 'mode-vocab' : 'mode-dictation';
     const profile = Object.values(profileMap).find(p => p.name === r.name) || {};
-    if (profile.user_id) {
+    const ghost = !profile.user_id ? ghostUsers.find(u => u.email && r.email && u.email === r.email) : null;
+    const targetUserId = profile.user_id || ghost?.user_id;
+    if (targetUserId) {
       tr.style.cursor = 'pointer';
-      tr.onclick = () => window.location.href = `admin-user-detail.html?id=${profile.user_id}`;
+      tr.onclick = () => window.location.href = `admin-user-detail.html?id=${targetUserId}`;
     }
     tr.innerHTML = `
-      <td id="name-${r.id}" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${profile.user_id ? 'color:var(--accent2);' : ''}">${r.name}</td>
+      <td id="name-${r.id}" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${targetUserId ? 'color:var(--accent2);' : ''}">${r.name}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${profile.class || '-'}</td>
       <td style="color:var(--text-muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.track}</td>
       <td><span class="mode-badge ${mc}">${r.mode}</span></td>
