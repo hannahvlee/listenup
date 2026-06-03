@@ -75,7 +75,28 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   const userId = req.query.id;
+  const quick = req.query.quick === 'true';
   if (!userId) return res.status(400).json({ error: 'Missing user id' });
+
+  // quick 모드: 프로필만 빠르게 반환
+  if (quick) {
+    try {
+      const [profileRes, userRes] = await Promise.all([
+        fetch(`${supabaseUrl}/rest/v1/profiles?user_id=eq.${userId}&select=*`, { headers }),
+        fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}`, { headers })
+      ]);
+      const profiles = await profileRes.json();
+      const userData = await userRes.json();
+      return res.status(200).json({
+        profile: profiles[0] || null,
+        email: userData?.email || null,
+        toefl: [],
+        records: []
+      });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
 
   try {
     const [profileRes, toeflRes, userRes] = await Promise.all([
