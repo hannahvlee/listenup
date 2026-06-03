@@ -1015,4 +1015,44 @@ const TRACKS = [
       { type: "phrase", en: "benefit from", ko: "~로부터 이익을 얻다" },
     ]
   }
+,
+  {
+    id: 17,
+    title: "Test 7 - Social Capital",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Social Capiatal.mp3",
+    sentences: [
+      { start: 5.50, end: 11.30, text: "Social capital is the network of relationships among people who live and work in a particular society." },
+      { start: 11.30, end: 14.53, text: "These networks enable society to function effectively." },
+      { start: 14.53, end: 20.31, text: "Social capital includes things like trust, mutual understanding, and shared values," },
+      { start: 20.31, end: 24.93, text: "and also behaviours that bind people together and facilitate cooperation." },
+      { start: 24.93, end: 32.36, text: "Social capital can be divided into two main types: bonding social capital and bridging social capital." },
+      { start: 32.36, end: 39.44, text: "Bonding social capital refers to the tight bonds within a close-knit group, like family members or close friends;" },
+      { start: 39.44, end: 44.60, text: "these strong ties are essential for providing support and assistance during times of need." },
+      { start: 44.60, end: 50.93, text: "Bridging social capital, on the other hand, involves connections that transcend different social groups," },
+      { start: 50.93, end: 55.50, text: "like relationships between acquaintances or colleagues from different backgrounds." },
+      { start: 55.50, end: 60.87, text: "These weaker ties are crucial for accessing new information and opportunities." },
+      { start: 60.87, end: 65.08, text: "The benefits of social capital are numerous." },
+      { start: 65.08, end: 72.69, text: "It can give people emotional support, increase their access to resources and information, and foster communal cooperation." },
+      { start: 72.69, end: 79.62, text: "And interestingly, people in communities with higher levels of social capital actually tend to have better health." },
+      { start: 79.62, end: 87.20, text: "Next, we will discuss how social capital can be measured and the challenges associated with its quantification." },
+    ],
+    vocab: [
+      { type: "word", en: "social capital", ko: "사회적 자본" },
+      { type: "word", en: "mutual understanding", ko: "상호 이해" },
+      { type: "word", en: "facilitate", ko: "촉진하다, 용이하게 하다" },
+      { type: "word", en: "bonding social capital", ko: "결속형 사회적 자본" },
+      { type: "word", en: "bridging social capital", ko: "가교형 사회적 자본" },
+      { type: "word", en: "close-knit", ko: "긴밀한, 단합된" },
+      { type: "word", en: "transcend", ko: "초월하다, 넘어서다" },
+      { type: "word", en: "acquaintance", ko: "지인, 아는 사람" },
+      { type: "word", en: "communal", ko: "공동체의, 공동의" },
+      { type: "word", en: "quantification", ko: "수량화, 정량화" },
+      { type: "phrase", en: "bind people together", ko: "사람들을 하나로 묶다" },
+      { type: "phrase", en: "on the other hand", ko: "반면에" },
+      { type: "phrase", en: "times of need", ko: "어려울 때, 필요할 때" },
+      { type: "phrase", en: "be divided into", ko: "~로 나뉘다" },
+      { type: "phrase", en: "associated with", ko: "~와 관련된" },
+      { type: "phrase", en: "tend to", ko: "~하는 경향이 있다" },
+    ]
+  }
 ];
