@@ -35,6 +35,24 @@ export default async function handler(req, res) {
       }
     }
 
+    // 프로필 목표점수/날짜 수정
+    if (type === 'update_profile') {
+      try {
+        const updateData = {};
+        if (req.body.target_score !== undefined) updateData.target_score = req.body.target_score;
+        if (req.body.target_date !== undefined) updateData.target_date = req.body.target_date;
+        const r = await fetch(`${supabaseUrl}/rest/v1/profiles?user_id=eq.${user_id}`, {
+          method: 'PATCH',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify(updateData)
+        });
+        if (!r.ok) throw new Error('수정 실패');
+        return res.status(200).json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     // 토플 점수 추가
     if (!type || !test_date) return res.status(400).json({ error: 'Missing required fields' });
     try {
