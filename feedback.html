@@ -138,12 +138,9 @@ var selectedRating = 0;
 
 function selectCategory(cat) {
   selectedCategory = cat;
-  ['bug','satisfaction','feature','other'].forEach(function(c) {
+  ['bug','feature','other'].forEach(function(c) {
     document.getElementById('cat-' + c).classList.toggle('selected', c === cat);
   });
-  document.getElementById('ratingGroup').style.display = cat === 'satisfaction' ? 'block' : 'none';
-}
-
 }
 
 async function submitFeedback() {
