@@ -14,10 +14,29 @@ export default async function handler(req, res) {
     'Content-Type': 'application/json'
   };
 
-  // POST: 토플 점수 추가
+  // POST: 프로필 생성 or 토플 점수 추가
   if (req.method === 'POST') {
-    const { user_id, type, reading, listening, speaking, writing, total, test_date } = req.body;
-    if (!user_id || !type || !test_date) return res.status(400).json({ error: 'Missing required fields' });
+    const { user_id, type, name, class: cls, target_score, reading, listening, speaking, writing, total, test_date } = req.body;
+    if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
+
+    // 프로필 생성
+    if (type === 'create_profile') {
+      if (!name || !cls) return res.status(400).json({ error: 'Missing name or class' });
+      try {
+        const r = await fetch(`${supabaseUrl}/rest/v1/profiles`, {
+          method: 'POST',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ user_id, name, class: cls, target_score: target_score || null, status: 'active' })
+        });
+        if (!r.ok) throw new Error('프로필 생성 실패');
+        return res.status(200).json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
+    // 토플 점수 추가
+    if (!type || !test_date) return res.status(400).json({ error: 'Missing required fields' });
     try {
       const r = await fetch(`${supabaseUrl}/rest/v1/toefl_scores`, {
         method: 'POST',
