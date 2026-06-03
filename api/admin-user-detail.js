@@ -39,6 +39,7 @@ export default async function handler(req, res) {
     if (type === 'update_profile') {
       try {
         const updateData = {};
+        if (req.body.class !== undefined) updateData.class = req.body.class;
         if (req.body.target_score !== undefined) updateData.target_score = req.body.target_score;
         if (req.body.target_date !== undefined) updateData.target_date = req.body.target_date;
         const r = await fetch(`${supabaseUrl}/rest/v1/profiles?user_id=eq.${user_id}`, {
