@@ -478,23 +478,23 @@ function renderNewUsers() {
   if (!newUsers.length) {
     document.getElementById('newUsersTable').style.display = 'none';
     document.getElementById('newUsersEmpty').style.display = 'block';
-    return;
-  }
-  document.getElementById('newUsersTable').style.display = 'table';
-  document.getElementById('newUsersEmpty').style.display = 'none';
-  newUsers.forEach(u => {
-    const tr = document.createElement('tr');
-    tr.style.cursor = 'pointer';
-    tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
-    tr.innerHTML = `
+  } else {
+    document.getElementById('newUsersTable').style.display = 'table';
+    document.getElementById('newUsersEmpty').style.display = 'none';
+    newUsers.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      tr.onclick = () => window.location.href = `admin-user-detail.html?id=${u.user_id}`;
+      tr.innerHTML = `
       <td style="font-weight:500;">${u.name || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.class || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">${u.target_score != null ? u.target_score+'점' : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.target_date || '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${u.created_at ? formatDate(u.created_at) : '-'}</td>
     `;
-    tbody.appendChild(tr);
-  });
+      tbody.appendChild(tr);
+    });
+  }
 
   // 프로필 미설정 유저
   document.getElementById('ghostUserCount').textContent = `${ghostUsers.length}명`;
