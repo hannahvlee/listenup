@@ -375,11 +375,11 @@
     if (!userId) { window.location.href = 'admin-users.html'; return; }
     currentUserId = userId;
 
-    const res = await fetch(`/api/admin-user-detail?id=${userId}`);
+    const res = await fetch(`/api/admin-user-detail?id=${userId}&quick=true`);
     const data = await res.json();
     if (data.error) { alert('불러오기 실패'); return; }
 
-    // 프로필
+    // 프로필 먼저 표시
     const p = data.profile;
     if (!p) {
       document.getElementById('userName').textContent = data.email || '프로필 미설정';
@@ -395,12 +395,12 @@
       if (p?.target_date) document.getElementById('editTargetDate').value = p.target_date;
     }
 
-    // 토플
-    renderToefl('mock', (data.toefl || []).filter(r => r.type === 'mock'));
-    renderToefl('actual', (data.toefl || []).filter(r => r.type === 'actual'));
-
-    // 트랙 기록
-    renderRecords(data.records || []);
+    // 토플 + 학습기록 동시에 로드
+    const fullRes = await fetch(`/api/admin-user-detail?id=${userId}`);
+    const fullData = await fullRes.json();
+    renderToefl('mock', (fullData.toefl || []).filter(r => r.type === 'mock'));
+    renderToefl('actual', (fullData.toefl || []).filter(r => r.type === 'actual'));
+    renderRecords(fullData.records || []);
   }
 
   function renderToefl(type, records) {
