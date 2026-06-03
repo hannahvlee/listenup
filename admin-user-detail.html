@@ -91,7 +91,20 @@
   <div class="info-grid" id="infoGrid">
     <div class="info-card">
       <div class="info-label">반</div>
-      <div class="info-value" id="userClass">-</div>
+      <div style="margin-top:4px;">
+        <select id="editClass" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:13px;">
+          <option value="">선택</option>
+          <option value="완초1">완초1</option>
+          <option value="완초2">완초2</option>
+          <option value="인터">인터</option>
+          <option value="케이">케이</option>
+          <option value="주니어 U">주니어 U</option>
+          <option value="주니어 S">주니어 S</option>
+          <option value="주니어 H">주니어 H</option>
+          <option value="주니어 E">주니어 E</option>
+          <option value="주니어 문제풀이">주니어 문제풀이</option>
+        </select>
+      </div>
     </div>
     <div class="info-card">
       <div class="info-label">목표 점수</div>
@@ -214,6 +227,7 @@
   let currentUserId = null;
 
   async function saveTargetInfo() {
+    const cls = document.getElementById('editClass').value;
     const target = document.getElementById('editTarget').value;
     const date = document.getElementById('editTargetDate').value;
     try {
@@ -223,6 +237,7 @@
         body: JSON.stringify({
           user_id: currentUserId,
           type: 'update_profile',
+          class: cls || null,
           target_score: target !== '' ? parseFloat(target) : null,
           target_date: date || null
         })
@@ -354,7 +369,7 @@
       document.getElementById('createProfileForm').style.display = 'block';
     } else {
       document.getElementById('userName').textContent = p?.name || '이름 없음';
-      document.getElementById('userClass').textContent = p?.class || '-';
+      if (p?.class) document.getElementById('editClass').value = p.class;
       if (p?.target_score != null) document.getElementById('editTarget').value = p.target_score;
       if (p?.target_date) document.getElementById('editTargetDate').value = p.target_date;
     }
