@@ -47,7 +47,10 @@ export default async function handler(req, res) {
           headers: { ...headers, 'Prefer': 'return=minimal' },
           body: JSON.stringify(updateData)
         });
-        if (!r.ok) throw new Error('수정 실패');
+        if (!r.ok) {
+          const errData = await r.json().catch(() => ({}));
+          throw new Error(errData.message || errData.error || '수정 실패');
+        }
         return res.status(200).json({ success: true });
       } catch (e) {
         return res.status(500).json({ error: e.message });
