@@ -347,9 +347,12 @@ async function init() {
   if (!adminData.isAdmin) { window.location.href = 'index.html'; return; }
   window._adminRole = adminData.role;
   await loadUsers();
-  await Promise.all([loadRecords(), loadToefl(), loadFeedback()]);
   renderTrackToggles();
 }
+
+let recordsLoaded = false;
+let toeflLoaded = false;
+let feedbackLoaded = false;
 
 function showTab(name) {
   ['stats','users','newusers','toefl','records','tracks','feedback'].forEach(t => {
@@ -359,6 +362,20 @@ function showTab(name) {
     el.classList.toggle('active', ['stats','users','newusers','toefl','records','tracks','feedback'][i] === name);
   });
   location.hash = name;
+
+  // 탭 클릭 시 필요한 데이터만 로드
+  if ((name === 'records' || name === 'stats') && !recordsLoaded) {
+    recordsLoaded = true;
+    loadRecords();
+  }
+  if (name === 'toefl' && !toeflLoaded) {
+    toeflLoaded = true;
+    loadToefl();
+  }
+  if (name === 'feedback' && !feedbackLoaded) {
+    feedbackLoaded = true;
+    loadFeedback();
+  }
 }
 
 // 기록 불러오기
