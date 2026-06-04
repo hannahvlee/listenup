@@ -686,7 +686,7 @@ function renderRecords() {
     const tr = document.createElement('tr');
     const sc = r.score >= 80 ? 'score-great' : r.score >= 60 ? 'score-ok' : 'score-poor';
     const mc = r.mode === '쉐도잉' ? 'mode-shadowing' : r.mode === '청취테스트' ? 'mode-listening' : r.mode === '어휘테스트' ? 'mode-vocab' : 'mode-dictation';
-    const profile = Object.values(profileMap).find(p => p.name === r.name) || {};
+    const profile = allUsers.find(u => (r.email && u.email === r.email) || u.name === r.name) || {};
     const ghost = !profile.user_id ? ghostUsers.find(u => u.email && r.email && u.email === r.email) : null;
     const targetUserId = profile.user_id || ghost?.user_id;
     if (targetUserId) {
