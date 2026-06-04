@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         const r = await fetch(`${supabaseUrl}/rest/v1/profiles`, {
           method: 'POST',
           headers: { ...headers, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ user_id, name, class: cls, target_score: target_score || null, status: 'active' })
+          body: JSON.stringify({ user_id, name, class: cls, target_score: target_score || null, target_date: req.body.target_date || null, status: 'active' })
         });
         if (!r.ok) throw new Error('프로필 생성 실패');
         return res.status(200).json({ success: true });
