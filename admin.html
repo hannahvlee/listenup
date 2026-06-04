@@ -694,7 +694,7 @@ function renderRecords() {
       tr.onclick = () => window.location.href = `admin-user-detail.html?id=${targetUserId}`;
     }
     tr.innerHTML = `
-      <td id="name-${r.id}" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${targetUserId ? 'color:var(--accent2);' : ''}">${r.name}</td>
+      <td id="name-${r.id}" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${targetUserId ? 'color:var(--accent2);' : ''}">${profile.name || r.name}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${profile.class || '-'}</td>
       <td style="color:var(--text-muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.track}</td>
       <td><span class="mode-badge ${mc}">${r.mode}</span></td>
