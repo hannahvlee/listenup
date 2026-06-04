@@ -865,7 +865,7 @@ function toggleTrack(id) {
 init().then(() => {
   const hash = location.hash.replace('#', '');
   const valid = ['stats','users','newusers','toefl','records','tracks','feedback'];
-  if (hash && valid.includes(hash)) showTab(hash);
+  showTab(hash && valid.includes(hash) ? hash : 'stats');
 });
 </script>
 </body>
