@@ -28,8 +28,12 @@ export default async function handler(req, res) {
     const users = await profilesRes.json();
     const authData = await authRes.json();
     const authMap = {};
-    (authData.users || []).forEach(u => { authMap[u.id] = u.created_at; });
-    const merged = users.map(u => ({ ...u, created_at: authMap[u.user_id] || u.created_at || null }));
+    const emailMap = {};
+    (authData.users || []).forEach(u => { 
+      authMap[u.id] = u.created_at;
+      emailMap[u.id] = u.email;
+    });
+    const merged = users.map(u => ({ ...u, created_at: authMap[u.user_id] || u.created_at || null, email: emailMap[u.user_id] || null }));
     const authCount = (authData.users || []).length;
     const authUserIds = (authData.users || []).map(u => u.id);
     const profileUserIds = new Set(users.map(u => u.user_id));
