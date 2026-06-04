@@ -58,7 +58,7 @@
   <!-- 프로필 미설정 유저 입력 폼 -->
   <div id="createProfileForm" style="display:none;background:var(--surface);border:1px solid var(--accent);border-radius:12px;padding:20px;margin-bottom:24px;">
     <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;">프로필 등록</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:end;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px;align-items:end;">
       <div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">이름</div>
         <input id="profileName" type="text" placeholder="홍길동" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 8px;font-size:12px;">
@@ -75,12 +75,16 @@
           <option value="주니어 S">주니어 S</option>
           <option value="주니어 H">주니어 H</option>
           <option value="주니어 E">주니어 E</option>
-      <option value="주니어 문제풀이">주니어 문제풀이</option>
+          <option value="주니어 문제풀이">주니어 문제풀이</option>
         </select>
       </div>
       <div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">목표 점수</div>
         <input id="profileTarget" type="number" step="0.5" placeholder="-" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 8px;font-size:12px;">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">목표 날짜</div>
+        <input id="profileTargetDate" type="date" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 8px;font-size:12px;">
       </div>
       <div style="display:flex;align-items:flex-end;">
         <button onclick="createProfile()" style="width:100%;background:var(--accent);color:#0e0e0e;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">저장</button>
@@ -272,6 +276,7 @@
     const name = document.getElementById('profileName').value.trim();
     const cls = document.getElementById('profileClass').value;
     const target = document.getElementById('profileTarget').value;
+    const targetDate = document.getElementById('profileTargetDate').value;
     if (!name) { alert('이름을 입력해주세요'); return; }
     if (!cls) { alert('반을 선택해주세요'); return; }
     try {
@@ -283,7 +288,8 @@
           type: 'create_profile',
           name,
           class: cls,
-          target_score: target !== '' ? parseFloat(target) : null
+          target_score: target !== '' ? parseFloat(target) : null,
+          target_date: targetDate || null
         })
       });
       const data = await res.json();
@@ -293,6 +299,11 @@
       document.getElementById('userName').textContent = name;
       document.getElementById('userClass').textContent = cls;
       document.getElementById('userTarget').textContent = target ? target + '점' : '-';
+      document.getElementById('userTargetDate').textContent = targetDate || '-';
+      // 수정 모드 열었을 때 값 유지
+      document.getElementById('editClass').value = cls;
+      if (target) document.getElementById('editTarget').value = target;
+      if (targetDate) document.getElementById('editTargetDate').value = targetDate;
     } catch(e) {
       alert('저장 실패: ' + e.message);
     }
