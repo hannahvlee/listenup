@@ -53,7 +53,14 @@
   </div>
 
   <div class="label">Admin / 유저 상세</div>
-  <h1 id="userName" style="font-size:28px;font-weight:600;margin-bottom:24px;">...</h1>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
+    <h1 id="userName" style="font-size:28px;font-weight:600;">...</h1>
+    <div style="display:flex;gap:8px;margin-top:6px;">
+      <button id="editBtn" onclick="toggleEdit(true)" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">수정</button>
+      <button id="saveBtn" onclick="saveTargetInfo()" style="display:none;background:var(--accent);color:#0e0e0e;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">저장</button>
+      <button id="cancelBtn" onclick="toggleEdit(false)" style="display:none;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">취소</button>
+    </div>
+  </div>
 
   <!-- 프로필 미설정 유저 입력 폼 -->
   <div id="createProfileForm" style="display:none;background:var(--surface);border:1px solid var(--accent);border-radius:12px;padding:20px;margin-bottom:24px;">
@@ -120,11 +127,6 @@
       <input id="editTargetDate" type="date" style="display:none;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:13px;margin-top:4px;">
     </div>
   </div>
-  <div style="margin-top:10px;display:flex;gap:8px;">
-    <button id="editBtn" onclick="toggleEdit(true)" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">수정</button>
-    <button id="saveBtn" onclick="saveTargetInfo()" style="display:none;background:var(--accent);color:#0e0e0e;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">저장</button>
-    <button id="cancelBtn" onclick="toggleEdit(false)" style="display:none;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">취소</button>
-  </div>
 
   <!-- 토플 -->
   <div class="section-title">토플 점수</div>
@@ -177,7 +179,7 @@
         <div class="loading" id="mockLoading">불러오는 중...</div>
         <table id="mockTable" style="display:none">
           <thead><tr>
-            <th>날짜</th><th>R</th><th>L</th><th>S</th><th>W</th><th>평균</th><th>총점</th>
+            <th>날짜</th><th>R</th><th>L</th><th>S</th><th>W</th><th>평균</th><th>총점</th><th></th>
           </tr></thead>
           <tbody id="mockBody"></tbody>
         </table>
@@ -190,7 +192,7 @@
         <div class="loading" id="actualLoading">불러오는 중...</div>
         <table id="actualTable" style="display:none">
           <thead><tr>
-            <th>날짜</th><th>R</th><th>L</th><th>S</th><th>W</th><th>평균</th><th>총점</th>
+            <th>날짜</th><th>R</th><th>L</th><th>S</th><th>W</th><th>평균</th><th>총점</th><th></th>
           </tr></thead>
           <tbody id="actualBody"></tbody>
         </table>
@@ -424,15 +426,82 @@
       const vals = [r.reading, r.listening, r.speaking, r.writing].filter(v => v != null);
       const avg = vals.length ? (vals.reduce((a,b) => a+b,0)/vals.length).toFixed(2) : '-';
       const tr = document.createElement('tr');
+      tr.id = `toefl-row-${r.id}`;
       tr.style.borderBottom = '1px solid var(--border)';
       tr.innerHTML = `
         <td style="color:var(--text-muted)">${r.test_date}</td>
         <td>${r.reading ?? '-'}</td><td>${r.listening ?? '-'}</td><td>${r.speaking ?? '-'}</td><td>${r.writing ?? '-'}</td>
         <td style="color:var(--text-muted)">${avg}</td>
         <td style="color:var(--accent);font-weight:600">${r.total != null ? r.total : '-'}</td>
+        <td><button onclick="editToeflRow(${r.id}, '${r.test_date}', ${r.reading??'null'}, ${r.listening??'null'}, ${r.speaking??'null'}, ${r.writing??'null'}, ${r.total??'null'}, '${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 8px;cursor:pointer;">수정</button></td>
       `;
       body.appendChild(tr);
     });
+  }
+
+  function editToeflRow(id, date, r, l, s, w, total, type) {
+    const tr = document.getElementById(`toefl-row-${id}`);
+    if (!tr) return;
+    tr.innerHTML = `
+      <td><input type="date" value="${date}" id="er-date-${id}" style="width:110px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:11px;"></td>
+      <td><input type="number" step="0.5" value="${r !== null ? r : ''}" id="er-r-${id}" placeholder="-" style="width:50px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:11px;"></td>
+      <td><input type="number" step="0.5" value="${l !== null ? l : ''}" id="er-l-${id}" placeholder="-" style="width:50px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:11px;"></td>
+      <td><input type="number" step="0.5" value="${s !== null ? s : ''}" id="er-s-${id}" placeholder="-" style="width:50px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:11px;"></td>
+      <td><input type="number" step="0.5" value="${w !== null ? w : ''}" id="er-w-${id}" placeholder="-" style="width:50px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:11px;"></td>
+      <td><input type="number" step="0.5" value="${total !== null ? total : ''}" id="er-total-${id}" placeholder="-" style="width:55px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:11px;" colspan="2"></td>
+      <td></td>
+      <td style="display:flex;gap:4px;align-items:center;">
+        <button onclick="saveToeflRow(${id}, '${type}')" style="font-size:10px;background:var(--accent);border:none;border-radius:4px;color:#0e0e0e;padding:3px 8px;cursor:pointer;font-weight:600;">저장</button>
+        <button onclick="cancelToeflEdit(${id}, '${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:3px 6px;cursor:pointer;">취소</button>
+      </td>
+    `;
+  }
+
+  async function saveToeflRow(id, type) {
+    const date = document.getElementById(`er-date-${id}`).value;
+    const r = document.getElementById(`er-r-${id}`).value;
+    const l = document.getElementById(`er-l-${id}`).value;
+    const s = document.getElementById(`er-s-${id}`).value;
+    const w = document.getElementById(`er-w-${id}`).value;
+    const total = document.getElementById(`er-total-${id}`).value;
+    if (!date) { alert('날짜를 입력해주세요'); return; }
+    try {
+      const res = await fetch('/api/admin-user-detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUserId,
+          type: 'update_toefl',
+          toefl_id: id,
+          test_date: date,
+          reading: r !== '' ? parseFloat(r) : null,
+          listening: l !== '' ? parseFloat(l) : null,
+          speaking: s !== '' ? parseFloat(s) : null,
+          writing: w !== '' ? parseFloat(w) : null,
+          total: total !== '' ? parseFloat(total) : null
+        })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || '저장 실패');
+      // 테이블 새로고침
+      document.getElementById(type + 'Body').innerHTML = '';
+      document.getElementById(type + 'Table').style.display = 'none';
+      document.getElementById(type + 'Loading').style.display = 'block';
+      const fullRes = await fetch(`/api/admin-user-detail?id=${currentUserId}`);
+      const fullData = await fullRes.json();
+      renderToefl(type, (fullData.toefl || []).filter(rec => rec.type === type));
+    } catch(e) {
+      alert('저장 실패: ' + e.message);
+    }
+  }
+
+  async function cancelToeflEdit(id, type) {
+    document.getElementById(type + 'Body').innerHTML = '';
+    document.getElementById(type + 'Table').style.display = 'none';
+    document.getElementById(type + 'Loading').style.display = 'block';
+    const fullRes = await fetch(`/api/admin-user-detail?id=${currentUserId}`);
+    const fullData = await fullRes.json();
+    renderToefl(type, (fullData.toefl || []).filter(rec => rec.type === type));
   }
 
   function renderRecords(records) {
