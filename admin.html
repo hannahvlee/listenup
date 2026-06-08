@@ -256,6 +256,11 @@
   <div id="tab-toefl" style="display:none;">
     <div class="filter-row">
       <input type="text" class="filter-input" id="toeflNameFilter" placeholder="이름으로 검색..." oninput="renderToefl()">
+      <select class="filter-select" id="toeflGroupFilter" onchange="updateToeflClassOptions(); renderToefl()">
+        <option value="">전체</option>
+        <option value="adult">성인</option>
+        <option value="junior">주니어</option>
+      </select>
       <select class="filter-select" id="toeflClassFilter" onchange="renderToefl()">
         <option value="">전체 반</option>
         <option value="완초1">완초1</option>
@@ -266,7 +271,7 @@
         <option value="주니어 S">주니어 S</option>
         <option value="주니어 H">주니어 H</option>
         <option value="주니어 E">주니어 E</option>
-      <option value="주니어 문제풀이">주니어 문제풀이</option>
+        <option value="주니어 문제풀이">주니어 문제풀이</option>
       </select>
       <select class="filter-select" id="toeflStatusFilter" onchange="renderToefl()">
         <option value="">전체 상태</option>
@@ -740,15 +745,34 @@ function sortToefl(key) {
   renderToefl();
 }
 
+const ADULT_CLASSES = ['완초1','완초2','인터','케이'];
+const JUNIOR_CLASSES = ['주니어 U','주니어 S','주니어 H','주니어 E','주니어 문제풀이'];
+
+function updateToeflClassOptions() {
+  const group = document.getElementById('toeflGroupFilter').value;
+  const select = document.getElementById('toeflClassFilter');
+  const current = select.value;
+  select.innerHTML = '<option value="">전체 반</option>';
+  const classes = group === 'adult' ? ADULT_CLASSES : group === 'junior' ? JUNIOR_CLASSES : [...ADULT_CLASSES, ...JUNIOR_CLASSES];
+  classes.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    select.appendChild(opt);
+  });
+  if (classes.includes(current)) select.value = current;
+}
+
 function renderToefl() {
   const nameQ = document.getElementById('toeflNameFilter').value.toLowerCase();
   const classQ = document.getElementById('toeflClassFilter').value;
   const typeQ = document.getElementById('toeflTypeFilter').value;
   const statusQ = document.getElementById('toeflStatusFilter').value;
+  const groupQ = document.getElementById('toeflGroupFilter').value;
   let filtered = allToefl.filter(s => {
     const p = profileMap[s.user_id] || {};
+    const classMatch = !classQ ? (!groupQ || (groupQ === 'adult' ? ADULT_CLASSES.includes(p.class) : JUNIOR_CLASSES.includes(p.class))) : p.class === classQ;
     return (!nameQ || (p.name||'').toLowerCase().includes(nameQ)) &&
-      (!classQ || p.class === classQ) &&
+      classMatch &&
       (!typeQ || s.type === typeQ) &&
       (!statusQ || (p.status || 'active') === statusQ);
   });
