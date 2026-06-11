@@ -1055,4 +1055,45 @@ const TRACKS = [
       { type: "phrase", en: "tend to", ko: "~하는 경향이 있다" },
     ]
   }
+,
+  {
+    id: 18,
+    title: "Test 3 Module 1 - Cultural Relativism",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 3 Module 1 Cultural Relativism.mp3",
+    sentences: [
+      { start: 5.00, end: 13.50, text: "Cultural relativism is the idea that a person's beliefs and activities should be understood based on that person's own culture," },
+      { start: 13.50, end: 16.93, text: "rather than be judged against the criteria of another culture." },
+      { start: 16.93, end: 20.49, text: "This concept contrasts with ethnocentrism," },
+      { start: 20.49, end: 25.96, text: "which is the practice of evaluating other cultures according to the standards of one's own culture." },
+      { start: 25.96, end: 31.82, text: "Cultural relativism encourages us to view cultural practices in their own context." },
+      { start: 31.82, end: 36.52, text: "For example, while arranged marriages may seem outdated to some," },
+      { start: 36.52, end: 41.31, text: "they are a norm in many cultures and often serve important social functions." },
+      { start: 41.31, end: 51.49, text: "Practicing cultural relativism allows sociologists and anthropologists to gain a deeper understanding of how cultural practices shape societies." },
+      { start: 51.49, end: 55.67, text: "However, cultural relativism is not without its challenges." },
+      { start: 55.67, end: 59.31, text: "Critics argue that it can lead to moral relativism," },
+      { start: 59.31, end: 62.69, text: "where all cultural practices are seen as equally valid," },
+      { start: 62.69, end: 66.27, text: "potentially excusing practices that violate human rights." },
+      { start: 66.27, end: 73.73, text: "Balancing respect for cultural diversity with the recognition of universal human rights is a complex issue." },
+      { start: 73.73, end: 83.17, text: "Next, we will explore case studies that illustrate the principles of cultural relativism and its application in cross-cultural research." },
+    ],
+    vocab: [
+      { type: "word", en: "cultural relativism", ko: "문화 상대주의" },
+      { type: "word", en: "ethnocentrism", ko: "자문화 중심주의" },
+      { type: "word", en: "criteria", ko: "기준 (criterion의 복수형)" },
+      { type: "word", en: "arranged marriage", ko: "중매결혼" },
+      { type: "word", en: "outdated", ko: "시대에 뒤떨어진" },
+      { type: "word", en: "sociologist", ko: "사회학자" },
+      { type: "word", en: "anthropologist", ko: "인류학자" },
+      { type: "word", en: "moral relativism", ko: "도덕 상대주의" },
+      { type: "word", en: "violate", ko: "위반하다, 침해하다" },
+      { type: "word", en: "universal", ko: "보편적인" },
+      { type: "word", en: "cross-cultural", ko: "문화 간의, 비교 문화적" },
+      { type: "phrase", en: "be judged against", ko: "~의 기준으로 판단되다" },
+      { type: "phrase", en: "contrast with", ko: "~와 대조되다" },
+      { type: "phrase", en: "according to", ko: "~에 따라" },
+      { type: "phrase", en: "not without its challenges", ko: "어려움이 없지 않다" },
+      { type: "phrase", en: "lead to", ko: "~로 이어지다" },
+      { type: "phrase", en: "be seen as", ko: "~로 여겨지다" },
+    ]
+  }
 ];
