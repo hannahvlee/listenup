@@ -352,6 +352,7 @@ async function init() {
   if (!adminData.isAdmin) { window.location.href = 'index.html'; return; }
   window._adminRole = adminData.role;
   await loadUsers();
+  await loadHiddenTracks();
   renderTrackToggles();
 }
 
@@ -860,30 +861,51 @@ function renderFeedback() {
 }
 
 // 트랙 관리
-function getHiddenTracks() { try { return JSON.parse(localStorage.getItem('hiddenTracks')||'[]').map(Number); } catch(e) { return []; } }
-function saveHiddenTracks(arr) { localStorage.setItem('hiddenTracks', JSON.stringify(arr)); }
+let hiddenTrackIds = [];
+
+async function loadHiddenTracks() {
+  try {
+    const r = await fetch('/api/admin-update-tracks');
+    const data = await r.json();
+    hiddenTrackIds = data.hiddenTracks || [];
+  } catch(e) {
+    hiddenTrackIds = [];
+  }
+}
+
 function renderTrackToggles() {
   const list = document.getElementById('trackToggleList');
   if (typeof TRACKS === 'undefined') { list.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">tracks.js를 불러올 수 없어요.</div>'; return; }
-  const hidden = getHiddenTracks();
   list.innerHTML = '';
   TRACKS.forEach((t, i) => {
-    const isVisible = !hidden.includes(Number(t.id));
+    const isVisible = !hiddenTrackIds.includes(Number(t.id));
     const row = document.createElement('div');
     row.className = 'track-row' + (isVisible ? '' : ' hidden-track');
     row.innerHTML = `<span class="track-num">${String(i+1).padStart(2,'0')}</span><span class="track-name">${t.title}</span><span class="track-status">${isVisible ? '표시 중' : '숨김'}</span><div class="toggle-btn ${isVisible?'on':''}" onclick="toggleTrack(${Number(t.id)})"></div>`;
     list.appendChild(row);
   });
 }
-function toggleTrack(id) {
-  const hidden = getHiddenTracks();
-  const idx = hidden.indexOf(id);
-  if (idx === -1) hidden.push(id); else hidden.splice(idx, 1);
-  saveHiddenTracks(hidden);
-  renderTrackToggles();
-  const notice = document.getElementById('saveNotice');
-  notice.style.display = 'block';
-  setTimeout(() => { notice.style.display = 'none'; }, 2000);
+
+async function toggleTrack(id) {
+  const isHidden = hiddenTrackIds.includes(id);
+  try {
+    await fetch('/api/admin-update-tracks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trackId: id, hidden: !isHidden })
+    });
+    if (isHidden) {
+      hiddenTrackIds = hiddenTrackIds.filter(t => t !== id);
+    } else {
+      hiddenTrackIds.push(id);
+    }
+    renderTrackToggles();
+    const notice = document.getElementById('saveNotice');
+    notice.style.display = 'block';
+    setTimeout(() => { notice.style.display = 'none'; }, 2000);
+  } catch(e) {
+    alert('저장 실패: ' + e.message);
+  }
 }
 
 init().then(() => {
