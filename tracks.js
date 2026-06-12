@@ -1,7 +1,7 @@
 const TRACKS = [
   {
     id: 12,
-    title: "Test 1 - Fascination",
+    title: "(Test 1 Module 1 5) Fascination",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/1_1_Fascination.mp3",
     sentences: [
       { start: 5.00, end: 9.77, text: "Did you see that new thriller movie that came out last week?", chunking: "너는 봤니 / 그 새로운 스릴러 영화를 / 지난주에 나온" },
@@ -227,7 +227,7 @@ const TRACKS = [
   },
   {
     id: 9,
-    title: "Test 10 - Volcanoes",
+    title: "(Test 10 Module 2-2 5) Volcanoes",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_2_2_Volcanoes.mp3",
     sentences: [
       { start: 4.00, end: 7.68, text: "Today we're going to discuss volcanoes." },
@@ -280,7 +280,7 @@ const TRACKS = [
   },
   {
     id: 8,
-    title: "Test 10 - Bioluminescence",
+    title: "(Test 10 Module 2-2 4) Bioluminescence",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_2_2_Bioluminescence.mp3",
     sentences: [
       { start: 5.00, end: 10.86, text: "Some living organisms emit their own light, a process we call bioluminescence." },
@@ -406,7 +406,7 @@ const TRACKS = [
   },
   {
     id: 6,
-    title: "Test 10 - Graffiti",
+    title: "(Test 10 Module 1) Graffiti",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/10_1_Graffiti.mp3",
     sentences: [
       { start: 7.00, end: 14.20, text: "Graffiti are writings and drawings created by private citizens in public places, like on walls." },
@@ -632,7 +632,7 @@ const TRACKS = [
   },
   {
     id: 3,
-    title: "Test 9 - Impressionism",
+    title: "(Test 9 Module 2-2 5) Impressionism",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Impressionism.mp3",
     sentences: [
       { start: 0.00, end: 5.21, text: "Impressionism is a painting style that began in France in the late 19th century." },
@@ -689,7 +689,7 @@ const TRACKS = [
   },
   {
     id: 2,
-    title: "Test 9 - Social Capital",
+    title: "(Test 9 Module 2-1 4) Social Capital",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_2_1_Social_Capital.mp3",
     sentences: [
       { start: 0.00, end: 3.50, text: "Social capital refers to the networks of relationships" },
@@ -750,7 +750,7 @@ const TRACKS = [
   },
   {
     id: 1,
-    title: "Test 9 - Photography",
+    title: "(Test 9 Module 1) Photography",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/9_1_Photography.mp3",
     sentences: [
       { start: 0.00, end: 2.20, text: "Over its two centuries of existence," },
@@ -812,7 +812,7 @@ const TRACKS = [
   },
   {
     id: 13,
-    title: "Test 1 - Ecological Footprint",
+    title: "(Test 1 Module 2 4) Ecological Footprint",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/1_2_Ecological%20footprint.mp3",
     sentences: [
       { start: 6.00, end: 13.58, text: "An ecological footprint is a measure of the environmental impact of an individual, community, or country." },
@@ -969,7 +969,7 @@ const TRACKS = [
 ,
   {
     id: 16,
-    title: "Test 7 - Cognitive Biases",
+    title: "(Test 7 Module 1 7) Cognitive Biases",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Cognitive Biases.mp3",
     sentences: [
       { start: 4.00, end: 10.91, text: "Today, we'll discuss the psychology of decision-making, focusing on the concept of cognitive biases." },
@@ -1018,7 +1018,7 @@ const TRACKS = [
 ,
   {
     id: 17,
-    title: "Test 7 - Social Capital",
+    title: "(Test 7 Module 1 8) Social Capital",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Social Capiatal.mp3",
     sentences: [
       { start: 5.50, end: 11.30, text: "Social capital is the network of relationships among people who live and work in a particular society." },
