@@ -933,11 +933,6 @@ function renderTrackToggles() {
       <span class="drag-handle" title="드래그">⠿</span>
       <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);min-width:20px;">${String(t.id).padStart(2,'0')}</span>
       <span style="font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.title}</span>
-      <select onchange="changeToeflType(${t.id}, this.value)" style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 4px;cursor:pointer;" onclick="event.stopPropagation()">
-        <option value="none" ${type==='none'?'selected':''}>미분류</option>
-        <option value="old" ${type==='old'?'selected':''}>구토플</option>
-        <option value="new" ${type==='new'?'selected':''}>뉴토플</option>
-      </select>
       <div class="toggle-btn ${isHidden?'':'on'}" onclick="toggleTrack(${Number(t.id)})"></div>
     `;
     row.addEventListener('dragstart', onDragStart);
@@ -950,6 +945,25 @@ function renderTrackToggles() {
   document.getElementById('oldCount').textContent = counts.old ? `${counts.old}개` : '';
   document.getElementById('newCount').textContent = counts.new ? `${counts.new}개` : '';
   document.getElementById('noneCount').textContent = counts.none ? `${counts.none}개` : '';
+
+  // 빈 컨테이너에도 드롭 가능하게
+  ['trackList-old','trackList-new','trackList-none'].forEach(id => {
+    const container = document.getElementById(id);
+    container.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    container.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!dragSrcId) return;
+      const srcEl = document.querySelector(`[data-id="${dragSrcId}"]`);
+      if (!srcEl || srcEl.parentNode === container) return;
+      srcEl.parentNode.removeChild(srcEl);
+      container.appendChild(srcEl);
+      const newType = id.replace('trackList-', '');
+      srcEl.dataset.type = newType;
+      changeToeflType(parseInt(dragSrcId), newType);
+      saveOrderFromDOM(container);
+    });
+  });
 }
 
 function onDragStart(e) {
@@ -965,19 +979,38 @@ function onDragOver(e) {
 }
 function onDrop(e) {
   e.stopPropagation();
-  if (dragSrcId !== this.dataset.id) {
-    const parent = this.parentNode;
-    const rows = [...parent.querySelectorAll('.track-row')];
-    const srcIdx = rows.findIndex(r => r.dataset.id == dragSrcId);
-    const tgtIdx = rows.findIndex(r => r.dataset.id == this.dataset.id);
+  e.preventDefault();
+  const srcId = dragSrcId;
+  const tgtRow = this;
+  if (!srcId || srcId === tgtRow.dataset.id) return false;
+
+  const srcContainer = document.querySelector(`[data-id="${srcId}"]`)?.parentNode;
+  const tgtContainer = tgtRow.parentNode;
+
+  if (!srcContainer) return false;
+  const srcEl = srcContainer.querySelector(`[data-id="${srcId}"]`);
+  if (!srcEl) return false;
+
+  // 다른 칸으로 이동
+  if (srcContainer !== tgtContainer) {
+    srcContainer.removeChild(srcEl);
+    tgtContainer.insertBefore(srcEl, tgtRow);
+    // 새 칸의 toefl_type 파악
+    const newType = tgtContainer.id.replace('trackList-', '');
+    srcEl.dataset.type = newType;
+    changeToeflType(parseInt(srcId), newType);
+  } else {
+    // 같은 칸 안에서 순서 변경
+    const rows = [...tgtContainer.querySelectorAll('.track-row')];
+    const srcIdx = rows.findIndex(r => r.dataset.id == srcId);
+    const tgtIdx = rows.findIndex(r => r.dataset.id == tgtRow.dataset.id);
     if (srcIdx !== -1 && tgtIdx !== -1) {
-      const srcEl = rows[srcIdx];
-      parent.removeChild(srcEl);
-      if (srcIdx < tgtIdx) parent.insertBefore(srcEl, this.nextSibling);
-      else parent.insertBefore(srcEl, this);
-      saveOrderFromDOM(parent);
+      tgtContainer.removeChild(srcEl);
+      if (srcIdx < tgtIdx) tgtContainer.insertBefore(srcEl, tgtRow.nextSibling);
+      else tgtContainer.insertBefore(srcEl, tgtRow);
     }
   }
+  saveOrderFromDOM(tgtContainer);
   return false;
 }
 function onDragEnd() {
