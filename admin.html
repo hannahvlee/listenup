@@ -318,14 +318,7 @@
 
   <!-- 트랙 관리 탭 -->
   <div id="tab-tracks" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <p style="font-size:13px;color:var(--text-muted);">드래그로 순서를 바꾸고, 토글로 표시/숨김을 설정하세요.</p>
-      <div style="display:flex;gap:8px;">
-        <button onclick="toggleAllTracks(true)" style="font-size:12px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;">전체 표시</button>
-        <button onclick="toggleAllTracks(false)" style="font-size:12px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;">전체 숨김</button>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">구토플 <span id="oldCount" style="color:var(--text-muted);"></span></div>
         <div id="trackList-old" class="track-droppable"></div>
@@ -333,10 +326,6 @@
       <div>
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">뉴토플 <span id="newCount" style="color:var(--text-muted);"></span></div>
         <div id="trackList-new" class="track-droppable"></div>
-      </div>
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">미분류 <span id="noneCount" style="color:var(--text-muted);"></span></div>
-        <div id="trackList-none" class="track-droppable"></div>
       </div>
     </div>
     <div class="save-notice" id="saveNotice">✓ 저장됐어요</div>
@@ -908,8 +897,8 @@ async function loadHiddenTracks() {
 }
 
 function renderTrackToggles() {
-  const lists = { old: document.getElementById('trackList-old'), new: document.getElementById('trackList-new'), none: document.getElementById('trackList-none') };
-  Object.values(lists).forEach(l => l.innerHTML = '');
+  const lists = { old: document.getElementById('trackList-old'), new: document.getElementById('trackList-new') };
+  Object.values(lists).forEach(l => { if(l) l.innerHTML = ''; });
 
   const sorted = [...TRACKS].sort((a, b) => {
     const ao = trackSettings[a.id]?.sort_order ?? 9999;
@@ -944,10 +933,9 @@ function renderTrackToggles() {
 
   document.getElementById('oldCount').textContent = counts.old ? `${counts.old}개` : '';
   document.getElementById('newCount').textContent = counts.new ? `${counts.new}개` : '';
-  document.getElementById('noneCount').textContent = counts.none ? `${counts.none}개` : '';
 
   // 빈 컨테이너에도 드롭 가능하게
-  ['trackList-old','trackList-new','trackList-none'].forEach(id => {
+  ['trackList-old','trackList-new'].forEach(id => {
     const container = document.getElementById(id);
     container.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
     container.addEventListener('drop', e => {
