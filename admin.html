@@ -60,8 +60,16 @@
   .score-ok { color: var(--warn); font-family: 'DM Mono', monospace; }
   .score-poor { color: var(--danger); font-family: 'DM Mono', monospace; }
   .track-list { display: flex; flex-direction: column; gap: 10px; }
-  .track-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: opacity 0.2s; }
+  .track-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; transition: opacity 0.2s; margin-bottom: 6px; }
   .track-row.hidden-track { opacity: 0.4; }
+  .track-row.dragging { opacity: 0.3; border: 1px dashed var(--accent); }
+  .track-row.drag-over { border-color: var(--accent2); background: rgba(96,200,240,0.05); }
+  .drag-handle { cursor: grab; color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
+  .track-droppable { min-height: 60px; }
+  .toefl-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; cursor: pointer; flex-shrink: 0; }
+  .badge-old { background: rgba(96,200,240,0.15); color: var(--accent2); border: 1px solid rgba(96,200,240,0.3); }
+  .badge-new { background: rgba(200,240,96,0.15); color: var(--accent); border: 1px solid rgba(200,240,96,0.3); }
+  .badge-none { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
   .track-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); min-width: 24px; }
   .track-name { flex: 1; font-size: 14px; }
   .track-status { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-right: 8px; }
@@ -310,8 +318,27 @@
 
   <!-- 트랙 관리 탭 -->
   <div id="tab-tracks" style="display:none;">
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">홈 화면에서 보여줄 트랙을 선택하세요.</p>
-    <div class="track-list" id="trackToggleList"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <p style="font-size:13px;color:var(--text-muted);">드래그로 순서를 바꾸고, 토글로 표시/숨김을 설정하세요.</p>
+      <div style="display:flex;gap:8px;">
+        <button onclick="toggleAllTracks(true)" style="font-size:12px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;">전체 표시</button>
+        <button onclick="toggleAllTracks(false)" style="font-size:12px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;">전체 숨김</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">구토플 <span id="oldCount" style="color:var(--text-muted);"></span></div>
+        <div id="trackList-old" class="track-droppable"></div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">뉴토플 <span id="newCount" style="color:var(--text-muted);"></span></div>
+        <div id="trackList-new" class="track-droppable"></div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">미분류 <span id="noneCount" style="color:var(--text-muted);"></span></div>
+        <div id="trackList-none" class="track-droppable"></div>
+      </div>
+    </div>
     <div class="save-notice" id="saveNotice">✓ 저장됐어요</div>
   </div>
 
@@ -381,6 +408,9 @@ function showTab(name) {
   if (name === 'feedback' && !feedbackLoaded) {
     feedbackLoaded = true;
     loadFeedback();
+  }
+  if (name === 'tracks') {
+    renderTrackToggles();
   }
 }
 
@@ -862,28 +892,127 @@ function renderFeedback() {
 
 // 트랙 관리
 let hiddenTrackIds = [];
+let trackSettings = {};
+let dragSrcId = null;
 
 async function loadHiddenTracks() {
   try {
     const r = await fetch('/api/admin-update-tracks');
     const data = await r.json();
     hiddenTrackIds = data.hiddenTracks || [];
+    trackSettings = data.trackSettings || {};
   } catch(e) {
     hiddenTrackIds = [];
+    trackSettings = {};
   }
 }
 
 function renderTrackToggles() {
-  const list = document.getElementById('trackToggleList');
-  if (typeof TRACKS === 'undefined') { list.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">tracks.js를 불러올 수 없어요.</div>'; return; }
-  list.innerHTML = '';
-  TRACKS.forEach((t, i) => {
-    const isVisible = !hiddenTrackIds.includes(Number(t.id));
-    const row = document.createElement('div');
-    row.className = 'track-row' + (isVisible ? '' : ' hidden-track');
-    row.innerHTML = `<span class="track-num">${String(i+1).padStart(2,'0')}</span><span class="track-name">${t.title}</span><span class="track-status">${isVisible ? '표시 중' : '숨김'}</span><div class="toggle-btn ${isVisible?'on':''}" onclick="toggleTrack(${Number(t.id)})"></div>`;
-    list.appendChild(row);
+  const lists = { old: document.getElementById('trackList-old'), new: document.getElementById('trackList-new'), none: document.getElementById('trackList-none') };
+  Object.values(lists).forEach(l => l.innerHTML = '');
+
+  const sorted = [...TRACKS].sort((a, b) => {
+    const ao = trackSettings[a.id]?.sort_order ?? 9999;
+    const bo = trackSettings[b.id]?.sort_order ?? 9999;
+    return ao !== bo ? ao - bo : a.id - b.id;
   });
+
+  const counts = { old: 0, new: 0, none: 0 };
+  sorted.forEach(t => {
+    const s = trackSettings[t.id] || {};
+    const type = s.toefl_type || 'none';
+    const isHidden = hiddenTrackIds.includes(Number(t.id));
+    counts[type] = (counts[type] || 0) + 1;
+
+    const row = document.createElement('div');
+    row.className = 'track-row' + (isHidden ? ' hidden-track' : '');
+    row.draggable = true;
+    row.dataset.id = t.id;
+    row.dataset.type = type;
+    row.innerHTML = `
+      <span class="drag-handle" title="드래그">⠿</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);min-width:20px;">${String(t.id).padStart(2,'0')}</span>
+      <span style="font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.title}</span>
+      <select onchange="changeToeflType(${t.id}, this.value)" style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 4px;cursor:pointer;" onclick="event.stopPropagation()">
+        <option value="none" ${type==='none'?'selected':''}>미분류</option>
+        <option value="old" ${type==='old'?'selected':''}>구토플</option>
+        <option value="new" ${type==='new'?'selected':''}>뉴토플</option>
+      </select>
+      <div class="toggle-btn ${isHidden?'':'on'}" onclick="toggleTrack(${Number(t.id)})"></div>
+    `;
+    row.addEventListener('dragstart', onDragStart);
+    row.addEventListener('dragover', onDragOver);
+    row.addEventListener('drop', onDrop);
+    row.addEventListener('dragend', onDragEnd);
+    lists[type]?.appendChild(row);
+  });
+
+  document.getElementById('oldCount').textContent = counts.old ? `${counts.old}개` : '';
+  document.getElementById('newCount').textContent = counts.new ? `${counts.new}개` : '';
+  document.getElementById('noneCount').textContent = counts.none ? `${counts.none}개` : '';
+}
+
+function onDragStart(e) {
+  dragSrcId = this.dataset.id;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.track-row').forEach(r => r.classList.remove('drag-over'));
+  this.classList.add('drag-over');
+}
+function onDrop(e) {
+  e.stopPropagation();
+  if (dragSrcId !== this.dataset.id) {
+    const parent = this.parentNode;
+    const rows = [...parent.querySelectorAll('.track-row')];
+    const srcIdx = rows.findIndex(r => r.dataset.id == dragSrcId);
+    const tgtIdx = rows.findIndex(r => r.dataset.id == this.dataset.id);
+    if (srcIdx !== -1 && tgtIdx !== -1) {
+      const srcEl = rows[srcIdx];
+      parent.removeChild(srcEl);
+      if (srcIdx < tgtIdx) parent.insertBefore(srcEl, this.nextSibling);
+      else parent.insertBefore(srcEl, this);
+      saveOrderFromDOM(parent);
+    }
+  }
+  return false;
+}
+function onDragEnd() {
+  document.querySelectorAll('.track-row').forEach(r => { r.classList.remove('dragging'); r.classList.remove('drag-over'); });
+}
+
+async function saveOrderFromDOM(container) {
+  const rows = container.querySelectorAll('.track-row');
+  const orders = [...rows].map((r, i) => ({ trackId: parseInt(r.dataset.id), sortOrder: i + 1 }));
+  try {
+    await fetch('/api/admin-update-tracks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save_order', orders })
+    });
+    orders.forEach(({ trackId, sortOrder }) => {
+      if (!trackSettings[trackId]) trackSettings[trackId] = {};
+      trackSettings[trackId].sort_order = sortOrder;
+    });
+    showSaveNotice();
+  } catch(e) { alert('저장 실패: ' + e.message); }
+}
+
+async function changeToeflType(trackId, toeflType) {
+  try {
+    await fetch('/api/admin-update-tracks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update_setting', trackId, toeflType: toeflType === 'none' ? null : toeflType })
+    });
+    if (!trackSettings[trackId]) trackSettings[trackId] = {};
+    trackSettings[trackId].toefl_type = toeflType === 'none' ? null : toeflType;
+    renderTrackToggles();
+    showSaveNotice();
+  } catch(e) { alert('저장 실패: ' + e.message); }
 }
 
 async function toggleTrack(id) {
@@ -892,20 +1021,32 @@ async function toggleTrack(id) {
     await fetch('/api/admin-update-tracks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ trackId: id, hidden: !isHidden })
+      body: JSON.stringify({ action: 'toggle', trackId: id, hidden: !isHidden })
     });
-    if (isHidden) {
-      hiddenTrackIds = hiddenTrackIds.filter(t => t !== id);
-    } else {
-      hiddenTrackIds.push(id);
-    }
+    if (isHidden) hiddenTrackIds = hiddenTrackIds.filter(t => t !== id);
+    else hiddenTrackIds.push(id);
     renderTrackToggles();
-    const notice = document.getElementById('saveNotice');
-    notice.style.display = 'block';
-    setTimeout(() => { notice.style.display = 'none'; }, 2000);
-  } catch(e) {
-    alert('저장 실패: ' + e.message);
-  }
+    showSaveNotice();
+  } catch(e) { alert('저장 실패: ' + e.message); }
+}
+
+async function toggleAllTracks(show) {
+  try {
+    await Promise.all(TRACKS.map(t => fetch('/api/admin-update-tracks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle', trackId: Number(t.id), hidden: !show })
+    })));
+    hiddenTrackIds = show ? [] : TRACKS.map(t => Number(t.id));
+    renderTrackToggles();
+    showSaveNotice();
+  } catch(e) { alert('저장 실패: ' + e.message); }
+}
+
+function showSaveNotice() {
+  const notice = document.getElementById('saveNotice');
+  notice.style.display = 'block';
+  setTimeout(() => { notice.style.display = 'none'; }, 2000);
 }
 
 init().then(() => {
