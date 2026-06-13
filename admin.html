@@ -889,7 +889,9 @@ async function loadHiddenTracks() {
     const r = await fetch('/api/admin-update-tracks');
     const data = await r.json();
     hiddenTrackIds = data.hiddenTracks || [];
-    trackSettings = data.trackSettings || {};
+    const raw = data.trackSettings || {};
+    trackSettings = {};
+    Object.keys(raw).forEach(k => { trackSettings[parseInt(k)] = raw[k]; });
   } catch(e) {
     hiddenTrackIds = [];
     trackSettings = {};
