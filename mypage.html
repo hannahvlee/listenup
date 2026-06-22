@@ -410,7 +410,7 @@
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.writing ?? '-'}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">${total}</td>
-        <td><button onclick="editToefl(${r.id},'${type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button><button onclick="deleteToefl(${r.id},'${type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;margin-left:4px;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">삭제</button></td>
+        <td style="white-space:nowrap;"><button onclick="editToefl(${r.id},'${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 8px;cursor:pointer;margin-right:4px;">수정</button><button onclick="deleteToefl(${r.id},'${type}')" style="font-size:10px;background:transparent;border:1px solid rgba(240,96,96,0.3);border-radius:4px;color:var(--danger);padding:2px 8px;cursor:pointer;">삭제</button></td>
       `;
       body.appendChild(tr);
     });
