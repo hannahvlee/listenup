@@ -34,7 +34,7 @@
   .record-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-left: auto; }
 
   /* Table */
-  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
   th { padding: 12px 16px; text-align: left; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -139,7 +139,7 @@
       <div class="toefl-section-title">모의 토플</div>
       <div class="table-wrap" id="mockWrap">
         <div class="loading" id="mockLoading">불러오는 중...</div>
-        <table id="mockTable" style="display:none;width:100%;border-collapse:collapse;">
+        <table id="mockTable" style="display:none;width:100%;border-collapse:collapse;min-width:500px;">
           <thead><tr style="background:var(--surface2);border-bottom:1px solid var(--border);">
             <th style="padding:10px 12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">날짜</th>
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">R</th>
@@ -160,7 +160,7 @@
       <div class="toefl-section-title">실제 토플</div>
       <div class="table-wrap" id="actualWrap">
         <div class="loading" id="actualLoading">불러오는 중...</div>
-        <table id="actualTable" style="display:none;width:100%;border-collapse:collapse;">
+        <table id="actualTable" style="display:none;width:100%;border-collapse:collapse;min-width:500px;">
           <thead><tr style="background:var(--surface2);border-bottom:1px solid var(--border);">
             <th style="padding:10px 12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">날짜</th>
             <th style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:left;">R</th>
@@ -410,7 +410,7 @@
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.writing ?? '-'}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">${total}</td>
-        <td style="white-space:nowrap;"><button onclick="editToefl(${r.id},'${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 8px;cursor:pointer;margin-right:4px;">수정</button><button onclick="deleteToefl(${r.id},'${type}')" style="font-size:10px;background:transparent;border:1px solid rgba(240,96,96,0.3);border-radius:4px;color:var(--danger);padding:2px 8px;cursor:pointer;">삭제</button></td>
+        <td><button onclick="editToefl(${r.id},'${type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
       `;
       body.appendChild(tr);
     });
@@ -428,13 +428,6 @@
     document.getElementById('toeflTotal').value = '';
     document.getElementById('toeflAvgDisplay').textContent = '-';
     document.getElementById('toeflModalOverlay').classList.add('show');
-  }
-
-  async function deleteToefl(id, type) {
-    if (!confirm('이 점수를 삭제할까요?')) return;
-    const { error } = await _supabase.from('toefl_scores').delete().eq('id', id);
-    if (error) { alert('삭제 실패: ' + error.message); return; }
-    await loadToeflScores(toeflUserId);
   }
 
   function editToefl(id, type) {
