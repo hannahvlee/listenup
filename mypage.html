@@ -434,11 +434,7 @@
     if (!confirm('이 점수를 삭제할까요?')) return;
     const { error } = await _supabase.from('toefl_scores').delete().eq('id', id);
     if (error) { alert('삭제 실패: ' + error.message); return; }
-    const { data } = await _supabase.from('toefl_scores').select('*').eq('user_id', currentUser.id).order('test_date', { ascending: false });
-    toeflMockRecords = (data || []).filter(r => r.type === 'mock');
-    toeflActualRecords = (data || []).filter(r => r.type === 'actual');
-    renderToeflTable('mock', toeflMockRecords);
-    renderToeflTable('actual', toeflActualRecords);
+    await loadToeflScores(toeflUserId);
   }
 
   function editToefl(id, type) {
