@@ -691,8 +691,8 @@ function renderRecords() {
   const modeQ = document.getElementById('modeFilter').value;
   const trackQ = document.getElementById('trackFilter').value;
   const filtered = allRecords.filter(r => {
-    const profile = Object.values(profileMap).find(p => p.name === r.name) || {};
-    return (!nameQ || r.name.toLowerCase().includes(nameQ)) &&
+    const profile = allUsers.find(u => (r.email && u.email === r.email) || u.name === r.name) || {};
+    return (!nameQ || r.name.toLowerCase().includes(nameQ) || (profile.name||'').toLowerCase().includes(nameQ)) &&
       (!classQ || profile.class === classQ) &&
       (!modeQ || r.mode === modeQ) &&
       (!trackQ || r.track === trackQ);
