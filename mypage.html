@@ -35,7 +35,7 @@
 
   /* Table */
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table { width: 100%; border-collapse: collapse; }
   thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
   th { padding: 12px 16px; text-align: left; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
@@ -410,7 +410,7 @@
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.writing ?? '-'}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${avg}</td>
         <td style="padding:10px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);">${total}</td>
-        <td style="white-space:nowrap;"><button onclick="editToefl(${r.id},'${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 8px;cursor:pointer;margin-right:4px;">수정</button><button onclick="deleteToefl(${r.id},'${type}')" style="font-size:10px;background:transparent;border:1px solid rgba(240,96,96,0.3);border-radius:4px;color:var(--danger);padding:2px 8px;cursor:pointer;">삭제</button></td>
+        <td><button onclick="editToefl(${r.id},'${type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
       `;
       body.appendChild(tr);
     });
@@ -428,13 +428,6 @@
     document.getElementById('toeflTotal').value = '';
     document.getElementById('toeflAvgDisplay').textContent = '-';
     document.getElementById('toeflModalOverlay').classList.add('show');
-  }
-
-  async function deleteToefl(id, type) {
-    if (!confirm('이 점수를 삭제할까요?')) return;
-    const { error } = await _supabase.from('toefl_scores').delete().eq('id', id);
-    if (error) { alert('삭제 실패: ' + error.message); return; }
-    await loadToeflScores(toeflUserId);
   }
 
   function editToefl(id, type) {
