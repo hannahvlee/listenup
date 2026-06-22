@@ -57,6 +57,22 @@ export default async function handler(req, res) {
       }
     }
 
+    // 토플 점수 삭제
+    if (type === 'delete_toefl') {
+      const { toefl_id } = req.body;
+      if (!toefl_id) return res.status(400).json({ error: 'Missing toefl_id' });
+      try {
+        const r = await fetch(`${supabaseUrl}/rest/v1/toefl_scores?id=eq.${toefl_id}`, {
+          method: 'DELETE',
+          headers
+        });
+        if (!r.ok) throw new Error('삭제 실패');
+        return res.status(200).json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     // 토플 점수 수정
     if (type === 'update_toefl') {
       const { toefl_id, test_date, reading, listening, speaking, writing, total } = req.body;
