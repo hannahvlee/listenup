@@ -433,10 +433,31 @@
         <td>${r.reading ?? '-'}</td><td>${r.listening ?? '-'}</td><td>${r.speaking ?? '-'}</td><td>${r.writing ?? '-'}</td>
         <td style="color:var(--text-muted)">${avg}</td>
         <td style="color:var(--accent);font-weight:600">${r.total != null ? r.total : '-'}</td>
-        <td><button onclick="editToeflRow(${r.id}, '${r.test_date}', ${r.reading??'null'}, ${r.listening??'null'}, ${r.speaking??'null'}, ${r.writing??'null'}, ${r.total??'null'}, '${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 8px;cursor:pointer;">수정</button></td>
+        <td><button onclick="editToeflRow(${r.id}, '${r.test_date}', ${r.reading??'null'}, ${r.listening??'null'}, ${r.speaking??'null'}, ${r.writing??'null'}, ${r.total??'null'}, '${type}')" style="font-size:10px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);padding:2px 8px;cursor:pointer;margin-right:4px;">수정</button><button onclick="deleteToeflRow(${r.id}, '${type}')" style="font-size:10px;background:transparent;border:1px solid rgba(240,96,96,0.3);border-radius:4px;color:var(--danger);padding:2px 8px;cursor:pointer;">삭제</button></td>
       `;
       body.appendChild(tr);
     });
+  }
+
+  async function deleteToeflRow(id, type) {
+    if (!confirm('이 점수를 삭제할까요?')) return;
+    try {
+      const res = await fetch('/api/admin-user-detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUserId, type: 'delete_toefl', toefl_id: id })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || '삭제 실패');
+      document.getElementById(type + 'Body').innerHTML = '';
+      document.getElementById(type + 'Table').style.display = 'none';
+      document.getElementById(type + 'Loading').style.display = 'block';
+      const fullRes = await fetch(`/api/admin-user-detail?id=${currentUserId}`);
+      const fullData = await fullRes.json();
+      renderToefl(type, (fullData.toefl || []).filter(rec => rec.type === type));
+    } catch(e) {
+      alert('삭제 실패: ' + e.message);
+    }
   }
 
   function editToeflRow(id, date, r, l, s, w, total, type) {
