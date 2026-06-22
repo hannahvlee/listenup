@@ -244,10 +244,17 @@
         <td class="td-score">${r.writing ?? '-'}</td>
         <td class="td-score" style="color:var(--text-muted)">${avg}</td>
         <td class="td-total">${total}</td>
-        <td><button onclick="editScore(${r.id}, '${r.type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;padding:2px 6px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button></td>
+        <td><button onclick="editScore(${r.id}, '${r.type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;padding:2px 6px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-muted)'">수정</button><button onclick="deleteScore(${r.id}, '${r.type}')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;padding:2px 6px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">삭제</button></td>
       `;
       body.appendChild(tr);
     });
+  }
+
+  async function deleteScore(id, type) {
+    if (!confirm('이 점수를 삭제할까요?')) return;
+    const { error } = await _supabase.from('toefl_scores').delete().eq('id', id);
+    if (error) { alert('삭제 실패: ' + error.message); return; }
+    await loadScores();
   }
 
   let editingId = null;
