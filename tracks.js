@@ -1146,7 +1146,7 @@ const TRACKS = [
   }
 ,
   {
-    id: 20,
+    id: 22,
     title: "Test 5 Module 1 - Magna Carta",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 5 Module 1 - Magna Carta.mp3",
     sentences: [
@@ -1187,6 +1187,57 @@ const TRACKS = [
       { type: "phrase", en: "according to the law", ko: "법에 따라" },
       { type: "phrase", en: "the rule of law", ko: "법치주의" },
       { type: "phrase", en: "be intended to", ko: "~하기 위해 의도되다" },
+    ]
+  }
+,
+  {
+    id: 21,
+    title: "Test 4 Module 2-2 (02) - Tatoo",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 4 Module 2-2 (02) - Tatoo.mp3",
+    sentences: [
+      { start: 7.00, end: 14.13, text: "Today we're examining the intriguing practice of tattooing in different cultures around the world." },
+      { start: 14.13, end: 19.34, text: "Tattoos have been a form of self-expression and identity for thousands of years," },
+      { start: 19.34, end: 24.37, text: "varying significantly in meaning and style across different societies." },
+      { start: 24.37, end: 31.13, text: "In Polynesian cultures, tattoos, known as tatau, are deeply rooted in tradition" },
+      { start: 31.13, end: 35.72, text: "and signify social status, family heritage, and personal achievements." },
+      { start: 35.72, end: 40.26, text: "These intricate designs often cover large parts of the body" },
+      { start: 40.26, end: 44.70, text: "and are applied using traditional methods that have been handed down through generations." },
+      { start: 44.70, end: 52.38, text: "Meanwhile, in Japan, Irezumi tattoos are recognized for their bold and vivid designs" },
+      { start: 52.38, end: 58.35, text: "and, while they were once banned by the Japanese government, they are now increasingly popular," },
+      { start: 58.35, end: 60.28, text: "especially among young people." },
+      { start: 60.28, end: 66.67, text: "Japanese tattoos often depict mythological creatures, flowers, and scenes from folklore" },
+      { start: 66.67, end: 69.57, text: "executed with remarkable precision and detail." },
+      { start: 69.57, end: 77.92, text: "In contrast, Native American tribes used tattoos for spiritual purposes and as rites of passage." },
+      { start: 77.92, end: 81.92, text: "Their designs, mostly geometric and symbolic," },
+      { start: 81.92, end: 86.30, text: "were believed to provide protection and convey tribal affiliations." },
+      { start: 86.30, end: 94.14, text: "In contemporary Western society, tattoos have evolved into diverse forms of personal expression," },
+      { start: 94.14, end: 98.50, text: "ranging from minimalist designs to elaborate sleeves." },
+      { start: 98.50, end: 107.12, text: "They often represent individuality, memories, or ideologies, reflecting the wearer's unique personality." },
+      { start: 107.12, end: 113.18, text: "Anthropologists are fascinated by how these varying practices of tattooing illustrate" },
+      { start: 113.18, end: 118.73, text: "the broader themes of cultural identity, societal norms, and individual expression." },
+      { start: 118.73, end: 122.44, text: "The ongoing study of tattooing practices" },
+      { start: 122.44, end: 128.70, text: "offers deep insights into human history and the ways in which we convey meaning through our bodies." },
+    ],
+    vocab: [
+      { type: "word", en: "intriguing", ko: "흥미로운, 매력적인" },
+      { type: "word", en: "signify", ko: "나타내다, 의미하다" },
+      { type: "word", en: "heritage", ko: "유산" },
+      { type: "word", en: "intricate", ko: "복잡한, 정교한" },
+      { type: "word", en: "vivid", ko: "생생한, 선명한" },
+      { type: "word", en: "depict", ko: "묘사하다" },
+      { type: "word", en: "mythological", ko: "신화적인" },
+      { type: "word", en: "precision", ko: "정밀함, 정확성" },
+      { type: "word", en: "geometric", ko: "기하학적인" },
+      { type: "word", en: "affiliation", ko: "소속, 연계" },
+      { type: "word", en: "individuality", ko: "개성" },
+      { type: "word", en: "ideology", ko: "이념, 사상" },
+      { type: "word", en: "elaborate", ko: "정교한, 복잡한" },
+      { type: "phrase", en: "rooted in tradition", ko: "전통에 뿌리를 둔" },
+      { type: "phrase", en: "handed down through generations", ko: "세대를 거쳐 전해진" },
+      { type: "phrase", en: "rite of passage", ko: "통과 의례" },
+      { type: "phrase", en: "in contrast", ko: "대조적으로" },
+      { type: "phrase", en: "evolve into", ko: "~로 발전하다" },
+      { type: "phrase", en: "ranging from A to B", ko: "A에서 B까지 다양한" },
     ]
   }
 ];
