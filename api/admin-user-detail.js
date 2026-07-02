@@ -39,6 +39,7 @@ export default async function handler(req, res) {
     if (type === 'update_profile') {
       try {
         const updateData = {};
+        if (req.body.name !== undefined) updateData.name = req.body.name;
         if (req.body.class !== undefined) updateData.class = req.body.class;
         if (req.body.target_score !== undefined) updateData.target_score = req.body.target_score;
         if (req.body.target_date !== undefined) updateData.target_date = req.body.target_date;
