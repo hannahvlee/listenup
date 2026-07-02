@@ -1240,4 +1240,47 @@ const TRACKS = [
       { type: "phrase", en: "ranging from A to B", ko: "A에서 B까지 다양한" },
     ]
   }
+,
+  {
+    id: 23,
+    title: "Test 5 Module 2-2 (01) - Silk Road",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 5 Module 2-2 (01) - Silk Road.mp3",
+    sentences: [
+      { start: 7.00, end: 12.63, text: "The Silk Road is an ancient trade route that connected the East and West." },
+      { start: 12.63, end: 20.05, text: "The Silk Road was not a single path but a network of trade routes that spanned thousands of miles" },
+      { start: 20.05, end: 25.89, text: "going through the modern day countries of China and India and further into Europe." },
+      { start: 25.89, end: 30.50, text: "It played a crucial role in the development of the civilizations it connected." },
+      { start: 30.50, end: 36.18, text: "It facilitated not only trade but also cultural exchange and the spread of ideas." },
+      { start: 36.18, end: 40.97, text: "Merchants on the Silk Road traded a wide variety of goods" },
+      { start: 40.97, end: 45.61, text: "from silk and spices to precious metals and artwork." },
+      { start: 45.61, end: 50.42, text: "The route was named after the lucrative trade in silk fabric" },
+      { start: 50.42, end: 54.10, text: "which was one of the most sought after commodities from China." },
+      { start: 54.10, end: 58.70, text: "However it's important to note that the exchange was not limited to physical goods" },
+      { start: 58.70, end: 62.43, text: "It also included knowledge technology and religion." },
+      { start: 62.43, end: 68.51, text: "For example Buddhism spread from India to China partly through interactions along the Silk Road." },
+      { start: 68.51, end: 76.51, text: "The cities along the route such as Samakand and Baghdad became prosperous centers of commerce and learning." },
+      { start: 76.51, end: 80.90, text: "They were melting pots of different cultures, languages and traditions." },
+      { start: 80.90, end: 88.00, text: "Next, we'll explore the impact of the Silk Road on the economic development of Europe." },
+    ],
+    vocab: [
+      { type: "word", en: "ancient", ko: "고대의" },
+      { type: "word", en: "span", ko: "뻗다, 걸치다" },
+      { type: "word", en: "civilization", ko: "문명" },
+      { type: "word", en: "facilitate", ko: "촉진하다, 용이하게 하다" },
+      { type: "word", en: "merchant", ko: "상인" },
+      { type: "word", en: "spice", ko: "향신료" },
+      { type: "word", en: "precious", ko: "귀중한, 값비싼" },
+      { type: "word", en: "lucrative", ko: "수익성 높은, 돈이 되는" },
+      { type: "word", en: "commodity", ko: "상품, 물자" },
+      { type: "word", en: "prosperous", ko: "번영한, 번창한" },
+      { type: "word", en: "commerce", ko: "상업, 무역" },
+      { type: "phrase", en: "play a crucial role in", ko: "~에 중요한 역할을 하다" },
+      { type: "phrase", en: "not only A but also B", ko: "A뿐만 아니라 B도" },
+      { type: "phrase", en: "a wide variety of", ko: "매우 다양한" },
+      { type: "phrase", en: "be named after", ko: "~의 이름을 따서 명명되다" },
+      { type: "phrase", en: "sought after", ko: "인기 있는, 수요가 많은" },
+      { type: "phrase", en: "be limited to", ko: "~에 국한되다" },
+      { type: "phrase", en: "melting pot", ko: "문화의 용광로" },
+    ]
+  }
 ];
