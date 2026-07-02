@@ -54,7 +54,10 @@
 
   <div class="label">Admin / 유저 상세</div>
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
-    <h1 id="userName" style="font-size:28px;font-weight:600;">...</h1>
+    <div>
+      <h1 id="userName" style="font-size:28px;font-weight:600;">...</h1>
+      <input id="editName" type="text" style="display:none;font-size:20px;font-weight:600;background:var(--surface2);border:1px solid var(--accent);border-radius:6px;color:var(--text);padding:5px 10px;width:200px;">
+    </div>
     <div style="display:flex;gap:8px;margin-top:6px;">
       <button id="editBtn" onclick="toggleEdit(true)" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">수정</button>
       <button id="saveBtn" onclick="saveTargetInfo()" style="display:none;background:var(--accent);color:#0e0e0e;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">저장</button>
@@ -234,6 +237,8 @@
   let currentUserId = null;
 
   function toggleEdit(on) {
+    document.getElementById('userName').style.display = on ? 'none' : 'block';
+    document.getElementById('editName').style.display = on ? 'block' : 'none';
     ['userClass','userTarget','userTargetDate'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = on ? 'none' : 'block';
@@ -248,9 +253,11 @@
   }
 
   async function saveTargetInfo() {
+    const name = document.getElementById('editName').value.trim();
     const cls = document.getElementById('editClass').value;
     const target = document.getElementById('editTarget').value;
     const date = document.getElementById('editTargetDate').value;
+    if (!name) { alert('이름을 입력해주세요'); return; }
     try {
       const r = await fetch('/api/admin-user-detail', {
         method: 'POST',
@@ -258,6 +265,7 @@
         body: JSON.stringify({
           user_id: currentUserId,
           type: 'update_profile',
+          name,
           class: cls || null,
           target_score: target !== '' ? parseFloat(target) : null,
           target_date: date || null
@@ -265,6 +273,7 @@
       });
       const data = await r.json();
       if (!data.success) throw new Error(data.error || '저장 실패');
+      document.getElementById('userName').textContent = name;
       document.getElementById('userClass').textContent = cls || '-';
       document.getElementById('userTarget').textContent = target ? target + '점' : '-';
       document.getElementById('userTargetDate').textContent = date || '-';
@@ -400,6 +409,7 @@
       document.getElementById('createProfileForm').style.display = 'block';
     } else {
       document.getElementById('userName').textContent = p?.name || '이름 없음';
+      document.getElementById('editName').value = p?.name || '';
       document.getElementById('userClass').textContent = p?.class || '-';
       document.getElementById('userTarget').textContent = p?.target_score != null ? p.target_score + '점' : '-';
       document.getElementById('userTargetDate').textContent = p?.target_date || '-';
