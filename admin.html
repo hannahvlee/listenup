@@ -676,7 +676,7 @@ function renderUsers() {
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${best ? bestType : '-'}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${best?.test_date ? formatDate(best.test_date) : '-'}</td>
       <td onclick="event.stopPropagation()">
-        ${window._adminRole === 'admin' ? `
+        ${window._adminRole === 'super' ? `
         <select style="font-size:11px;background:transparent;border:1px solid var(--border);border-radius:4px;color:${statusColor[currentStatus]};padding:2px 4px;cursor:pointer;" onchange="updateUserStatus('${u.user_id}', this.value)">
           <option value="active" ${currentStatus==='active'?'selected':''}>재원</option>
           <option value="graduated" ${currentStatus==='graduated'?'selected':''}>졸업</option>
