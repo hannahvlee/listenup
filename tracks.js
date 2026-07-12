@@ -1528,4 +1528,40 @@ const TRACKS = [
       { type: "phrase", en: "over time", ko: "시간이 지남에 따라" },
     ]
   }
+,
+  {
+    id: 29,
+    title: "Test 2 Module 1 - Dark matter",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 2 Module 1 - Dark matter.mp3",
+    sentences: [
+      { start: 4.50, end: 9.68, text: "Dark matter is a type of matter that doesn't emit, absorb, or reflect light, making it invisible to current instruments." },
+      { start: 9.68, end: 20.57, text: "Despite being unobservable directly, it's believed to make up about 27 percent of the universe's mass-energy content." },
+      { start: 20.57, end: 23.60, text: "How do scientists know dark matter exists?" },
+      { start: 23.60, end: 28.55, text: "Well all the stars in a galaxy rotate around the center of their galaxy." },
+      { start: 28.55, end: 36.11, text: "According to basic physics, the farther a star is from the center of a galaxy, the slower it should rotate." },
+      { start: 36.11, end: 44.71, text: "However, observations show that stars in the outer regions of galaxies rotate at unexpectedly high speeds." },
+      { start: 44.71, end: 53.84, text: "This anomaly suggests that a massive, unseen matter is exerting gravitational force, keeping the stars moving faster than expected." },
+      { start: 53.84, end: 58.06, text: "Dark matter is hugely important for the structure of the universe." },
+      { start: 58.06, end: 65.06, text: "Computer simulations show that galaxies wouldn't have formed the way they did if dark matter hadn't been around." },
+      { start: 65.06, end: 67.72, text: "But what does dark matter consist of?" },
+      { start: 67.72, end: 72.16, text: "Well, there are different theories, so let's consider a couple of them." },
+    ],
+    vocab: [
+      { type: "word", en: "emit", ko: "방출하다" },
+      { type: "word", en: "absorb", ko: "흡수하다" },
+      { type: "word", en: "unobservable", ko: "관측 불가능한" },
+      { type: "word", en: "mass-energy content", ko: "질량-에너지 함량" },
+      { type: "word", en: "galaxy", ko: "은하" },
+      { type: "word", en: "rotate", ko: "회전하다" },
+      { type: "word", en: "anomaly", ko: "이상 현상, 변칙" },
+      { type: "word", en: "gravitational force", ko: "중력" },
+      { type: "word", en: "simulation", ko: "시뮬레이션" },
+      { type: "word", en: "consist of", ko: "~로 구성되다" },
+      { type: "phrase", en: "make up", ko: "~을 구성하다, 차지하다" },
+      { type: "phrase", en: "according to", ko: "~에 따르면" },
+      { type: "phrase", en: "exert gravitational force", ko: "중력을 행사하다" },
+      { type: "phrase", en: "the farther A, the slower B", ko: "A가 멀수록 B가 느리다" },
+      { type: "phrase", en: "faster than expected", ko: "예상보다 빠르게" },
+    ]
+  }
 ];
