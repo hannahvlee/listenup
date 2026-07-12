@@ -1486,4 +1486,46 @@ const TRACKS = [
       { type: "phrase", en: "us-and-them mentality", ko: "내집단 외집단 사고방식" },
     ]
   }
+,
+  {
+    id: 28,
+    title: "Test 4 Module 2-2 (01) - Resilience",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 4 Module 2-2 (01) - Resilience.mp3",
+    sentences: [
+      { start: 4.50, end: 8.87, text: "Resilience refers to the ability to adapt and recover from adversity or stress." },
+      { start: 8.87, end: 14.65, text: "It's a dynamic process that varies significantly from person to person," },
+      { start: 14.65, end: 19.64, text: "influenced by a combination of genetic, psychological, and social factors." },
+      { start: 19.64, end: 24.56, text: "Research has shown that certain traits and behaviors can enhance resilience." },
+      { start: 24.56, end: 30.70, text: "These include optimism, the ability to regulate emotions, and having a strong support network." },
+      { start: 30.70, end: 36.30, text: "For instance, people who maintain a positive outlook are better equipped to handle setbacks" },
+      { start: 36.30, end: 39.96, text: "because they tend to see challenges as temporary and surmountable." },
+      { start: 39.96, end: 44.57, text: "Emotional regulation involves managing one's feelings in a healthy way," },
+      { start: 44.57, end: 47.43, text: "which can prevent stress from becoming overwhelming." },
+      { start: 47.43, end: 52.20, text: "Moreover, social connections play a crucial role in resilience." },
+      { start: 52.20, end: 58.33, text: "Support from family and friends can provide emotional comfort and practical assistance during difficult times." },
+      { start: 58.33, end: 63.93, text: "Communities with strong social bonds typically exhibit higher levels of collective resilience," },
+      { start: 63.93, end: 66.98, text: "which is the ability of a group to recover from crises." },
+      { start: 66.98, end: 75.04, text: "Next, we will discuss various strategies that individuals can use to build and strengthen their resilience over time." },
+    ],
+    vocab: [
+      { type: "word", en: "resilience", ko: "회복력, 탄력성" },
+      { type: "word", en: "adversity", ko: "역경, 어려움" },
+      { type: "word", en: "dynamic", ko: "역동적인" },
+      { type: "word", en: "genetic", ko: "유전적인" },
+      { type: "word", en: "trait", ko: "특성, 특질" },
+      { type: "word", en: "optimism", ko: "낙관주의" },
+      { type: "word", en: "regulate", ko: "조절하다" },
+      { type: "word", en: "outlook", ko: "관점, 시각" },
+      { type: "word", en: "setback", ko: "좌절, 차질" },
+      { type: "word", en: "surmountable", ko: "극복 가능한" },
+      { type: "word", en: "overwhelming", ko: "압도적인, 감당하기 힘든" },
+      { type: "word", en: "exhibit", ko: "보여주다, 나타내다" },
+      { type: "word", en: "collective", ko: "집단적인" },
+      { type: "phrase", en: "recover from", ko: "~에서 회복하다" },
+      { type: "phrase", en: "be equipped to", ko: "~할 준비가 되어 있다" },
+      { type: "phrase", en: "play a crucial role in", ko: "~에 중요한 역할을 하다" },
+      { type: "phrase", en: "prevent A from -ing", ko: "A가 ~하지 못하게 막다" },
+      { type: "phrase", en: "over time", ko: "시간이 지남에 따라" },
+    ]
+  }
 ];
