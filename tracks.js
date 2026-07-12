@@ -1330,7 +1330,7 @@ const TRACKS = [
   }
 ,
   {
-    id: 25,
+    id: 26,
     title: "Test 6 Module 2-1 (01) - Cubism",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 6 Module 2-1 (01) - Cubism.mp3",
     sentences: [
@@ -1382,7 +1382,7 @@ const TRACKS = [
   }
 ,
   {
-    id: 26,
+    id: 27,
     title: "Test 6 Module 2-1 (02) - Synesthesia",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 6 Module 2-1 (02) - Synesthesia.mp3",
     sentences: [
@@ -1431,7 +1431,7 @@ const TRACKS = [
   }
 ,
   {
-    id: 27,
+    id: 25,
     title: "Test 6 Module 1 - Social Capital",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 6 Module 1 - Social Capital.mp3",
     sentences: [
