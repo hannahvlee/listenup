@@ -1492,9 +1492,9 @@ const TRACKS = [
     title: "Test 4 Module 2-2 (01) - Resilience",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 4 Module 2-2 (01) - Resilience.mp3",
     sentences: [
-      { start: 4.50, end: 8.87, text: "Resilience refers to the ability to adapt and recover from adversity or stress." },
-      { start: 8.87, end: 14.65, text: "It's a dynamic process that varies significantly from person to person," },
-      { start: 14.65, end: 19.64, text: "influenced by a combination of genetic, psychological, and social factors." },
+      { start: 4.50, end: 9.88, text: "Resilience refers to the ability to adapt and recover from adversity or stress." },
+      { start: 9.88, end: 14.61, text: "It's a dynamic process that varies significantly from person to person," },
+      { start: 14.61, end: 19.64, text: "influenced by a combination of genetic, psychological, and social factors." },
       { start: 19.64, end: 24.56, text: "Research has shown that certain traits and behaviors can enhance resilience." },
       { start: 24.56, end: 30.70, text: "These include optimism, the ability to regulate emotions, and having a strong support network." },
       { start: 30.70, end: 36.30, text: "For instance, people who maintain a positive outlook are better equipped to handle setbacks" },
