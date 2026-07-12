@@ -47,9 +47,9 @@ const TRACKS = [
     ]
   },
   {
-    id: 11,
-    title: "[LC14] TPO 11 - Advertising",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-3_Advertising.mp3",
+    id: 105,
+    title: "[LC14] TPO 11 Set 2-3 - Advertising",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 11 Set 2-3 - Advertising.mp3",
     sentences: [
       { start: 7.00, end: 13.13, text: "Let's get started. Last time we were talking about the need for advertising." },
       { start: 13.13, end: 20.29, text: "Now, let's look at how you can successfully call attention to the service or product you want to sell." },
@@ -125,9 +125,9 @@ const TRACKS = [
     ]
   },
   {
-    id: 10,
-    title: "[LC14] TPO 11 - Landscape & Climate",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-2_Landscape & Climate.mp3",
+    id: 104,
+    title: "[LC14] TPO 11 Set 2-2 - Landscape & Climate",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 11 Set 2-2 - Landscape & Climate.mp3",
     sentences: [
       { start: 7.00, end: 12.27, text: "When land gets developed for human use, the landscape changes." },
       { start: 12.27, end: 16.83, text: "We don't see as many types of vegetation, trees, grasses, and so forth." },
@@ -332,9 +332,9 @@ const TRACKS = [
     ]
   },
   {
-    id: 7,
-    title: "[LC 14] TPO 11 - Work for the committee",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set2-1_Work of the biology committee.mp3",
+    id: 103,
+    title: "[LC14] TPO 11 Set 2-1 - Work of the biology committee",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 11 Set 2-1 - Work of the biology committee.mp3",
     sentences: [
       { start: 7.00, end: 9.72, text: "Hi, Professor Atkins. You wanted to see me?" },
       { start: 9.72, end: 13.52, text: "Hi, Bill. Thanks for coming. I wanted to talk to you about," },
@@ -459,9 +459,9 @@ const TRACKS = [
     ]
   },
   {
-    id: 5,
-    title: "[LC 14] TPO 11 - Cape Cod House",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-3_CapeCodHouse.mp3",
+    id: 102,
+    title: "[LC14] TPO 11 Set 1-3 - Cape Cod House",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 11 Set 1-3 - Cape Cod House.mp3",
     sentences: [
       { start: 7.00, end: 10.10, text: "Today, we're taking a little detour" },
       { start: 10.10, end: 14.05, text: "from the grand styles of public architecture we've been studying" },
@@ -556,9 +556,9 @@ const TRACKS = [
     ]
   },
   {
-    id: 4,
-    title: "[LC 14] TPO 11 - Distraction Display",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO11_Set1-2_DistractionDisplay.mp3",
+    id: 101,
+    title: "[LC14] TPO 11 Set 1-2 - Distraction Display",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 11 Set 1-2 - Distraction Display.mp3",
     sentences: [
       { start: 11.50, end: 17.80, text: "Okay. Today, we're going to continue our discussion of the parenting behaviors of birds" },
       { start: 17.80, end: 23.40, text: "and we're going to start by talking about what are known as \"distraction displays.\"" },
@@ -848,9 +848,9 @@ const TRACKS = [
   }
 ,
   {
-    id: 14,
-    title: "[LC14] TPO 12 - Revise a Hemingway paper",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO12_Set1-1_Revise a Hemingway paper.mp3",
+    id: 106,
+    title: "[LC14] TPO 12 Set 1-1 - Revise a Hemingway paper",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 12 Set 1-1 - Revise a Hemingway paper.mp3",
     sentences: [
       { start: 5.70, end: 11.12, text: "So, Professor Tibbits. Your note said that you wanted to see me about my Hemmingway paper?" },
       { start: 11.12, end: 16.39, text: "I have to say that grade wasn't what I was expecting. I thought I'd done a pretty good job." },
@@ -908,9 +908,9 @@ const TRACKS = [
   }
 ,
   {
-    id: 15,
-    title: "[LC14] TPO 12 - Cell Division",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14_TPO12_Set1-2_Cell Division.mp3",
+    id: 107,
+    title: "[LC14] TPO 12 Set 1-2 - Cell Division",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/LC14 TPO 12 Set 1-2 - Cell Division.mp3",
     sentences: [
       { start: 4.30, end: 8.34, text: "As we learn more about the DNA in human cells," },
       { start: 8.34, end: 12.14, text: "and how it controls the growth and development of cells," },
