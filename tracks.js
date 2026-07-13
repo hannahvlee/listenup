@@ -968,8 +968,8 @@ const TRACKS = [
   }
 ,
   {
-    id: 16,
-    title: "(Test 7 Module 1 7) Cognitive Biases",
+    id: 28,
+    title: "Test 7 Module 1 (01) - Cognitive Biases",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Cognitive Biases.mp3",
     sentences: [
       { start: 4.00, end: 10.91, text: "Today, we'll discuss the psychology of decision-making, focusing on the concept of cognitive biases." },
@@ -1017,8 +1017,8 @@ const TRACKS = [
   }
 ,
   {
-    id: 17,
-    title: "(Test 7 Module 1 8) Social Capital",
+    id: 29,
+    title: "Test 7 Module 1 (02) - Social Capital",
     file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Social Capiatal.mp3",
     sentences: [
       { start: 5.50, end: 11.30, text: "Social capital is the network of relationships among people who live and work in a particular society." },
