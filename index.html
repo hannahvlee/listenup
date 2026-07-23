@@ -6,6 +6,7 @@
 <title>ListenUp</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="tracks.js"></script>
+<script src="speakingTracks.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const _supabase = supabase.createClient(
@@ -152,6 +153,43 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Top-level 리스닝/스피킹 tabs */
+  .top-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .top-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 6px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 20px;
+  }
+  .top-tab .t-icon { font-size: 16px; opacity: 0.6; }
+  .top-tab.active { color: var(--text); }
+  .top-tab.active.listening { border-color: var(--accent2); }
+  .top-tab.active.listening .t-icon { opacity: 1; }
+  .top-tab.active.speaking { border-color: var(--accent); }
+  .top-tab.active.speaking .t-icon { opacity: 1; }
+  .top-tab:hover { color: var(--text); }
+
+  .top-panel { display: none; }
+  .top-panel.active { display: block; }
+
+  .speaking-card:hover { border-color: var(--accent); background: rgba(200,240,96,0.04); }
+  .speaking-card:hover .track-arrow { color: var(--accent); }
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDELTEL4XC"></script>
@@ -174,44 +212,62 @@
     <p class="subtitle" style="margin-bottom:32px">학습 모드를 선택하세요</p>
   </header>
 
-  <!-- Mode selector -->
-  <div style="display:grid;grid-template-columns:repeat(4,minmax(200px,1fr));gap:12px;margin-bottom:40px">
-    <a href="#listening" onclick="setMode('listening')" id="mode-listening"
-      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
-      <span style="font-size:24px">🎧</span>
-      <div>
-        <div style="font-weight:500;margin-bottom:4px">청취 테스트</div>
-        <div style="font-size:12px;color:var(--text-muted)">듣고 한국어로 번역</div>
-      </div>
-    </a>
-    <a href="#shadowing" onclick="setMode('shadowing')" id="mode-shadowing"
-      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
-      <span style="font-size:24px">🎙</span>
-      <div>
-        <div style="font-weight:500;margin-bottom:4px">쉐도잉</div>
-        <div style="font-size:12px;color:var(--text-muted)">듣고 따라 말하기</div>
-      </div>
-    </a>
-    <a href="#dictation" onclick="setMode('dictation')" id="mode-dictation"
-      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
-      <span style="font-size:24px">✏️</span>
-      <div>
-        <div style="font-weight:500;margin-bottom:4px">딕테이션</div>
-        <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">듣고 영어로 받아쓰기</div>
-      </div>
-    </a>
-    <a href="#vocab" onclick="setMode('vocab')" id="mode-vocab"
-      style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
-      <span style="font-size:24px">📝</span>
-      <div>
-        <div style="font-weight:500;margin-bottom:4px">어휘 테스트</div>
-        <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">핵심 단어/구문 테스트</div>
-      </div>
-    </a>
+  <!-- 리스닝/스피킹 대분류 탭 -->
+  <div class="top-tabs">
+    <button class="top-tab listening active" id="toptab-listening" onclick="switchTop('listening')">
+      <span class="t-icon">🎧</span> 리스닝
+    </button>
+    <button class="top-tab speaking" id="toptab-speaking" onclick="switchTop('speaking')">
+      <span class="t-icon">🗣️</span> 스피킹
+    </button>
   </div>
 
-  <!-- Track list -->
-  <div class="track-list" id="trackList" style="max-width:100%"></div>
+  <!-- ===================== 리스닝 패널 ===================== -->
+  <div class="top-panel active" id="panel-listening">
+    <!-- Mode selector -->
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(200px,1fr));gap:12px;margin-bottom:40px">
+      <a href="#listening" onclick="setMode('listening')" id="mode-listening"
+        style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+        <span style="font-size:24px">🎧</span>
+        <div>
+          <div style="font-weight:500;margin-bottom:4px">청취 테스트</div>
+          <div style="font-size:12px;color:var(--text-muted)">듣고 한국어로 번역</div>
+        </div>
+      </a>
+      <a href="#shadowing" onclick="setMode('shadowing')" id="mode-shadowing"
+        style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+        <span style="font-size:24px">🎙</span>
+        <div>
+          <div style="font-weight:500;margin-bottom:4px">쉐도잉</div>
+          <div style="font-size:12px;color:var(--text-muted)">듣고 따라 말하기</div>
+        </div>
+      </a>
+      <a href="#dictation" onclick="setMode('dictation')" id="mode-dictation"
+        style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+        <span style="font-size:24px">✏️</span>
+        <div>
+          <div style="font-weight:500;margin-bottom:4px">딕테이션</div>
+          <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">듣고 영어로 받아쓰기</div>
+        </div>
+      </a>
+      <a href="#vocab" onclick="setMode('vocab')" id="mode-vocab"
+        style="flex:1;display:flex;align-items:center;gap:14px;padding:20px 24px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+        <span style="font-size:24px">📝</span>
+        <div>
+          <div style="font-weight:500;margin-bottom:4px">어휘 테스트</div>
+          <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">핵심 단어/구문 테스트</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Track list -->
+    <div class="track-list" id="trackList" style="max-width:100%"></div>
+  </div>
+
+  <!-- ===================== 스피킹 패널 ===================== -->
+  <div class="top-panel" id="panel-speaking">
+    <div class="track-list" id="speakingList" style="max-width:100%"></div>
+  </div>
 </div>
 
 <script>
@@ -228,14 +284,17 @@
   }
 
   let hiddenTrackIds = [];
+  let trackSettings = {};
 
   async function loadAndRender() {
     try {
       const r = await fetch('/api/admin-update-tracks');
       const data = await r.json();
       hiddenTrackIds = data.hiddenTracks || [];
+      trackSettings = data.trackSettings || {};
     } catch(e) {
       hiddenTrackIds = [];
+      trackSettings = {};
     }
     renderTracks();
   }
@@ -243,7 +302,13 @@
   function renderTracks() {
     const trackList = document.getElementById('trackList');
     trackList.innerHTML = '';
-    const visibleTracks = TRACKS.filter(t => !hiddenTrackIds.includes(Number(t.id))).sort((a,b) => b.id - a.id);
+    const visibleTracks = TRACKS
+      .filter(t => !hiddenTrackIds.includes(Number(t.id)))
+      .sort((a, b) => {
+        const ao = trackSettings[a.id]?.sort_order ?? 9999;
+        const bo = trackSettings[b.id]?.sort_order ?? 9999;
+        return ao !== bo ? ao - bo : b.id - a.id;
+      });
     visibleTracks.forEach((track, i) => {
       const a = document.createElement('a');
       a.className = 'track-card';
@@ -280,6 +345,40 @@
   }
 
   loadAndRender();
+
+  // ===================== 리스닝/스피킹 대분류 탭 =====================
+  function switchTop(which) {
+    document.getElementById('toptab-listening').classList.toggle('active', which === 'listening');
+    document.getElementById('toptab-speaking').classList.toggle('active', which === 'speaking');
+    document.getElementById('panel-listening').classList.toggle('active', which === 'listening');
+    document.getElementById('panel-speaking').classList.toggle('active', which === 'speaking');
+  }
+
+  function renderSpeakingList() {
+    const list = document.getElementById('speakingList');
+    list.innerHTML = '';
+    const tests = (typeof SPEAKING_TESTS !== 'undefined' ? SPEAKING_TESTS : [])
+      .slice()
+      .sort((a, b) => b.id - a.id);
+    tests.forEach(t => {
+      const a = document.createElement('a');
+      a.className = 'track-card speaking-card';
+      a.href = `speaking.html?id=${t.id}`;
+      a.innerHTML = `
+        <div class="track-left">
+          <span class="track-num">${String(t.id).padStart(2,'0')}</span>
+          <span class="track-title">${t.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span class="track-count">${t.sentences.length} sentences</span>
+          <span class="track-arrow">→</span>
+        </div>
+      `;
+      list.appendChild(a);
+    });
+  }
+
+  renderSpeakingList();
 </script>
 
 <footer style="border-top:1px solid var(--border);background:var(--bg);padding:28px 24px;text-align:center;position:relative;z-index:1;"><div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;"><a href="terms.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">이용약관</a><span style="color:var(--border);">|</span><a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">개인정보 처리방침</a><span style="color:var(--border);">|</span>
