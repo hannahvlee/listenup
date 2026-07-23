@@ -84,5 +84,128 @@ const SPEAKING_TESTS = [
         file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-07.mp3"
       }
     ]
+  },
+  {
+    id: 3,
+    title: "Test 3",
+    sentences: [
+      {
+        id: "3-1",
+        text: "Is this your first time at our museum?",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-01.mp3"
+      },
+      {
+        id: "3-2",
+        text: "For modern art, visit the Eastern Wing.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-02.mp3"
+      },
+      {
+        id: "3-3",
+        text: "Classical paintings are located on the second floor.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-03.mp3"
+      },
+      {
+        id: "3-4",
+        text: "The new exhibit of self-portraits is very popular.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-04.mp3"
+      },
+      {
+        id: "3-5",
+        text: "We offer group tours of gallery highlights at no extra charge.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-05.mp3"
+      },
+      {
+        id: "3-6",
+        text: "Unfortunately, the sculpture hall is currently under renovation.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-06.mp3"
+      },
+      {
+        id: "3-7",
+        text: "Our gift shop is running a special promotion on a wide selection of books.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test3-07.mp3"
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: "Test 4",
+    sentences: [
+      {
+        id: "4-1",
+        text: "The ticket counter is over there.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-01.mp3"
+      },
+      {
+        id: "4-2",
+        text: "We have maps to help you find your way.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-02.mp3"
+      },
+      {
+        id: "4-3",
+        text: "It's a good idea to start at the Central Gallery.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-03.mp3"
+      },
+      {
+        id: "4-4",
+        text: "Or take a self-guided tour to explore our most famous items.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-04.mp3"
+      },
+      {
+        id: "4-5",
+        text: "Don't forget to budget extra time for our popular gift shop.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-05.mp3"
+      },
+      {
+        id: "4-6",
+        text: "This week is your last chance to see the special exhibit on photography.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-06.mp3"
+      },
+      {
+        id: "4-7",
+        text: "Check out our calendar of upcoming events, many of which are family-friendly.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test4-07.mp3"
+      }
+    ]
+  },
+  {
+    id: 5,
+    title: "Test 5",
+    sentences: [
+      {
+        id: "5-1",
+        text: "Welcome, let's check your reservations.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-01.mp3"
+      },
+      {
+        id: "5-2",
+        text: "You can choose your vehicle from this lot.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-02.mp3"
+      },
+      {
+        id: "5-3",
+        text: "The rental terms can be viewed at the contract signing desk.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-03.mp3"
+      },
+      {
+        id: "5-4",
+        text: "When you are ready, come over to the key pickup station.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-04.mp3"
+      },
+      {
+        id: "5-5",
+        text: "Over here is where rental cars are returned to the parking lot.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-05.mp3"
+      },
+      {
+        id: "5-6",
+        text: "Please be sure to make a full inspection before driving away from the building.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-06.mp3"
+      },
+      {
+        id: "5-7",
+        text: "When returning your rental, be sure to park it in the exact same location where you picked it up.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test5-07.mp3"
+      }
+    ]
   }
 ];
