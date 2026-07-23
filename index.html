@@ -190,6 +190,20 @@
 
   .speaking-card:hover { border-color: var(--accent); background: rgba(200,240,96,0.04); }
   .speaking-card:hover .track-arrow { color: var(--accent); }
+
+  .speaking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .speaking-grid .track-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 22px 22px;
+  }
+  .speaking-grid .track-left { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .speaking-grid .track-title { font-size: 17px; font-weight: 500; }
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDELTEL4XC"></script>
@@ -266,7 +280,7 @@
 
   <!-- ===================== 스피킹 패널 ===================== -->
   <div class="top-panel" id="panel-speaking">
-    <div class="track-list" id="speakingList" style="max-width:100%"></div>
+    <div class="track-list speaking-grid" id="speakingList" style="max-width:100%"></div>
   </div>
 </div>
 
@@ -359,7 +373,7 @@
     list.innerHTML = '';
     const tests = (typeof SPEAKING_TESTS !== 'undefined' ? SPEAKING_TESTS : [])
       .slice()
-      .sort((a, b) => b.id - a.id);
+      .sort((a, b) => a.id - b.id);
     tests.forEach(t => {
       const a = document.createElement('a');
       a.className = 'track-card speaking-card';
