@@ -43,5 +43,46 @@ const SPEAKING_TESTS = [
         file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test1-07.mp3"
       }
     ]
+  },
+  {
+    id: 2,
+    title: "Test 2",
+    sentences: [
+      {
+        id: "2-1",
+        text: "Welcome to our campus gym.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-01.mp3"
+      },
+      {
+        id: "2-2",
+        text: "Cardio machines are near the entrance.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-02.mp3"
+      },
+      {
+        id: "2-3",
+        text: "Free weights are in the back.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-03.mp3"
+      },
+      {
+        id: "2-4",
+        text: "All of our locker rooms are equipped with showers and towels.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-04.mp3"
+      },
+      {
+        id: "2-5",
+        text: "Our fitness instructors hold exercise classes over here.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-05.mp3"
+      },
+      {
+        id: "2-6",
+        text: "You can check the schedule for available classes and timings.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-06.mp3"
+      },
+      {
+        id: "2-7",
+        text: "If you have any questions, please seek assistance from the attendants at the Help Desk.",
+        file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/speaking-audio/Test2-07.mp3"
+      }
+    ]
   }
 ];
