@@ -191,19 +191,19 @@
   .speaking-card:hover { border-color: var(--accent); background: rgba(200,240,96,0.04); }
   .speaking-card:hover .track-arrow { color: var(--accent); }
 
-  .speaking-grid {
-    display: grid;
+  #speakingList {
+    display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 12px;
   }
-  .speaking-grid .track-card {
+  #speakingList .track-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
     padding: 22px 22px;
   }
-  .speaking-grid .track-left { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .speaking-grid .track-title { font-size: 17px; font-weight: 500; }
+  #speakingList .track-left { flex-direction: column; align-items: flex-start; gap: 6px; }
+  #speakingList .track-title { font-size: 17px; font-weight: 500; }
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDELTEL4XC"></script>
