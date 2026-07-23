@@ -48,6 +48,7 @@
   .mode-listening { background: rgba(96,200,240,0.1); color: var(--accent2); border: 1px solid rgba(96,200,240,0.2); }
   .mode-dictation { background: rgba(180,96,240,0.1); color: #c060f0; border: 1px solid rgba(180,96,240,0.2); }
   .mode-vocab { background: rgba(240,150,60,0.1); color: #f09640; border: 1px solid rgba(240,150,60,0.2); }
+  .mode-speaking { background: rgba(240,96,180,0.1); color: #f060b4; border: 1px solid rgba(240,96,180,0.2); }
   .td-score { font-family: 'DM Mono', monospace; font-weight: 500; }
   .score-great { color: var(--success); }
   .score-ok { color: var(--warn); }
@@ -79,6 +80,25 @@
   .btn-modal-save:hover { background: #d4f570; }
   .btn-modal-cancel { width: 100%; padding: 10px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; margin-top: 8px; }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* 기록 상세보기 모달 */
+  tbody tr.clickable { cursor: pointer; }
+  .detail-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; padding: 24px; }
+  .detail-modal-overlay.show { opacity: 1; pointer-events: all; }
+  .detail-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 80vh; overflow-y: auto; }
+  .detail-modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .detail-modal-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .detail-modal-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .detail-close { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+  .detail-close:hover { color: var(--text); }
+  .detail-sentence { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .detail-sentence:last-child { margin-bottom: 0; }
+  .detail-sentence-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .detail-sentence-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); }
+  .detail-sentence-text { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 6px; }
+  .detail-sentence-said { font-size: 12px; color: var(--text-muted); font-style: italic; }
+  .detail-sentence-score { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .detail-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -186,6 +206,7 @@
       <option value="쉐도잉">쉐도잉</option>
       <option value="딕테이션">딕테이션</option>
       <option value="어휘테스트">어휘테스트</option>
+      <option value="리슨앤리핏">리슨앤리핏</option>
     </select>
     <select class="filter-select" id="trackFilter" onchange="renderTable()">
       <option value="">전체 트랙</option>
@@ -266,6 +287,20 @@
   <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">© 2026 ListenUp. All Rights Reserved.</span>
 </footer>
 
+<!-- 기록 상세보기 모달 -->
+<div class="detail-modal-overlay" id="detailModalOverlay">
+  <div class="detail-modal">
+    <div class="detail-modal-header">
+      <div>
+        <div class="detail-modal-title" id="detailModalTitle">-</div>
+        <div class="detail-modal-sub" id="detailModalSub">-</div>
+      </div>
+      <button class="detail-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div id="detailModalBody"></div>
+  </div>
+</div>
+
 <script>
   const _supabase = supabase.createClient(
     'https://wccuzwkswtaehcdijtcf.supabase.co',
@@ -315,7 +350,9 @@
     filtered.forEach(r => {
       const tr = document.createElement('tr');
       const scoreClass = r.score >= 80 ? 'score-great' : r.score >= 60 ? 'score-ok' : 'score-poor';
-      const modeClass = r.mode === '쉐도잉' ? 'mode-shadowing' : r.mode === '청취테스트' ? 'mode-listening' : r.mode === '어휘테스트' ? 'mode-vocab' : 'mode-dictation';
+      const modeClass = r.mode === '쉐도잉' ? 'mode-shadowing' : r.mode === '청취테스트' ? 'mode-listening' : r.mode === '어휘테스트' ? 'mode-vocab' : r.mode === '리슨앤리핏' ? 'mode-speaking' : 'mode-dictation';
+      const hasDetails = Array.isArray(r.details) && r.details.length > 0;
+      if (hasDetails) tr.classList.add('clickable');
       tr.innerHTML = `
         <td class="td-track">${r.track}</td>
         <td><span class="mode-badge ${modeClass}">${r.mode}</span></td>
@@ -323,6 +360,7 @@
         <td style="font-size:12px;color:var(--text-muted);">${r.textVisible === true ? '👁 표시' : r.textVisible === false ? '🙈 숨김' : '-'}</td>
         <td class="td-score ${scoreClass}">${r.score != null ? r.score + '점' : '-'}</td>
         <td class="td-date">${formatDate(r.date)}</td>`;
+      if (hasDetails) tr.addEventListener('click', () => openDetailModal(r));
       tbody.appendChild(tr);
     });
   }
@@ -375,6 +413,49 @@
       document.getElementById('loading').textContent = '기록을 불러올 수 없어요.';
     }
   }
+
+  // 기록 상세보기 모달
+  function openDetailModal(r) {
+    document.getElementById('detailModalTitle').textContent = r.track;
+    document.getElementById('detailModalSub').textContent = `${r.mode} · ${formatDate(r.date)}`;
+
+    const body = document.getElementById('detailModalBody');
+    body.innerHTML = '';
+
+    const details = Array.isArray(r.details) ? r.details : [];
+    if (details.length === 0) {
+      body.innerHTML = '<div class="detail-empty">문장별 기록이 없어요</div>';
+    } else {
+      const isSpeaking = r.mode === '리슨앤리핏';
+      details.forEach((d, i) => {
+        const div = document.createElement('div');
+        div.className = 'detail-sentence';
+        const scoreText = d.score == null ? '—' : (isSpeaking ? d.score.toFixed(2) : d.score + '%');
+        const scoreColor = d.score == null ? 'var(--text-dim)' : (isSpeaking
+          ? (d.score >= 4.5 ? 'var(--success)' : d.score >= 2.5 ? 'var(--warn)' : 'var(--danger)')
+          : (d.score >= 80 ? 'var(--success)' : d.score >= 60 ? 'var(--warn)' : 'var(--danger)'));
+        div.innerHTML = `
+          <div class="detail-sentence-top">
+            <span class="detail-sentence-num">${String(i+1).padStart(2,'0')}</span>
+            <span class="detail-sentence-score" style="color:${scoreColor}">${scoreText}</span>
+          </div>
+          <div class="detail-sentence-text">${d.text || ''}</div>
+          ${d.userSaid ? `<div class="detail-sentence-said">"${d.userSaid}"</div>` : ''}
+        `;
+        body.appendChild(div);
+      });
+    }
+
+    document.getElementById('detailModalOverlay').classList.add('show');
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detailModalOverlay').classList.remove('show');
+  }
+
+  document.getElementById('detailModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeDetailModal();
+  });
 
   // 토플
   let toeflCurrentType = null, toeflEditingId = null, toeflMockRecords = [], toeflActualRecords = [], toeflUserId = null;
