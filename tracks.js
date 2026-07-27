@@ -970,7 +970,7 @@ const TRACKS = [
   {
     id: 28,
     title: "Test 7 Module 1 (01) - Cognitive Biases",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Cognitive Biases.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/TEST 7 Module 1 (01) - Cognitive Biases.mp3",
     sentences: [
       { start: 4.00, end: 10.91, text: "Today, we'll discuss the psychology of decision-making, focusing on the concept of cognitive biases." },
       { start: 10.91, end: 16.74, text: "Cognitive biases are patterns of irrational thinking, and they often affect the decisions we make every day." },
@@ -1019,7 +1019,7 @@ const TRACKS = [
   {
     id: 29,
     title: "Test 7 Module 1 (02) - Social Capital",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/7_1_Social Capiatal.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/TEST 7 Module 1 (02) - Social Capital.mp3",
     sentences: [
       { start: 5.50, end: 11.30, text: "Social capital is the network of relationships among people who live and work in a particular society." },
       { start: 11.30, end: 14.53, text: "These networks enable society to function effectively." },
