@@ -1568,7 +1568,7 @@ const TRACKS = [
   {
     id: 30,
     title: "Test 7 Module 2-1 (01) - Bioluminescence",
-    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 7 Module 2-1 (01) - Bioluminescence.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 7 Module 2-1 (01) Bioluminescence.mp3",
     sentences: [
       { start: 6.00, end: 10.64, text: "Today, we're discussing the fascinating phenomenon of bioluminescence," },
       { start: 10.64, end: 13.93, text: "the ability of certain organisms to produce light." },
@@ -1604,6 +1604,52 @@ const TRACKS = [
       { type: "phrase", en: "in addition to", ko: "~에 더하여" },
       { type: "phrase", en: "not only A but also B", ko: "A뿐만 아니라 B도" },
       { type: "phrase", en: "open doors to", ko: "~로 가는 문을 열다" },
+    ]
+  }
+,
+  {
+    id: 31,
+    title: "Test 7 Module 2-1 (02) - Existentialism",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 7 Module 2-1 (02) - Existentialism.mp3",
+    sentences: [
+      { start: 5.00, end: 8.25, text: "Today we'll explore the concept of existentialism," },
+      { start: 8.25, end: 14.09, text: "a philosophical movement that emphasises individual freedom, choice, and existence." },
+      { start: 14.09, end: 18.44, text: "Existentialism gained prominence in the 20th century" },
+      { start: 18.44, end: 23.60, text: "through thinkers such as Jean-Paul Sartre, Simone de Beauvoir, and Albert Camus." },
+      { start: 23.60, end: 31.52, text: "The core idea of existentialism is that humans are not defined by pre-existing categories or essential characteristics." },
+      { start: 31.52, end: 36.07, text: "Instead, we exist first and then define ourselves through our actions and choices." },
+      { start: 36.07, end: 42.67, text: "This notion is encapsulated in Sartre's famous phrase, existence precedes essence." },
+      { start: 42.67, end: 48.63, text: "Existentialists argue that each person is responsible for creating their own meaning in life" },
+      { start: 48.63, end: 53.40, text: "rather than finding it through external sources like religion or societal norms." },
+      { start: 53.40, end: 57.82, text: "This can lead to feelings of anxiety or existential angst" },
+      { start: 57.82, end: 62.04, text: "as individuals confront the freedom and burden of shaping their own lives." },
+      { start: 62.04, end: 66.76, text: "For instance, Sartre spoke extensively about the concept of bad faith," },
+      { start: 66.76, end: 71.06, text: "where individuals deceive themselves to escape the anxiety of freedom" },
+      { start: 71.06, end: 75.77, text: "by conforming to societal expectations or denying their own potential." },
+      { start: 75.77, end: 81.67, text: "Existentialism also addresses themes of authenticity and alienation." },
+      { start: 81.67, end: 87.83, text: "Authenticity involves embracing one's freedom and making choices that reflect one's true self," },
+      { start: 87.83, end: 93.49, text: "while alienation refers to the disconnection from one's true self or others in society." },
+      { start: 93.49, end: 101.22, text: "Although existentialism may seem abstract, its ideas have influenced literature, psychology, and even politics," },
+      { start: 101.22, end: 107.00, text: "offering profound insights into the human condition and the complexities of modern life." },
+    ],
+    vocab: [
+      { type: "word", en: "existentialism", ko: "실존주의" },
+      { type: "word", en: "prominence", ko: "두각, 저명함" },
+      { type: "word", en: "encapsulate", ko: "압축하다, 요약하다" },
+      { type: "word", en: "essence", ko: "본질" },
+      { type: "word", en: "angst", ko: "불안, 실존적 고뇌" },
+      { type: "word", en: "confront", ko: "직면하다" },
+      { type: "word", en: "bad faith", ko: "자기기만 (사르트르 철학 용어)" },
+      { type: "word", en: "deceive", ko: "속이다, 기만하다" },
+      { type: "word", en: "conform", ko: "따르다, 순응하다" },
+      { type: "word", en: "authenticity", ko: "진정성" },
+      { type: "word", en: "alienation", ko: "소외" },
+      { type: "word", en: "disconnection", ko: "단절" },
+      { type: "phrase", en: "existence precedes essence", ko: "실존은 본질에 앞선다" },
+      { type: "phrase", en: "be responsible for", ko: "~에 대한 책임이 있다" },
+      { type: "phrase", en: "rather than", ko: "~보다는" },
+      { type: "phrase", en: "lead to", ko: "~로 이어지다" },
+      { type: "phrase", en: "human condition", ko: "인간의 조건" },
     ]
   }
 ];
