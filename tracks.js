@@ -1564,4 +1564,46 @@ const TRACKS = [
       { type: "phrase", en: "faster than expected", ko: "예상보다 빠르게" },
     ]
   }
+,
+  {
+    id: 30,
+    title: "Test 7 Module 2-1 (01) - Bioluminescence",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 7 Module 2-1 (01) - Bioluminescence.mp3",
+    sentences: [
+      { start: 6.00, end: 10.64, text: "Today, we're discussing the fascinating phenomenon of bioluminescence," },
+      { start: 10.64, end: 13.93, text: "the ability of certain organisms to produce light." },
+      { start: 13.93, end: 21.55, text: "This trait is found across a variety of species, including bacteria, fungi, and animals like jellyfish and fireflies." },
+      { start: 21.55, end: 24.96, text: "Bioluminescence occurs through a chemical reaction" },
+      { start: 24.96, end: 29.96, text: "that involves the enzyme luciferase, which interacts with a molecule called luciferin." },
+      { start: 29.96, end: 34.17, text: "When oxygen is introduced into this reaction, light is produced." },
+      { start: 34.17, end: 38.39, text: "This light can serve multiple purposes, depending on the organism." },
+      { start: 38.39, end: 45.38, text: "For instance, deep-sea fish use bioluminescence to attract prey or communicate with potential mates in the dark ocean depths." },
+      { start: 45.38, end: 50.40, text: "Fireflies, on the other hand, use their glow primarily for mating signals." },
+      { start: 50.40, end: 55.04, text: "Interestingly, the color of bioluminescent light can vary between species." },
+      { start: 55.04, end: 58.69, text: "Some emit blue, while others glow green or even red." },
+      { start: 58.69, end: 67.25, text: "Researchers have found that the specific wavelengths of light produced can be crucial for the organism's survival and interaction within its environment." },
+      { start: 67.25, end: 74.77, text: "In addition to biological functions, bioluminescence has attracted scientific interest for its potential applications." },
+      { start: 74.77, end: 81.61, text: "Medical researchers, for example, are exploring ways to use bioluminescent markers and imaging techniques;" },
+      { start: 81.61, end: 87.68, text: "this could one day help in tracking processes like the spread of cancer cells or the effectiveness of a drug." },
+      { start: 87.68, end: 95.50, text: "The study of bioluminescence not only illuminates the wonders of nature but also opens doors to innovative scientific advancements." },
+    ],
+    vocab: [
+      { type: "word", en: "bioluminescence", ko: "생물 발광" },
+      { type: "word", en: "organism", ko: "생물, 유기체" },
+      { type: "word", en: "enzyme", ko: "효소" },
+      { type: "word", en: "luciferase", ko: "루시퍼라제 (발광 효소)" },
+      { type: "word", en: "luciferin", ko: "루시페린 (발광 물질)" },
+      { type: "word", en: "wavelength", ko: "파장" },
+      { type: "word", en: "prey", ko: "먹이" },
+      { type: "word", en: "primarily", ko: "주로" },
+      { type: "word", en: "marker", ko: "표지자, 마커" },
+      { type: "word", en: "illuminate", ko: "밝히다, 조명하다" },
+      { type: "word", en: "advancement", ko: "발전, 진보" },
+      { type: "phrase", en: "a variety of", ko: "다양한" },
+      { type: "phrase", en: "on the other hand", ko: "반면에" },
+      { type: "phrase", en: "in addition to", ko: "~에 더하여" },
+      { type: "phrase", en: "not only A but also B", ko: "A뿐만 아니라 B도" },
+      { type: "phrase", en: "open doors to", ko: "~로 가는 문을 열다" },
+    ]
+  }
 ];
