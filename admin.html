@@ -56,6 +56,7 @@
   .mode-listening { background: rgba(96,200,240,0.1); color: var(--accent2); border: 1px solid rgba(96,200,240,0.2); }
   .mode-dictation { background: rgba(180,96,240,0.1); color: #c060f0; border: 1px solid rgba(180,96,240,0.2); }
   .mode-vocab { background: rgba(240,150,60,0.1); color: #f09640; border: 1px solid rgba(240,150,60,0.2); }
+  .mode-speaking { background: rgba(240,96,180,0.1); color: #f060b4; border: 1px solid rgba(240,96,180,0.2); }
   .score-great { color: var(--success); font-family: 'DM Mono', monospace; }
   .score-ok { color: var(--warn); font-family: 'DM Mono', monospace; }
   .score-poor { color: var(--danger); font-family: 'DM Mono', monospace; }
@@ -99,7 +100,8 @@
     <button class="tab" onclick="showTab('users')">👥 유저 관리</button>
     <button class="tab" onclick="showTab('newusers')">🆕 신규 유저</button>
     <button class="tab" onclick="showTab('toefl')">🏆 토플 기록</button>
-    <button class="tab" onclick="showTab('records')">📋 학습 기록</button>
+    <button class="tab" onclick="showTab('records')">📋 학습기록(LC)</button>
+    <button class="tab" onclick="showTab('records-sp')">🗣️ 학습기록(SP)</button>
     <button class="tab" onclick="showTab('tracks')">🎵 트랙 관리</button>
     <button class="tab" onclick="showTab('feedback')">💬 피드백</button>
   </div>
@@ -260,6 +262,45 @@
     </div>
   </div>
 
+  <!-- 학습 기록(SP) 탭 -->
+  <div id="tab-records-sp" style="display:none;">
+    <div class="filter-row">
+      <input type="text" class="filter-input" id="nameFilterSP" placeholder="이름 검색..." oninput="renderRecordsSP()">
+      <select class="filter-select" id="classFilterSP" onchange="renderRecordsSP()">
+        <option value="">전체 반</option>
+        <option value="완초1">완초1</option>
+        <option value="완초2">완초2</option>
+        <option value="인터">인터</option>
+        <option value="케이">케이</option>
+        <option value="주니어 U">주니어 U</option>
+        <option value="주니어 S">주니어 S</option>
+        <option value="주니어 H">주니어 H</option>
+        <option value="주니어 E">주니어 E</option>
+      <option value="주니어 문제풀이">주니어 문제풀이</option>
+      </select>
+      <select class="filter-select" id="trackFilterSP" onchange="renderRecordsSP()">
+        <option value="">전체 Test</option>
+      </select>
+      <span class="record-count" id="recordCountSP"></span>
+    </div>
+    <div class="table-wrap">
+      <div class="loading" id="recordsLoadingSP">불러오는 중...</div>
+      <table id="recordsTableSP" style="display:none;">
+        <thead><tr>
+          <th style="width:120px">이름</th>
+          <th style="width:80px">반</th>
+          <th style="width:180px">Test</th>
+          <th style="width:90px">모드</th>
+          <th style="width:80px">완료</th>
+          <th style="width:90px">평균 점수</th>
+          <th style="width:120px">날짜</th>
+        </tr></thead>
+        <tbody id="recordsBodySP"></tbody>
+      </table>
+      <div class="empty" id="recordsEmptySP" style="display:none;">기록이 없어요</div>
+    </div>
+  </div>
+
   <!-- 토플 기록 탭 -->
   <div id="tab-toefl" style="display:none;">
     <div class="filter-row">
@@ -381,16 +422,16 @@ let toeflLoaded = false;
 let feedbackLoaded = false;
 
 function showTab(name) {
-  ['stats','users','newusers','toefl','records','tracks','feedback'].forEach(t => {
+  ['stats','users','newusers','toefl','records','records-sp','tracks','feedback'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach((el, i) => {
-    el.classList.toggle('active', ['stats','users','newusers','toefl','records','tracks','feedback'][i] === name);
+    el.classList.toggle('active', ['stats','users','newusers','toefl','records','records-sp','tracks','feedback'][i] === name);
   });
   location.hash = name;
 
   // 탭 클릭 시 필요한 데이터만 로드
-  if ((name === 'records' || name === 'stats') && !recordsLoaded) {
+  if ((name === 'records' || name === 'records-sp' || name === 'stats') && !recordsLoaded) {
     recordsLoaded = true;
     loadRecords();
   }
@@ -413,15 +454,28 @@ async function loadRecords() {
     const res = await fetch('/api/records');
     const data = await res.json();
     allRecords = data.records || [];
-    const tracks = [...new Set(allRecords.map(r => r.track))];
+
+    const lcRecords = allRecords.filter(r => r.mode !== '리슨앤리핏');
+    const spRecords = allRecords.filter(r => r.mode === '리슨앤리핏');
+
+    const lcTracks = [...new Set(lcRecords.map(r => r.track))];
     const tf = document.getElementById('trackFilter');
-    tracks.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; tf.appendChild(o); });
+    lcTracks.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; tf.appendChild(o); });
+
+    const spTracks = [...new Set(spRecords.map(r => r.track))];
+    const tfSP = document.getElementById('trackFilterSP');
+    spTracks.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; tfSP.appendChild(o); });
+
     document.getElementById('recordsLoading').style.display = 'none';
     document.getElementById('recordsTable').style.display = 'table';
+    document.getElementById('recordsLoadingSP').style.display = 'none';
+    document.getElementById('recordsTableSP').style.display = 'table';
     renderRecords();
+    renderRecordsSP();
     renderStats();
   } catch(e) {
     document.getElementById('recordsLoading').textContent = '불러오기 실패';
+    document.getElementById('recordsLoadingSP').textContent = '불러오기 실패';
   }
 }
 
@@ -695,6 +749,7 @@ function renderRecords() {
   const modeQ = document.getElementById('modeFilter').value;
   const trackQ = document.getElementById('trackFilter').value;
   const filtered = allRecords.filter(r => {
+    if (r.mode === '리슨앤리핏') return false; // SP 탭에서 따로 보여줌
     const profile = allUsers.find(u => (r.email && u.email === r.email) || u.name === r.name) || {};
     return (!nameQ || r.name.toLowerCase().includes(nameQ) || (profile.name||'').toLowerCase().includes(nameQ)) &&
       (!classQ || profile.class === classQ) &&
@@ -735,6 +790,54 @@ function renderRecords() {
     tbody.appendChild(tr);
   });
 }
+
+function renderRecordsSP() {
+  const nameQ = document.getElementById('nameFilterSP').value.toLowerCase();
+  const classQ = document.getElementById('classFilterSP').value;
+  const trackQ = document.getElementById('trackFilterSP').value;
+  const filtered = allRecords.filter(r => {
+    if (r.mode !== '리슨앤리핏') return false;
+    const profile = allUsers.find(u => (r.email && u.email === r.email) || u.name === r.name) || {};
+    return (!nameQ || r.name.toLowerCase().includes(nameQ) || (profile.name||'').toLowerCase().includes(nameQ)) &&
+      (!classQ || profile.class === classQ) &&
+      (!trackQ || r.track === trackQ);
+  });
+  document.getElementById('recordCountSP').textContent = `${filtered.length}개`;
+  const tbody = document.getElementById('recordsBodySP');
+  tbody.innerHTML = '';
+  if (!filtered.length) {
+    document.getElementById('recordsTableSP').style.display = 'none';
+    document.getElementById('recordsEmptySP').style.display = 'block';
+    return;
+  }
+  document.getElementById('recordsTableSP').style.display = 'table';
+  document.getElementById('recordsEmptySP').style.display = 'none';
+  filtered.forEach(r => {
+    const tr = document.createElement('tr');
+    const details = Array.isArray(r.details) ? r.details : [];
+    const validScores = details.filter(d => d.score != null).map(d => d.score);
+    const avg = validScores.length ? validScores.reduce((a,b) => a+b, 0) / validScores.length : null;
+    const sc = avg == null ? '' : avg >= 4.5 ? 'score-great' : avg >= 2.5 ? 'score-ok' : 'score-poor';
+    const profile = allUsers.find(u => (r.email && u.email === r.email) || u.name === r.name) || {};
+    const ghost = !profile.user_id ? ghostUsers.find(u => u.email && r.email && u.email === r.email) : null;
+    const targetUserId = profile.user_id || ghost?.user_id;
+    if (targetUserId) {
+      tr.style.cursor = 'pointer';
+      tr.onclick = () => window.location.href = `admin-user-detail.html?id=${targetUserId}`;
+    }
+    tr.innerHTML = `
+      <td id="name-${r.id}" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${targetUserId ? 'color:var(--accent2);' : ''}">${profile.name || r.name}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${profile.class || '-'}</td>
+      <td style="color:var(--text-muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.track}</td>
+      <td><span class="mode-badge mode-speaking">${r.mode}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);">${r.progress || '-'}</td>
+      <td class="${sc}" style="font-family:'DM Mono',monospace;">${avg != null ? avg.toFixed(2)+'/6' : '-'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);">${formatDate(r.date)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 
 function startEdit(id, currentName) {
   const cell = document.getElementById('name-' + id);
@@ -1079,7 +1182,7 @@ function showSaveNotice() {
 
 init().then(() => {
   const hash = location.hash.replace('#', '');
-  const valid = ['stats','users','newusers','toefl','records','tracks','feedback'];
+  const valid = ['stats','users','newusers','toefl','records','records-sp','tracks','feedback'];
   showTab(hash && valid.includes(hash) ? hash : 'stats');
 });
 </script>
