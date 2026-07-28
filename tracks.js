@@ -1698,4 +1698,47 @@ const TRACKS = [
       { type: "phrase", en: "stay competitive", ko: "경쟁력을 유지하다" },
     ]
   }
+,
+  {
+    id: 33,
+    title: "Test 8 Module 1 (02) - Cognitive Dissonance",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 8 Module 1 (02) - Cognitive Dissonance.mp3",
+    sentences: [
+      { start: 5.20, end: 8.93, text: "Cognitive dissonance refers to the mental discomfort" },
+      { start: 8.93, end: 15.59, text: "experienced when a person holds two or more contradictory beliefs, values, or attitudes simultaneously." },
+      { start: 15.59, end: 20.42, text: "This theory, developed by psychologist Leon Festinger in the 1950s," },
+      { start: 20.42, end: 23.84, text: "suggests that people are motivated to reduce this discomfort" },
+      { start: 23.84, end: 26.80, text: "by changing their attitudes, beliefs, or behaviors." },
+      { start: 26.80, end: 31.64, text: "For example, imagine someone who values health but smokes cigarettes." },
+      { start: 31.64, end: 38.77, text: "The conflict between their behavior - smoking - and their belief valuing health creates cognitive dissonance." },
+      { start: 38.77, end: 42.94, text: "To reduce this discomfort, they might decide to quit smoking" },
+      { start: 42.94, end: 47.55, text: "or rationalize their behavior by downplaying the health risks associated with smoking." },
+      { start: 47.55, end: 52.04, text: "Cognitive dissonance can also play a significant role in decision-making." },
+      { start: 52.04, end: 57.54, text: "When faced with a difficult choice, people often experience dissonance after making a decision," },
+      { start: 57.54, end: 60.53, text: "particularly if the chosen option has downsides." },
+      { start: 60.53, end: 62.64, text: "To alleviate this discomfort," },
+      { start: 62.64, end: 67.76, text: "they may seek out information that supports their choice and ignore information that contradicts it." },
+      { start: 67.76, end: 71.88, text: "Understanding cognitive dissonance is crucial for psychologists" },
+      { start: 71.88, end: 75.02, text: "because it explains various aspects of human behavior," },
+      { start: 75.02, end: 79.95, text: "including why people sometimes act in ways that contradict their stated beliefs and values." },
+      { start: 79.95, end: 87.55, text: "Next, we will discuss some experiments conducted to study cognitive dissonance and their implications for psychological research." },
+    ],
+    vocab: [
+      { type: "word", en: "cognitive dissonance", ko: "인지 부조화" },
+      { type: "word", en: "contradictory", ko: "모순적인" },
+      { type: "word", en: "simultaneously", ko: "동시에" },
+      { type: "word", en: "motivated", ko: "동기 부여된" },
+      { type: "word", en: "rationalize", ko: "합리화하다" },
+      { type: "word", en: "downplay", ko: "축소하다, 경시하다" },
+      { type: "word", en: "alleviate", ko: "완화하다" },
+      { type: "word", en: "contradict", ko: "모순되다, 반박하다" },
+      { type: "word", en: "implication", ko: "함의, 시사점" },
+      { type: "word", en: "downside", ko: "단점, 부정적인 면" },
+      { type: "phrase", en: "be motivated to", ko: "~하도록 동기 부여되다" },
+      { type: "phrase", en: "when faced with", ko: "~에 직면했을 때" },
+      { type: "phrase", en: "seek out", ko: "찾아내다" },
+      { type: "phrase", en: "play a significant role in", ko: "~에 중요한 역할을 하다" },
+      { type: "phrase", en: "associated with", ko: "~와 관련된" },
+    ]
+  }
 ];
