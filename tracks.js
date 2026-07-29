@@ -633,7 +633,7 @@ const TRACKS = [
   {
     id: 38,
     title: "Test 9 Module 2-1 (02) - Impressionism",
-    file: "https:/Test 9 Module 2-1 (02) - Impressionism.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 9 Module 2-1 (02) - Impressionism.mp3",
     sentences: [
       { start: 0.00, end: 5.21, text: "Impressionism is a painting style that began in France in the late 19th century." },
       { start: 5.21, end: 9.00, text: "It challenged traditional painting techniques and subject matter." },
@@ -690,7 +690,7 @@ const TRACKS = [
   {
     id: 37,
     title: "Test 9 Module 2-1 (01) - Social capital",
-    file: "https:/Test 9 Module 2-1 (01) - Social capital.mp3",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 9 Module 2-1 (01) - Social capital.mp3",
     sentences: [
       { start: 0.00, end: 3.50, text: "Social capital refers to the networks of relationships" },
       { start: 3.60, end: 7.30, text: "among people who live and work in a particular society." },
