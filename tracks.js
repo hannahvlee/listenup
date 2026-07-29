@@ -1783,4 +1783,43 @@ const TRACKS = [
       { type: "phrase", en: "no longer", ko: "더 이상 ~않다" },
     ]
   }
+,
+  {
+    id: 35,
+    title: "Test 8 Module 2-1 (02) - Magical Realism",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 8 Module 2-1 (02) - Magical Realism.mp3",
+    sentences: [
+      { start: 6.00, end: 13.72, text: "Magical realism is a style of fiction that combines realistic narrative with surreal elements of magic and fantasy." },
+      { start: 13.72, end: 22.09, text: "Unlike pure fantasy, magical realism is set in a realistic world, but extraordinary events occur without explanation," },
+      { start: 22.09, end: 24.68, text: "blending the ordinary with the extraordinary." },
+      { start: 24.68, end: 32.82, text: "One of the most famous examples of magical realism is Gabriel García Márquez's novel, One Hundred Years of Solitude." },
+      { start: 32.82, end: 39.85, text: "In this book, everyday life in the fictional town of Macondo is interwoven with fantastic occurrences," },
+      { start: 39.85, end: 43.64, text: "such as a character ascending to the heavens while hanging out laundry." },
+      { start: 43.64, end: 47.23, text: "These magical events are presented in a matter-of-fact manner," },
+      { start: 47.23, end: 51.15, text: "like this is the way things should be, and this is a hallmark of the genre." },
+      { start: 51.15, end: 56.15, text: "Magical realism often serves to highlight complex social and cultural issues," },
+      { start: 56.15, end: 61.01, text: "offering a unique way to explore themes like identity, history, and politics." },
+      { start: 61.01, end: 66.16, text: "The blending of reality and magic allows authors to delve into deeper truths" },
+      { start: 66.16, end: 68.73, text: "and challenge readers' perceptions of the world." },
+      { start: 68.73, end: 74.45, text: "Next, we will examine how magical realism has influenced other literary traditions" },
+      { start: 74.45, end: 77.00, text: "and its role in contemporary literature." },
+    ],
+    vocab: [
+      { type: "word", en: "magical realism", ko: "마술적 사실주의" },
+      { type: "word", en: "narrative", ko: "서사, 이야기" },
+      { type: "word", en: "surreal", ko: "초현실적인" },
+      { type: "word", en: "extraordinary", ko: "비범한, 특별한" },
+      { type: "word", en: "interwoven", ko: "뒤얽힌, 혼합된" },
+      { type: "word", en: "occurrence", ko: "사건, 발생" },
+      { type: "word", en: "ascend", ko: "올라가다, 승천하다" },
+      { type: "word", en: "hallmark", ko: "특징, 전형적인 표시" },
+      { type: "word", en: "genre", ko: "장르" },
+      { type: "word", en: "contemporary", ko: "현대의" },
+      { type: "phrase", en: "matter-of-fact", ko: "사실적인, 담담한" },
+      { type: "phrase", en: "serve to", ko: "~하는 역할을 하다" },
+      { type: "phrase", en: "delve into", ko: "깊이 파고들다" },
+      { type: "phrase", en: "blend A with B", ko: "A와 B를 혼합하다" },
+      { type: "phrase", en: "challenge perceptions", ko: "인식에 도전하다" },
+    ]
+  }
 ];
