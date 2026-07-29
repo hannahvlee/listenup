@@ -1741,4 +1741,46 @@ const TRACKS = [
       { type: "phrase", en: "associated with", ko: "~와 관련된" },
     ]
   }
+,
+  {
+    id: 34,
+    title: "Test 8 Module 2-1 (01) - Silk Road",
+    file: "https://wccuzwkswtaehcdijtcf.supabase.co/storage/v1/object/public/audio/Test 8 Module 2-1 (01) - Silk Road.mp3",
+    sentences: [
+      { start: 5.00, end: 11.65, text: "Today we'll examine the Silk Road, an ancient network of trade routes that connected the East and West." },
+      { start: 11.65, end: 16.30, text: "The Silk Road was not a single road, but a series of interconnected paths" },
+      { start: 16.30, end: 23.10, text: "that facilitated the exchange of goods, ideas, and cultures from China to the Mediterranean Sea." },
+      { start: 23.10, end: 27.61, text: "Originating in the Han Dynasty around the 2nd century B.C.E," },
+      { start: 27.61, end: 31.52, text: "the Silk Road was named after the lucrative trade in silk," },
+      { start: 31.52, end: 35.49, text: "which was one of the most sought-after commodities in the Western world." },
+      { start: 35.49, end: 38.75, text: "However, it wasn't just silk that was traded;" },
+      { start: 38.75, end: 46.58, text: "merchants carried spices, precious metals, textiles, and other valuable items across vast distances." },
+      { start: 46.58, end: 52.51, text: "The Silk Road also played a critical role in the transmission of knowledge and culture." },
+      { start: 52.51, end: 60.58, text: "It enabled the spread of technologies such as papermaking and gunpowder, as well as artistic and religious influences." },
+      { start: 60.58, end: 67.01, text: "For instance, Buddhism spread from India to China and other parts of Asia via the Silk Road." },
+      { start: 67.01, end: 70.68, text: "The decline of the Silk Road began in the 15th century" },
+      { start: 70.68, end: 75.03, text: "with the rise of maritime trade routes and the fall of the Mongol Empire," },
+      { start: 75.03, end: 78.54, text: "which had provided stability and security for the merchants." },
+      { start: 78.54, end: 83.40, text: "Although it no longer exists, the legacy of the Silk Road endures," },
+      { start: 83.40, end: 89.80, text: "highlighting the importance of cultural and economic exchanges in shaping human history." },
+    ],
+    vocab: [
+      { type: "word", en: "interconnected", ko: "상호 연결된" },
+      { type: "word", en: "facilitate", ko: "촉진하다, 용이하게 하다" },
+      { type: "word", en: "lucrative", ko: "수익성 높은, 돈이 되는" },
+      { type: "word", en: "commodity", ko: "상품, 물자" },
+      { type: "word", en: "textile", ko: "직물, 섬유" },
+      { type: "word", en: "vast", ko: "광대한, 방대한" },
+      { type: "word", en: "transmission", ko: "전파, 전달" },
+      { type: "word", en: "gunpowder", ko: "화약" },
+      { type: "word", en: "maritime", ko: "해양의, 해상의" },
+      { type: "word", en: "stability", ko: "안정성" },
+      { type: "word", en: "endure", ko: "지속되다, 견디다" },
+      { type: "phrase", en: "be named after", ko: "~의 이름을 따서 명명되다" },
+      { type: "phrase", en: "sought-after", ko: "인기 있는, 수요가 많은" },
+      { type: "phrase", en: "play a critical role in", ko: "~에 중요한 역할을 하다" },
+      { type: "phrase", en: "as well as", ko: "~뿐만 아니라" },
+      { type: "phrase", en: "no longer", ko: "더 이상 ~않다" },
+    ]
+  }
 ];
