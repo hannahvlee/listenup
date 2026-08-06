@@ -96,6 +96,15 @@
     gap: 12px;
   }
 
+  .track-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
   .track-card {
     display: flex;
     align-items: center;
@@ -277,7 +286,16 @@
     </div>
 
     <!-- Track list -->
-    <div class="track-list" id="trackList" style="max-width:100%"></div>
+    <div id="trackListWrap" style="max-width:100%">
+      <div class="track-section" id="section-new">
+        <div class="track-section-label">뉴토플</div>
+        <div class="track-list" id="trackList-new"></div>
+      </div>
+      <div class="track-section" id="section-old" style="margin-top:36px">
+        <div class="track-section-label">구토플</div>
+        <div class="track-list" id="trackList-old"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ===================== 스피킹 패널 ===================== -->
@@ -315,9 +333,43 @@
     renderTracks();
   }
 
+  // toefl_type 값을 'new' / 'old' / null(미설정,인식불가)로 정규화
+  function classifyToeflType(raw) {
+    if (!raw) return null;
+    const s = String(raw).trim();
+    const lower = s.toLowerCase();
+    if (lower.includes('new') || s.includes('뉴')) return 'new';
+    if (lower.includes('old') || s.includes('구')) return 'old';
+    return null;
+  }
+
+  function buildTrackCard(track) {
+    const a = document.createElement('a');
+    a.className = 'track-card';
+    const href = currentMode === 'shadowing' ? `player.html?id=${track.id}` :
+                 currentMode === 'listening' ? `listening.html?id=${track.id}` :
+                 currentMode === 'dictation' ? `dictation.html?id=${track.id}` :
+                 `vocab.html?id=${track.id}`;
+    a.href = href;
+    a.innerHTML = `
+      <div class="track-left">
+        <span class="track-num">${String(track.id).padStart(2, '0')}</span>
+        <span class="track-title">${track.title}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <span class="track-count">${track.sentences.length} sentences</span>
+        <span class="track-arrow">→</span>
+      </div>
+    `;
+    return a;
+  }
+
   function renderTracks() {
-    const trackList = document.getElementById('trackList');
-    trackList.innerHTML = '';
+    const listNewEl = document.getElementById('trackList-new');
+    const listOldEl = document.getElementById('trackList-old');
+    listNewEl.innerHTML = '';
+    listOldEl.innerHTML = '';
+
     const visibleTracks = TRACKS
       .filter(t => !hiddenTrackIds.includes(Number(t.id)))
       .sort((a, b) => {
@@ -325,26 +377,21 @@
         const bo = trackSettings[b.id]?.sort_order ?? 9999;
         return ao !== bo ? ao - bo : b.id - a.id;
       });
-    visibleTracks.forEach((track, i) => {
-      const a = document.createElement('a');
-      a.className = 'track-card';
-      const href = currentMode === 'shadowing' ? `player.html?id=${track.id}` :
-                   currentMode === 'listening' ? `listening.html?id=${track.id}` :
-                   currentMode === 'dictation' ? `dictation.html?id=${track.id}` :
-                   `vocab.html?id=${track.id}`;
-      a.href = href;
-      a.innerHTML = `
-        <div class="track-left">
-          <span class="track-num">${String(track.id).padStart(2, '0')}</span>
-          <span class="track-title">${track.title}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <span class="track-count">${track.sentences.length} sentences</span>
-          <span class="track-arrow">→</span>
-        </div>
-      `;
-      trackList.appendChild(a);
+
+    const newTracks = [];
+    const oldTracks = [];
+    visibleTracks.forEach(track => {
+      const type = classifyToeflType(trackSettings[track.id]?.toefl_type);
+      if (type === 'new') newTracks.push(track);
+      else if (type === 'old') oldTracks.push(track);
+      // toefl_type이 없거나 인식되지 않는 트랙은 두 섹션 모두에서 제외됨
     });
+
+    newTracks.forEach(track => listNewEl.appendChild(buildTrackCard(track)));
+    oldTracks.forEach(track => listOldEl.appendChild(buildTrackCard(track)));
+
+    document.getElementById('section-new').style.display = newTracks.length ? '' : 'none';
+    document.getElementById('section-old').style.display = oldTracks.length ? '' : 'none';
   }
 
   // 사용자 이름 표시
