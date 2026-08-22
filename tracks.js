@@ -2109,8 +2109,7 @@ const TRACKS = [
     sentences: [
       { start: 3.90, end: 8.42, text: "Today we'll be discussing an innovative but somewhat unorthodox marketing concept." },
       { start: 8.42, end: 11.03, text: "I'm talking about guerrilla marketing." },
-      { start: 11.03, end: 18.67, text: "In a nutshell, guerrilla marketing is an advertising strategy that focuses on low-cost, unconventional marketing tactics" },
-      { start: 18.67, end: 20.58, text: "that yield maximum results." },
+      { start: 11.03, end: 20.58, text: "In a nutshell, guerrilla marketing is an advertising strategy that focuses on low-cost, unconventional marketing tactics that yield maximum results." },
       { start: 20.58, end: 24.64, text: "It's been around for quite a while—since the 1980s, in fact." },
       { start: 24.64, end: 28.91, text: "Now, one of the key aspects of guerrilla marketing is creativity." },
       { start: 28.91, end: 35.34, text: "Unlike traditional marketing, which often requires large budgets for TV commercials or print ads," },
