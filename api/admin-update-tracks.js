@@ -14,12 +14,13 @@ export default async function handler(req, res) {
     'Content-Type': 'application/json'
   };
 
-  // GET: 숨긴 트랙 + 트랙 설정 조회
+  // GET: 숨긴 트랙 + 트랙 설정 조회 (?type=listening|speaking, 기본값 listening)
   if (req.method === 'GET') {
     try {
+      const type = (req.query && req.query.type) || 'listening';
       const [hiddenRes, settingsRes] = await Promise.all([
-        fetch(`${supabaseUrl}/rest/v1/hidden_tracks?select=track_id`, { headers }),
-        fetch(`${supabaseUrl}/rest/v1/track_settings?select=*`, { headers })
+        fetch(`${supabaseUrl}/rest/v1/hidden_tracks?select=track_id&track_type=eq.${type}`, { headers }),
+        fetch(`${supabaseUrl}/rest/v1/track_settings?select=*&track_type=eq.${type}`, { headers })
       ]);
       const hiddenData = await hiddenRes.json();
       const settingsData = await settingsRes.json();
@@ -34,7 +35,8 @@ export default async function handler(req, res) {
 
   // POST: 숨김 토글 or 트랙 설정 업데이트
   if (req.method === 'POST') {
-    const { action, trackId, hidden, toeflType, sortOrder } = req.body;
+    const { action, trackId, hidden, toeflType, sortOrder, trackType } = req.body;
+    const type = trackType || 'listening';
 
     // 숨김 토글
     if (action === 'toggle' || hidden !== undefined) {
@@ -44,10 +46,10 @@ export default async function handler(req, res) {
           await fetch(`${supabaseUrl}/rest/v1/hidden_tracks`, {
             method: 'POST',
             headers: { ...headers, 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ track_id: trackId })
+            body: JSON.stringify({ track_id: trackId, track_type: type })
           });
         } else {
-          await fetch(`${supabaseUrl}/rest/v1/hidden_tracks?track_id=eq.${trackId}`, {
+          await fetch(`${supabaseUrl}/rest/v1/hidden_tracks?track_id=eq.${trackId}&track_type=eq.${type}`, {
             method: 'DELETE', headers
           });
         }
@@ -64,19 +66,19 @@ export default async function handler(req, res) {
         const body = {};
         if (toeflType !== undefined) body.toefl_type = toeflType;
         if (sortOrder !== undefined) body.sort_order = sortOrder;
-        await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${trackId}`, {
+        await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${trackId}&track_type=eq.${type}`, {
           method: 'PATCH',
           headers: { ...headers, 'Prefer': 'return=minimal' },
           body: JSON.stringify(body)
         });
         // PATCH가 없으면 INSERT
-        const checkRes = await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${trackId}&select=track_id`, { headers });
+        const checkRes = await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${trackId}&track_type=eq.${type}&select=track_id`, { headers });
         const checkData = await checkRes.json();
         if (!checkData || checkData.length === 0) {
           await fetch(`${supabaseUrl}/rest/v1/track_settings`, {
             method: 'POST',
             headers: { ...headers, 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ track_id: trackId, ...body })
+            body: JSON.stringify({ track_id: trackId, track_type: type, ...body })
           });
         }
         return res.status(200).json({ success: true });
@@ -91,10 +93,10 @@ export default async function handler(req, res) {
       if (!orders) return res.status(400).json({ error: 'Missing orders' });
       try {
         await Promise.all(orders.map(async ({ trackId: tid, sortOrder: order }) => {
-          const checkRes = await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${tid}&select=track_id`, { headers });
+          const checkRes = await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${tid}&track_type=eq.${type}&select=track_id`, { headers });
           const checkData = await checkRes.json();
           if (checkData && checkData.length > 0) {
-            await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${tid}`, {
+            await fetch(`${supabaseUrl}/rest/v1/track_settings?track_id=eq.${tid}&track_type=eq.${type}`, {
               method: 'PATCH',
               headers: { ...headers, 'Prefer': 'return=minimal' },
               body: JSON.stringify({ sort_order: order })
@@ -103,7 +105,7 @@ export default async function handler(req, res) {
             await fetch(`${supabaseUrl}/rest/v1/track_settings`, {
               method: 'POST',
               headers: { ...headers, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({ track_id: tid, sort_order: order })
+              body: JSON.stringify({ track_id: tid, track_type: type, sort_order: order })
             });
           }
         }));
