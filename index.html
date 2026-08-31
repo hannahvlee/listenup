@@ -417,10 +417,24 @@
     document.getElementById('panel-speaking').classList.toggle('active', which === 'speaking');
   }
 
+  let hiddenSpeakingTrackIds = [];
+
+  async function loadSpeakingList() {
+    try {
+      const r = await fetch('/api/admin-update-tracks?type=speaking');
+      const data = await r.json();
+      hiddenSpeakingTrackIds = data.hiddenTracks || [];
+    } catch(e) {
+      hiddenSpeakingTrackIds = [];
+    }
+    renderSpeakingList();
+  }
+
   function renderSpeakingList() {
     const list = document.getElementById('speakingList');
     list.innerHTML = '';
     const tests = (typeof SPEAKING_TESTS !== 'undefined' ? SPEAKING_TESTS : [])
+      .filter(t => !hiddenSpeakingTrackIds.includes(Number(t.id)))
       .slice()
       .sort((a, b) => a.id - b.id);
     tests.forEach(t => {
@@ -441,7 +455,7 @@
     });
   }
 
-  renderSpeakingList();
+  loadSpeakingList();
 </script>
 
 <footer style="border-top:1px solid var(--border);background:var(--bg);padding:28px 24px;text-align:center;position:relative;z-index:1;"><div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;"><a href="terms.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">이용약관</a><span style="color:var(--border);">|</span><a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">개인정보 처리방침</a><span style="color:var(--border);">|</span>
