@@ -164,6 +164,39 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+  /* 접속 암호 게이트 */
+  #accessGate {
+    position: fixed; inset: 0; z-index: 999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #accessGate .gate-box { width: 320px; max-width: 88vw; text-align: center; }
+  #accessGate .gate-logo {
+    font-family: 'DM Mono', monospace; font-size: 15px; color: var(--accent2);
+    letter-spacing: 0.18em; font-weight: 700; margin-bottom: 28px;
+  }
+  #accessGate input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 13px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    text-align: center; outline: none; letter-spacing: 0.1em; transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  #accessGate input:focus { border-color: var(--accent); }
+  #accessGate input.shake { border-color: #f06060; animation: gateShake 0.3s; }
+  @keyframes gateShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  #accessGate button {
+    width: 100%; margin-top: 10px; padding: 13px; border-radius: 10px; border: none;
+    background: var(--accent); color: #0e0e0e; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  #accessGate .gate-error {
+    margin-top: 12px; font-size: 12px; color: #f06060; display: none;
+  }
+
   /* Top-level 리스닝/스피킹 tabs */
   .top-tabs {
     display: flex;
@@ -226,6 +259,46 @@
 </script>
 </head>
 <body>
+<div id="accessGate">
+  <div class="gate-box">
+    <div class="gate-logo">🎧 ListenUp!</div>
+    <input type="password" id="gateInput" placeholder="암호를 입력하세요" autocomplete="off" inputmode="numeric">
+    <button onclick="checkGate()">입장</button>
+    <div class="gate-error" id="gateError">암호가 올바르지 않아요</div>
+  </div>
+</div>
+<script>
+  (function() {
+    const GATE_KEY = 'lu_access_ok';
+    const GATE_PASSWORD = '1202';
+    if (localStorage.getItem(GATE_KEY) === '1') {
+      document.getElementById('accessGate') && (document.getElementById('accessGate').style.display = 'none');
+    }
+    window.checkGate = function() {
+      const input = document.getElementById('gateInput');
+      const err = document.getElementById('gateError');
+      if (input.value.trim() === GATE_PASSWORD) {
+        localStorage.setItem(GATE_KEY, '1');
+        document.getElementById('accessGate').style.display = 'none';
+      } else {
+        err.style.display = 'block';
+        input.classList.remove('shake');
+        void input.offsetWidth;
+        input.classList.add('shake');
+        input.value = '';
+        input.focus();
+      }
+    };
+    window.addEventListener('DOMContentLoaded', function() {
+      const input = document.getElementById('gateInput');
+      if (input) {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') checkGate();
+        });
+      }
+    });
+  })();
+</script>
 <div class="container">
   <header>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)">
